@@ -1,4 +1,5 @@
 import time
+import os
 import json
 import base64
 
@@ -8,18 +9,18 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
+# from selenium.webdriver.chrome.service import Service
 
 from bs4 import BeautifulSoup
 
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 
 from webscraper import sentiment
 
 
 class Webscraper:
     def __init__(self):
-        service = Service(ChromeDriverManager().install())
+        # service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
         ua = UserAgent()
@@ -30,8 +31,11 @@ class Webscraper:
 
         # set chrome options
         options = webdriver.ChromeOptions()
+        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-blink-features=AutomationControlled')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-sh-usage')
         options.add_argument('--disable-extensions')
         options.add_argument('--disable-logging')
         options.add_argument('disable-infobars')
@@ -41,10 +45,10 @@ class Webscraper:
         options.add_experimental_option('excludeSwitches', ['enable-automation'])
         options.add_experimental_option('useAutomationExtension', False)
 
-        # options.headless = True
+        options.headless = True
 
         # set webdriver
-        self.driver = webdriver.Chrome(options=options, service=service)
+        self.driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'), chrome_options=options)
         self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')
