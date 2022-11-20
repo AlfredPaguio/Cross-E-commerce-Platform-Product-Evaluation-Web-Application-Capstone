@@ -1,5 +1,5 @@
 import time
-import os
+# import os
 import json
 import base64
 
@@ -31,7 +31,7 @@ class Webscraper:
 
         # set chrome options
         options = webdriver.ChromeOptions()
-        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
         # options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--no-sandbox')
