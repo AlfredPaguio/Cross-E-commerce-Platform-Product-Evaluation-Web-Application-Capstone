@@ -6,21 +6,21 @@ import base64
 # from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+# from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-# from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service
 
 from bs4 import BeautifulSoup
 
-# from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 
 from webscraper import sentiment
 
 
 class Webscraper:
     def __init__(self):
-        # service = Service(ChromeDriverManager().install())
+        service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
         #
@@ -47,7 +47,7 @@ class Webscraper:
         options.headless = True
 
         # set webdriver
-        self.driver = webdriver.Chrome(executable_path=os.environ.get('CHROMEDRIVER_PATH'), chrome_options=options)
+        self.driver = webdriver.Chrome(options=options, service=service)
         self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')
