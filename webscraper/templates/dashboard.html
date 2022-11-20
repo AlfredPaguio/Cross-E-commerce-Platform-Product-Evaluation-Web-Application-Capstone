@@ -1,0 +1,267 @@
+{% extends 'base.html'%}
+{% block title %}
+Dashboard Page
+{% endblock %}
+{{ super() }}
+{% block content %}
+<div class="container-fluid">
+   <div class="row">
+      <!-- Data Visualization, Search Bar, Product View and Reccomendation -->
+      <div class="col-9">
+         <!-- Data Visualization -->
+         <div class="border rounded row mx-auto mt-4 p-3">
+            <div class="row col-12">
+               <!-- Shopee -->
+               <div class="col">
+                  <h5 class="mb-3">Shopee's Top 5 Searches</h5>
+                  {% for sdf in shopee_dataframe[:5] %}
+                  <div class="row">
+                     <div class="col-4 nav-item">
+                        <a href="{{ sdf.category_link }}" class="d-inline-block text-truncate" style="max-width: 150px; color:white;" target="_blank">{{ sdf.category }}</a>
+                     </div>
+                     <div class="col-8">
+                        <div class="progress mb-3" style="height: 30px;">
+                           <div class="progress-bar" role="progressbar" style="width: {{ sdf.percentage }}%" aria-valuenow="{{ sdf.size }}" aria-valuemin="0" aria-valuemax="100">{{ sdf.size }}</div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </div>
+               <!-- Lazada -->
+               <div class="col">
+                  <h5  class="mb-3">Lazada's Top 5 Searches</h5>
+                  {% for ldf in lazada_dataframe[:5] %}
+                  <div class="row">
+                     <div class="col-4 nav-item">
+                        <a href="{{ ldf.category_link }}" class="d-inline-block text-truncate" style="max-width: 150px; color:white;" target="_blank">{{ ldf.category }}</a>
+                     </div>
+                     <div class="col-8">
+                        <div class="progress mb-3" style="height: 30px;">
+                           <div class="progress-bar" role="progressbar" style="width: {{ ldf.percentage }}%" aria-valuenow="{{ ldf.size }}" aria-valuemin="0" aria-valuemax="100">{{ ldf.size }}</div>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </div>
+            </div>
+         </div>
+         <!-- Search Bar -->
+         <div class="row mt-5 mb-5">
+            <form class="col-11 mx-auto"  onsubmit="loading();" action="/dashboard?req=search" method="POST">
+               <div class="row col-12">
+                  <div class="col">
+                     <input type="url" class="form-control" id="inputLink" name="inputLink" placeholder="Please input product links from Shopee and Lazada" aria-label="Input Link" required>
+                  </div>
+                  <button type="submit" class="btn btn-outline-primary" style="color:white;">Search</button>
+               </div>
+            </form>
+         </div>
+         <!-- Product View and Reccomendation -->
+         {% if list_of_products|length == 0 %}
+         <!-- Product View Empty -->
+         <div>
+            <img class="mx-auto d-block" src="{{url_for('static',filename='images/empty-state.svg')}}" style="height:400px;"  alt="Product Image">
+            <h3 class="text-center display-4 ">View is empty</h3>
+         </div>
+         {% else %}
+         <div class="row mx-auto">
+            <!-- Product View not Empty -->
+            {% for prod in list_of_products %}
+            {% include 'includes/add_to_favorites_modal.html' %}
+            {% include 'includes/update_product_modal.html' %}
+            <div class="col-6 mx-auto">
+               <label  class="font-weight-bold" for="productView1">Product Information</label>
+               <div class="row" style="height:300px;">
+                  <div class="col-6 mt-3">
+                     <!--
+                        <img class="img-thumbnail" src="https://lh3.googleusercontent.com/yYtdFyi9V2z4uD1Dxp_PgkjF_HYXQdCBM5XGuxwCaqOGXYdoTCMV31gl0-DBTxjmCOgDsLXqKN0tRV61bRcsVnMlD2jd5CSYtsJ-fGNPvpRYtzwG4ouLD5w5HiRxLO3ndhn6_5INnw=w2400" alt="">
+                        -->
+                     <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ prod.product_image }}" alt="Product Image">
+                     <!--
+                        <img class="img-thumbnail" src="{{ prod.product_image }}" alt="Product Image">
+                        -->
+                     <div class="mt-3 ml-2">
+                        <small class="font-weight-bold">Chat Response Rate: {{ prod.shop_response_rate }}</small><br>
+                        <small class="font-weight-bold">Shop Rating: {{ prod.shop_rating }}</small>
+                     </div>
+                  </div>
+                  <div class="col-6 mt-3">
+                     {% if prod.target_website == 'Shopee'%}
+                     <h5 class="overflow-auto text-danger" style="height:100px">{{ prod.name}}</h5>
+                     {% else %}
+                     <h5 class="overflow-auto text-primary" style="height:100px">{{ prod.name}}</h5>
+                     {% endif %}
+                     <p class="font-weight-normal"><span class="font-weight-bold">Price: </span>{{ prod.price }}</p>
+                     <p class="font-weight-normal"><span class="font-weight-bold">Rating: </span>{{ prod.rating }} stars</p>
+                     <p class="font-weight-normal"><span class="font-weight-bold">Sold: </span>{{ prod.sold }}</p>
+                     {% if prod.target_website == 'Shopee' %}
+                     <p class="font-weight-normal text-danger"><span class="font-weight-bold">From: </span>{{ prod.target_website }}</p>
+                     {% else %}
+                     <p class="font-weight-normal text-primary"><span class="font-weight-bold">From: </span>{{ prod.target_website }}</p>
+                     {% endif %}
+                  </div>
+               </div>
+               <div class="text-center pt-3 pb-3">
+                  <button type="submit" class="btn btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateProduct-{{ prod.product_id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>  Update</button>
+                  <a href='{{ prod.link }}' class="btn btn-outline-info mt-2" style="color:white;" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
+                  <button type="submit" class="btn btn-outline-danger mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-AddToFavoritesConfirm-{{ prod.product_id }}"><i class="fa fa-heart-o" aria-hidden="true"></i>  Favorite</button>
+               </div>
+               <div class="row">
+                  <div class="col-12 mt-2">
+                     <label  class="font-weight-bold" for="productView1">Product Description</label>
+                     <textarea class="form-control"  style="resize:none;" id="productView1" rows="10" readonly>{{ prod.description }}</textarea>
+                  </div>
+               </div>
+               <div class="row mt-3">
+                  <div class="col-12 mt-3 overflow-auto" style="height:500px;">
+                     <label  class="font-weight-bold" for="productView1">Customer Reviews</label>
+                     {% if loop.index0 == 0 %}
+                        {% if reviews_1|length == 0 %}
+                           <div class="row mt-3 mx-auto">
+                              <div class="col text-center">
+                                 <form onsubmit="loading();" action="/dashboard?req=load_reviews" method="POST">
+                                     {{ load_reviews_form.hidden_tag() }}
+                                    <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
+                                    <input name="load_review_link" type="hidden" value="{{ prod.link }}">
+                                   <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
+                                   <div class="text-center">
+                                       {{ load_reviews_form.submit(class="btn btn-outline-primary", style="color:white;") }}
+                                   </div>
+                                 </form>
+                              </div>
+                           </div>
+                        {% else %}
+                           {% for review in reviews_1 %}
+                              {% if review.product_id == prod.product_id %}
+                                 <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+                                    <div class="col-2 p-3 pt-4">
+                                       {% if review.review_sentiment == 1 %}
+                                       <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                                       {% elif review.review_sentiment == 0 %}
+                                       <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                                       {% else %}
+                                       <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                                       {% endif %}
+                                    </div>
+                                    <div class="col-10 p-3">
+                                       <h5>Review Author | {{ review.review_author }}</h5>
+                                       <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                                       <hr style="background-color:white;">
+                                       <label  class="font-weight-bold" for="productView1">Review Comment</label>
+                                       <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+                                    </div>
+                                 </div>
+                              {% endif %}
+                           {% endfor %}
+                        {% endif %}
+
+                     {% elif loop.index0 == 1 %}
+                        {% if reviews_2|length == 0 %}
+                           <div class="row mt-3 mx-auto">
+                              <div class="col text-center">
+                                 <form onsubmit="loading();" action="/dashboard?req=load_reviews" method="POST">
+                                     {{ load_reviews_form.hidden_tag() }}
+                                    <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
+                                    <input name="load_review_link" type="hidden" value="{{ prod.link }}">
+                                   <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
+                                   <div class="text-center">
+                                       {{ load_reviews_form.submit(class="btn btn-outline-primary", style="color:white;") }}
+                                   </div>
+                                 </form>
+                              </div>
+                           </div>
+                        {% else %}
+                           {% for review in reviews_2 %}
+                              {% if review.product_id == prod.product_id %}
+                                 <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+                                    <div class="col-2 p-3 pt-4">
+                                       {% if review.review_sentiment == 1 %}
+                                       <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                                       {% elif review.review_sentiment == 0 %}
+                                       <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                                       {% else %}
+                                       <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                                       {% endif %}
+                                    </div>
+                                    <div class="col-10 p-3">
+                                       <h5>Review Author | {{ review.review_author }}</h5>
+                                       <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                                       <hr style="background-color:white;">
+                                       <label  class="font-weight-bold" for="productView1">Review Comment</label>
+                                       <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+                                    </div>
+                                 </div>
+                              {% endif %}
+                           {% endfor%}
+                        {% endif %}
+                     {% endif %}
+                  </div>
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+         {% endif %}
+      </div>
+      <!-- Favorites and History -->
+      <div class="col-3 container">
+         <div class="mt-4 pr-3 pl-3">
+            <nav class="border rounded navbar navbar-expand-md navbar-dark mb-3">
+               <div class="collapse navbar-collapse nav-tabs align-items-center">
+                  <ul class="nav align-items-center" id="myTab" role="tablist">
+                     <li class="nav-item">
+                        <a class="nav-link active h5" id="favorites-tab" data-toggle="tab" href="#favorites" role="tab" aria-controls="favorites" aria-selected="true">Favorites</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link h5" id="history-tab" data-toggle="tab" href="#history" role="tab" aria-controls="history" aria-selected="false">History</a>
+                     </li>
+                  </ul>
+               </div>
+            </nav>
+            <div class="tab-content" id="myTabContent">
+               <div class="tab-pane fade show active" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
+                  {% for favorite in list_of_favorites %}
+                  {% include 'includes/replace_modal.html' %}
+                  {% include 'includes/remove_to_favorites_modal.html' %}
+                  <div class="row border mb-3 rounded">
+                     <div class="col-4 mt-4">
+                        <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ favorite.product_image }}"  alt="Product Image">
+                     </div>
+                     <div class="col-8 mt-3 mb-3">
+                        {% if favorite.target_website == 'Shopee' %}
+                        <h6 class="text-danger">{{ favorite.product_name }}</h6>
+                        {% else %}
+                        <h6 class="text-primary">{{ favorite.product_name }}</h6>
+                        {% endif %}
+                        <p class="font-weight-bold">Price: <span class="font-weight-normal">{{ favorite.product_price }}</span></p>
+                     </div>
+                     <div class="row mx-auto mb-3">
+                        <div class="col-12 text-center">
+                           <button type="submit" style="color:white;" class="btn  btn-outline-success btn-sm mt-2" data-toggle="modal" data-target="#Modal-ReplaceProduct-{{ favorite.product_id }}">
+                           {% if list_of_products|length > 1 %}
+                           <i class="fa fa-refresh" aria-hidden="true"></i> Replace
+                           {% else %}
+                           <i class="fa fa-eye" aria-hidden="true"></i> View
+                           {% endif %}
+                           </button>
+                           <a href='{{ favorite.product_link }}' style="color:white;" class="btn btn-outline-info btn-sm mt-2" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
+                           <button type="submit" style="color:white;" class="btn btn-outline-danger btn-sm mt-2" data-toggle="modal" data-target="#Modal-RemoveToFavoritesConfirm-{{ favorite.product_id }}"><i class="fa fa-trash-o" aria-hidden="true"></i> Remove</button>
+                        </div>
+                     </div>
+                  </div>
+                  {% endfor %}
+               </div>
+               <div class="tab-pane fade overflow-auto" id="history" style="max-height: 50%;" role="tabpanel" aria-labelledby="history-tab">
+                  <div class="col">
+                     <ul class="list-group list-group-flush">
+                        {% for history in list_of_history %}
+                        <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
+                        {% endfor %}
+                     </ul>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

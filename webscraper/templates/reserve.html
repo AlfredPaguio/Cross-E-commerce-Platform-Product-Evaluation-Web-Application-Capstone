@@ -1,0 +1,80 @@
+   <!-- container for the loop values -->
+   {% if loop.index0 == 0 %}
+      {% for review in reviews_pagination_1.items %}
+          {% if review.product_id == prod.product_id %}
+            <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+               <div class="col-2 p-3 pt-4">
+                  {% if review.review_sentiment == 1 %}
+                  <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                  {% elif review.review_sentiment == 0 %}
+                  <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                  {% else %}
+                  <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                  {% endif %}
+               </div>
+               <div class="col-10 p-3">
+                  <h5>Review Author | {{ review.review_author }}</h5>
+                  <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                  <hr style="background-color:white;">
+                  <label  class="font-weight-bold" for="productView1">Review Comment</label>
+                  <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+               </div>
+            </div>
+         {% endif %}
+      {% endfor %}
+
+      <div class="pt-3">
+         <ul class="pagination justify-content-center">
+            {% for page in reviews_pagination_1.iter_pages(left_current=5) %}
+               {% if page %}
+                  <li class="page-item {{'active' if page == value1 }}">
+                     <a class="page-link" href="{{ url_for('dashboard_page', page_of_list1=page|int, page_of_list2=value2) }}">{{ page }}</a>
+                  </li>
+               {% else %}
+                  <li class="page-item">
+                     <a class="page-link" href="#">...</a>
+                  </li>
+               {% endif %}
+            {% endfor%}
+         </ul>
+      </div>
+   {% elif loop.index0 == 1 %}
+      {% for review in reviews_pagination_2.items %}
+          {% if review.product_id == prod.product_id %}
+            <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+               <div class="col-2 p-3 pt-4">
+                  {% if review.review_sentiment == 1 %}
+                  <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                  {% elif review.review_sentiment == 0 %}
+                  <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                  {% else %}
+                  <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                  {% endif %}
+               </div>
+               <div class="col-10 p-3">
+                  <h5>Review Author | {{ review.review_author }}</h5>
+                  <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                  <hr style="background-color:white;">
+                  <label  class="font-weight-bold" for="productView1">Review Comment</label>
+                  <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+               </div>
+            </div>
+         {% endif %}
+      {% endfor %}
+
+      <div class="pt-3">
+         <ul class="pagination justify-content-center">
+            {% for page in reviews_pagination_2.iter_pages(left_current=5) %}
+               {% if page %}
+                  <li class="page-item {{'active' if page == value2 }}">
+                     <a class="page-link" href="{{ url_for('dashboard_page', page_of_list1=value1, page_of_list2=page|int) }}">{{ page }}</a>
+                  </li>
+               {% else %}
+                  <li class="page-item">
+                     <a class="page-link" href="#">...</a>
+                  </li>
+               {% endif %}
+            {% endfor%}
+         </ul>
+      </div>
+   {% endif %}

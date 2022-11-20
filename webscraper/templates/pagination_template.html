@@ -1,0 +1,53 @@
+{% if loop.index0 == 0 %}
+                        {% for review in pagination_reviews_1 %}
+                           {% if review.review_data_owner == prod.product_id %}
+                           <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+                              <div class="col-2 p-3 pt-4">
+                                 {% if review.review_sentiment == 1 %}
+                                 <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                                 {% elif review.review_sentiment == 0 %}
+                                 <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                                 {% else %}
+                                 <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                                 {% endif %}
+                              </div>
+                              <div class="col-10 p-3">
+                                 <h5>Review Author | {{ review.review_author }}</h5>
+                                 <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                                 <hr style="background-color:white;">
+                                 <label  class="font-weight-bold" for="productView1">Review Comment</label>
+                                 <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+                              </div>
+                           </div>
+                           {% endif %}
+                        {% endfor %}
+                        <div class="pt-3 pagination justify-content-center">
+                           {{ pagination_1.links }}
+                        </div>
+                     {% elif loop.index0 == 1 %}
+                        {% for review in pagination_reviews_2 %}
+                           {% if review.review_data_owner == prod.product_id %}
+                           <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+                              <div class="col-2 p-3 pt-4">
+                                 {% if review.review_sentiment == 1 %}
+                                 <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                                 {% elif review.review_sentiment == 0 %}
+                                 <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                                 {% else %}
+                                 <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                                 {% endif %}
+                              </div>
+                              <div class="col-10 p-3">
+                                 <h5>Review Author | {{ review.review_author }}</h5>
+                                 <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                                 <hr style="background-color:white;">
+                                 <label  class="font-weight-bold" for="productView1">Review Comment</label>
+                                 <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+                              </div>
+                           </div>
+                           {% endif %}
+                        {% endfor %}
+                        <div class="pt-3 pagination justify-content-center">
+                           {{ pagination_2.links }}
+                        </div>
+                     {% endif %}

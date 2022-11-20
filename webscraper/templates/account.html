@@ -1,0 +1,38 @@
+{% extends 'base.html'%}
+{% block title %}
+Account Page
+{% endblock %}
+{% block content %}
+<div class="container col-md-4 col-sm-12 p-4 mx-auto">
+   <h1 class="h3 mb-3 font-weight-normal text-center">
+      Account
+   </h1>
+   <h5>Username: {{ current_user.username }}</h5>
+   <h5>Email address: {{ current_user.email_address }}</h5>
+   <p>
+      <button class="btn btn-outline-primary" style="color:white;" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+      Password
+      </button>
+   </p>
+   <div class="collapse" id="collapseExample">
+      <div class="">
+         <form method="POST" class="form-signin" style="color:white">
+            {{ change_password_form.hidden_tag() }}
+
+            {{ change_password_form.old_password.label() }}
+            {{ change_password_form.old_password(class="form-control mb-2", placeholder="Old Password") }}
+
+            {{ change_password_form.new_password.label() }}
+            {{ change_password_form.new_password(class="form-control mb-2", placeholder="New Password (Requires a combination of uppercase, numbers, and special characters") }}
+
+            {{ change_password_form.confirm_new_password.label() }}
+            {{ change_password_form.confirm_new_password(class="form-control mb-2", placeholder="Confirm New Password") }}
+            <input type="checkbox" onclick="password_show_account()"> Show Password <br>
+            <div class="checkbox mb-3 text-center mt-3">
+               {{ change_password_form.submit(class="btn btn-sn btn-outline-primary", style="color:white;") }}
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+{% endblock %}
