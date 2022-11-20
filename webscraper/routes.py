@@ -441,14 +441,14 @@ def dashboard_page():
                 scraper.land_first_page(product_on_database.product_link)
 
                 is_loaded = None
-                time_out = 30
+                time_out = 20
                 url_helper = UrlHelper()
                 what_hostname = url_helper.get_hostname(product_on_database.product_link)
                 try:
                     is_loaded = WebDriverWait(scraper.driver, time_out).until(
                         EC.visibility_of_element_located(
                             (By.CSS_SELECTOR,
-                             'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="container"]'
+                             'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="root"]'
                              )))
                 except TimeoutException:
                     flash("Timed out: Waiting for target page to load took to long. Please try again",

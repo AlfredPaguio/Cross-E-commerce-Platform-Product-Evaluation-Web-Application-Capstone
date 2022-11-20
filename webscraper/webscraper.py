@@ -193,18 +193,6 @@ class Webscraper:
     def find_product_info_lazada(self, soup_text):
         print('Getting product info..')
         # scroll down to product name to trigger lazy load
-        try:
-            title = self.driver.find_element(
-                By.CSS_SELECTOR,
-                'h1[class="pdp-mod-product-title"]'
-            )
-        except NoSuchElementException:
-            title = self.driver.find_element(
-                By.CSS_SELECTOR,
-                'h1[class="pdp-mod-product-title show-atmosphere"]'
-            )
-        self.driver.execute_script('arguments[0].scrollIntoView(true);', title)
-
         soup = BeautifulSoup(soup_text, 'lxml')
 
         prod_name = soup.find('h1', class_='pdp-mod-product-title').text
