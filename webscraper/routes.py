@@ -254,15 +254,18 @@ def dashboard_page():
                 what_hostname = url_helper.get_hostname(load_review_link)
 
                 try:
-                    end = load_review_link.find('.html')
-                    split = load_review_link[:end].split('-')
+                    shop_id = []
+                    item_id = []
+                    if what_hostname == 'www.lazada.com.ph':
+                        end = load_review_link.find('.html')
+                        split = load_review_link[:end].split('-')
 
-                    shop_id = split[-1].strip(split[-1][0])
-                    item_id = split[-2].strip(split[-2][0])
+                        shop_id.append(split[-1].strip(split[-1][0]))
+                        item_id.append(split[-2].strip(split[-2][0]))
 
                     reviews = scraper.find_product_reviews_shopee(
                         str(load_review_link + "?sp_atk")) \
-                        if 'shopee.ph' in what_hostname else scraper.find_product_reviews_lazada(shop_id, item_id)
+                        if 'shopee.ph' in what_hostname else scraper.find_product_reviews_lazada(shop_id[0], item_id[0])
 
                     for review in reviews:
                         review_data = ProductDataReviewsTable(product_id=load_review_item,
@@ -296,12 +299,14 @@ def dashboard_page():
                     flash(f'Webdriver Status: {status}', category='info')
                     flash(f"Reviews loaded successfully", category='success')
                     return redirect(url_for('dashboard_page'))
+
                 except AttributeError or TimeoutException as e:
                     print(f'Error: {e}')
                     flash("Something went wrong. Please try agan in a few seconds.", category='danger')
                     db.session.rollback()
                     scraper.driver.quit()
                     return redirect(url_for('dashboard_page'))
+
             else:
                 if load_review_index == 0:
                     for reviews in list_of_reviews:

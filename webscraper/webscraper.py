@@ -28,7 +28,7 @@ class Webscraper:
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
-        prefs = {"profile.default_content_setting_values.notifications": 2}
+        # prefs = {"profile.default_content_setting_values.notifications": 2}
 
         # set chrome options
         options = webdriver.ChromeOptions()
@@ -36,20 +36,21 @@ class Webscraper:
         options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-blink-features=AutomationControlled')
         # options.add_argument("window-size=1920x1480")
+        # options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-extensions')
         options.add_argument('--disable-logging')
         options.add_argument('disable-infobars')
         options.add_argument('--disable-notifications')
-        # options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
+        options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
         options.add_experimental_option("mobileEmulation", mobile_emulation)
-        options.add_experimental_option("prefs", prefs)
+        # options.add_experimental_option("prefs", prefs)
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        options.add_experimental_option('excludeSwitches', ['enable-automation'])
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-
-        # options.headless = True
+        options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
