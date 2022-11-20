@@ -35,7 +35,6 @@ def home_page():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard_page():
-    scraper = Webscraper()
     add_to_favorites_form = AddToFavoritesForm()
     remove_to_favorites_form = RemoveToFavoritesForm()
     replace_product_modal_form = ReplaceProductModalForm()
@@ -142,6 +141,7 @@ def dashboard_page():
 
                 # data not existing in current_user, not existing in other users, run scraper
                 else:
+                    scraper = Webscraper()
                     scraper.land_first_page(input_link)
 
                     is_loaded = None
@@ -249,6 +249,7 @@ def dashboard_page():
             ).limit(50)
 
             if list_of_reviews.first() is None:
+                scraper = Webscraper()
                 url_helper = UrlHelper()
                 what_hostname = url_helper.get_hostname(load_review_link)
 
@@ -436,6 +437,7 @@ def dashboard_page():
             ).first()
 
             if product_on_database is not None:
+                scraper = Webscraper()
                 scraper.land_first_page(product_on_database.product_link)
 
                 is_loaded = None
