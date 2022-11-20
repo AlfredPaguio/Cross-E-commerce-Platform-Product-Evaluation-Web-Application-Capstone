@@ -746,7 +746,6 @@ def login_page():
 @app.route('/logout')
 @login_required
 def logout_page():
-    scraper.driver.quit()
     session.clear()
     logout_user()
     flash('You have been logged out successfully.', category='info')
