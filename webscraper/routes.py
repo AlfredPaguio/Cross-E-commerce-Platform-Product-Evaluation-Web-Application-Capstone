@@ -506,6 +506,7 @@ def dashboard_page():
                             db.session.commit()  # commit
                             session.pop('reviews_1')
                             session.pop('reviews_2')
+                            scraper.driver.quit()
                             flash(f"Product {product_on_database.product_name} successfully updated.",
                                   category='success')
                             return redirect(url_for('dashboard_page'))

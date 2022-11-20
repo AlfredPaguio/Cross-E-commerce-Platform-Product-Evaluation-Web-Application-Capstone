@@ -27,6 +27,7 @@ class Webscraper:
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
+        prefs = {"profile.default_content_setting_values.notifications": 2}
 
         # set chrome options
         options = webdriver.ChromeOptions()
@@ -38,8 +39,10 @@ class Webscraper:
         options.add_argument('--disable-extensions')
         options.add_argument('--disable-logging')
         options.add_argument('disable-infobars')
+        options.add_argument('--disable-notifications')
         options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
         options.add_experimental_option("mobileEmulation", mobile_emulation)
+        options.add_experimental_option("prefs", prefs)
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         options.add_experimental_option('excludeSwitches', ['enable-automation'])
         options.add_experimental_option('useAutomationExtension', False)
