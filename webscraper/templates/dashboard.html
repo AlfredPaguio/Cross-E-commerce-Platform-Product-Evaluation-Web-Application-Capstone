@@ -76,7 +76,7 @@ Dashboard Page
                      <!--
                         <img class="img-thumbnail" src="https://lh3.googleusercontent.com/yYtdFyi9V2z4uD1Dxp_PgkjF_HYXQdCBM5XGuxwCaqOGXYdoTCMV31gl0-DBTxjmCOgDsLXqKN0tRV61bRcsVnMlD2jd5CSYtsJ-fGNPvpRYtzwG4ouLD5w5HiRxLO3ndhn6_5INnw=w2400" alt="">
                         -->
-                     <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ prod.product_image }}" alt="Product Image">
+                     <img class="img-fluid rounded" src="{{ prod.product_image }}" alt="Product Image">
                      <!--
                         <img class="img-thumbnail" src="{{ prod.product_image }}" alt="Product Image">
                         -->
@@ -112,7 +112,7 @@ Dashboard Page
                      <textarea class="form-control"  style="resize:none;" id="productView1" rows="10" readonly>{{ prod.description }}</textarea>
                   </div>
                </div>
-               <div class="row mt-3">
+               <div class="row mt-3 mb-3">
                   <div class="col-12 mt-3 overflow-auto" style="height:500px;">
                      <label  class="font-weight-bold" for="productView1">Customer Reviews</label>
                      {% if loop.index0 == 0 %}
@@ -224,7 +224,7 @@ Dashboard Page
                   {% include 'includes/remove_to_favorites_modal.html' %}
                   <div class="row border mb-3 rounded">
                      <div class="col-4 mt-4">
-                        <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ favorite.product_image }}"  alt="Product Image">
+                        <img class="img-fluid rounded" src="{{ favorite.product_image }}"  alt="Product Image">
                      </div>
                      <div class="col-8 mt-3 mb-3">
                         {% if favorite.target_website == 'Shopee' %}
