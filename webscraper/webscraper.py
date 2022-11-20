@@ -53,7 +53,7 @@ class Webscraper:
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
-        self.driver.maximize_window()
+        # self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')
 
