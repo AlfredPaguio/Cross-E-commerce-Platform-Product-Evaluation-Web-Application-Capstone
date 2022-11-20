@@ -507,6 +507,11 @@ def dashboard_page():
                             session.pop('reviews_1')
                             session.pop('reviews_2')
                             scraper.driver.quit()
+                            status = scraper.driver.execute_script('return navigator.webdriver')
+
+                            # Close headless browser and webdriver instance gracefully
+                            # alisin pag deployment na.
+                            flash(f'Webdriver Status: {status}', category='info')
                             flash(f"Product {product_on_database.product_name} successfully updated.",
                                   category='success')
                             return redirect(url_for('dashboard_page'))
