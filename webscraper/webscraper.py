@@ -3,7 +3,7 @@ import time
 import json
 import base64
 
-# from fake_useragent import UserAgent
+from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 # from selenium.common.exceptions import NoSuchElementException
@@ -23,8 +23,8 @@ class Webscraper:
         service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
-        # ua = UserAgent()
-        # user_agent = ua.chrome
+        ua = UserAgent()
+        user_agent = ua.chrome
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
@@ -33,9 +33,9 @@ class Webscraper:
         # set chrome options
         options = webdriver.ChromeOptions()
         # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
-        # options.add_argument(f'user-agent={user_agent}')
+        options.add_argument(f'user-agent={user_agent}')
         # options.add_argument('--disable-blink-features=AutomationControlled')
-        options.add_argument("window-size=1920x1480")
+        # options.add_argument("window-size=1920x1480")
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         # options.add_argument('--disable-extensions')
@@ -53,7 +53,7 @@ class Webscraper:
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
-        # self.driver.maximize_window()
+        self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')
 
