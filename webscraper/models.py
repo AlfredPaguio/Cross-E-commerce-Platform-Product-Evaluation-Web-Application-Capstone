@@ -63,7 +63,6 @@ class ProductDetailsTable(db.Model):  # ProductData has one-to-many relationship
     product_sold = db.Column(db.String(length=10), nullable=False)
     product_description = db.Column(db.String(), nullable=False)
     product_image = db.Column(db.String(), nullable=False)
-    # product_image = not yetimplemented.
     shop_rating = db.Column(db.String(length=10), nullable=False)
     shop_response_rate = db.Column(db.String(length=10), nullable=False)
     category = db.Column(db.String(length=50), nullable=False)

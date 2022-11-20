@@ -181,9 +181,9 @@ class Webscraper:
                 # div.class from inspect element from div.class from driver.page_source is different.
                 # used the element from driver.page_source as div.class 'iLqFOu' not working
                 try:
-                    comment = review.find_next('div', class_='pqiYNA').text
-                except AttributeError:
                     comment = review.find_next('div', class_='iLqFOu').text
+                except AttributeError:
+                    comment = review.find_next('div', class_='pqiYNA').text
 
                 review_sentiment = sentiment.do_sentiment(comment)
 
