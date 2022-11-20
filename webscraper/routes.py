@@ -441,7 +441,7 @@ def dashboard_page():
                 scraper.land_first_page(product_on_database.product_link)
 
                 is_loaded = None
-                time_out = 20
+                time_out = 15
                 url_helper = UrlHelper()
                 what_hostname = url_helper.get_hostname(product_on_database.product_link)
                 try:
