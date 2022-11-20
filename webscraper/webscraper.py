@@ -1,7 +1,7 @@
 import time
 # import os
 import json
-# import base64
+import base64
 
 from fake_useragent import UserAgent
 from selenium import webdriver
@@ -49,7 +49,7 @@ class Webscraper:
         options.add_experimental_option('excludeSwitches', ['enable-automation'])
         options.add_experimental_option('useAutomationExtension', False)
 
-        options.headless = True
+        # options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
@@ -98,18 +98,19 @@ class Webscraper:
                 category_link = json_object['itemListElement'][1]['item']['@id']
 
         # Image
-        # prod_image_raw = self.driver.find_element(
-        #     By.CSS_SELECTOR,
-        #     'img[class="product-carousel__item _35N8Pu"]'
-        # #).screenshot_as_png
-        #
-        # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
-        try:
-            prod_image_ = soup.find('img', class_='product-carousel__item _35N8Pu')
-            prod_image = prod_image_['src']
-        except AttributeError:
-            prod_image_ = soup.find('video', class_='product-video__video')
-            prod_image = prod_image_['poster']
+        prod_image_raw = self.driver.find_element(
+            By.CSS_SELECTOR,
+            'img[class="product-carousel__item _35N8Pu"]'
+        ).screenshot_as_png
+
+        prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
+
+        # try:
+        #     prod_image_ = soup.find('img', class_='product-carousel__item _35N8Pu')
+        #     prod_image = prod_image_['src']
+        # except AttributeError:
+        #     prod_image_ = soup.find('video', class_='product-video__video')
+        #     prod_image = prod_image_['poster']
 
         print('Getting product info: Success')
         return {
@@ -118,7 +119,7 @@ class Webscraper:
             'prod_rating': prod_rating,
             'prod_sold': prod_sold[:prod_sold_end],
             'prod_desc': prod_desc["content"],
-            'prod_image': prod_image,
+            'prod_image': prod_image_encoded,
             'shop_rating': shop_rating,
             'shop_res_rate': shop_response_rate,
             'category': category,
@@ -240,19 +241,19 @@ class Webscraper:
                     category = 'Breadcrumblist Empty'
                     category_link = 'BreadCrumbList Empty'
 
-        try:
-            prod_image_ = soup.find('div', class_='mod-pdp-item-gallery-video-item').find('img')
-            prod_image = prod_image_['src']
-        except AttributeError:
-            prod_image_ = soup.find('div', class_='slick-slide slick-active').find('img')
-            prod_image = prod_image_['src']
+        # try:
+        #     prod_image_ = soup.find('div', class_='mod-pdp-item-gallery-video-item').find('img')
+        #     prod_image = prod_image_['src']
+        # except AttributeError:
+        #     prod_image_ = soup.find('div', class_='slick-slide slick-active').find('img')
+        #     prod_image = prod_image_['src']
 
-        # prod_image_raw = self.driver.find_element(
-        #     By.CSS_SELECTOR,
-        #     'div[class="mod-pdp-item-gallery-inner"]'
-        # ).screenshot_as_png
-        #
-        # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
+        prod_image_raw = self.driver.find_element(
+            By.CSS_SELECTOR,
+            'div[class="mod-pdp-item-gallery-inner"]'
+        ).screenshot_as_png
+
+        prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
 
         print('Getting product info: Success')
         return {
@@ -261,7 +262,7 @@ class Webscraper:
             'prod_rating': prod_rating,
             'prod_sold': prod_sold,
             'prod_desc': prod_desc['content'],
-            'prod_image': prod_image,
+            'prod_image': prod_image_encoded,
             'shop_rating': shop_rating,
             'shop_res_rate': shop_response_rate,
             'category': category,

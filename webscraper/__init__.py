@@ -14,7 +14,7 @@ mail = Mail(app)  # instantiate the mail class
 # app.jinja_env.add_extension('jinja2.ext.do')
 
 # database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rewrite_db3.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rewrite_db2.db'
 app.config['SECRET_KEY'] = '90e32cb1cc919276aa230a2f3ab77333'
 
 # session

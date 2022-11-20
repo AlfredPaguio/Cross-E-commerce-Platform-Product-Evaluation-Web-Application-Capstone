@@ -86,7 +86,7 @@ def dashboard_page():
                                               product_rating=exists_in_current_user[1].product_rating,
                                               product_sold=exists_in_current_user[1].product_sold,
                                               product_description=exists_in_current_user[1].product_description,
-                                              product_image=exists_in_current_user[1].product_image,
+                                              product_image=exists_in_current_user[1].product_image_base64,
                                               shop_rating=exists_in_current_user[1].shop_rating,
                                               shop_response_rate=exists_in_current_user[1].shop_response_rate,
                                               product_link=exists_in_current_user[1].product_link,
@@ -121,7 +121,7 @@ def dashboard_page():
                                               product_rating=exist_in_database[1].product_rating,
                                               product_sold=exist_in_database[1].product_sold,
                                               product_description=exist_in_database[1].product_description,
-                                              product_image=exist_in_database[1].product_image,
+                                              product_image=exist_in_database[1].product_image_base64,
                                               shop_rating=exist_in_database[1].shop_rating,
                                               shop_response_rate=exist_in_database[1].shop_response_rate,
                                               product_link=exist_in_database[1].product_link,
@@ -181,7 +181,7 @@ def dashboard_page():
                                                                    product_rating=prod_info.get('prod_rating'),
                                                                    product_sold=prod_info.get('prod_sold'),
                                                                    product_description=prod_info.get('prod_desc'),
-                                                                   product_image=prod_info.get('prod_image'),
+                                                                   product_image_base64=prod_info.get('prod_image'),
                                                                    shop_rating=prod_info.get('shop_rating'),
                                                                    shop_response_rate=prod_info.get('shop_res_rate'),
                                                                    category=prod_info.get('category'),
@@ -206,7 +206,7 @@ def dashboard_page():
                                                               product_rating=prod_details.product_rating,
                                                               product_sold=prod_details.product_sold,
                                                               product_description=prod_details.product_description,
-                                                              product_image=prod_details.product_image,
+                                                              product_image=prod_details.product_image_base64,
                                                               shop_rating=prod_details.shop_rating,
                                                               shop_response_rate=prod_details.shop_response_rate,
                                                               product_link=prod_details.product_link,
@@ -369,7 +369,7 @@ def dashboard_page():
                                                          product_rating=product[1].product_rating,
                                                          product_sold=product[1].product_sold,
                                                          product_description=product[1].product_description,
-                                                         product_image=product[1].product_image,
+                                                         product_image=product[1].product_image_base64,
                                                          shop_rating=product[1].shop_rating,
                                                          shop_response_rate=product[1].shop_response_rate,
                                                          product_link=product[1].product_link,
@@ -410,7 +410,7 @@ def dashboard_page():
                                                      product_rating=product[1].product_rating,
                                                      product_sold=product[1].product_sold,
                                                      product_description=product[1].product_description,
-                                                     product_image=product[1].product_image,
+                                                     product_image=product[1].product_image_base64,
                                                      shop_rating=product[1].shop_rating,
                                                      shop_response_rate=product[1].shop_response_rate,
                                                      product_link=product[1].product_link,
@@ -477,7 +477,7 @@ def dashboard_page():
                             product_on_database.product_rating = prod_info.get('prod_rating')
                             product_on_database.product_sold = prod_info.get('prod_sold')
                             product_on_database.product_description = prod_info.get('prod_desc')
-                            product_on_database.product_image = prod_info.get('prod_image')
+                            product_on_database.product_image_base64 = prod_info.get('prod_image')
                             product_on_database.shop_rating = prod_info.get('shop_rating')
                             product_on_database.shop_response_rate = prod_info.get('shop_res_rate')
                             product_on_database.category = prod_info.get('category')
@@ -498,7 +498,7 @@ def dashboard_page():
                                 session['list_of_products'][i].update(
                                     {"description": product_on_database.product_description})
                                 session['list_of_products'][i].update(
-                                    {"product_image": product_on_database.product_image})
+                                    {"product_image": product_on_database.product_image_base64})
                                 session['list_of_products'][i].update({"shop_rating": product_on_database.shop_rating})
                                 session['list_of_products'][i].update(
                                     {"shop_response_rate": product_on_database.shop_response_rate})
@@ -563,7 +563,7 @@ def dashboard_page():
                     'product_link': pdetails.product_link,
                     'product_name': pdetails.product_name,
                     'product_price': pdetails.product_price,
-                    'product_image': pdetails.product_image,
+                    'product_image': pdetails.product_image_base64,
                     'target_website': pdetails.target_website
                 }
             )
