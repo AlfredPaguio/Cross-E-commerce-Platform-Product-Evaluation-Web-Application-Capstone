@@ -14,7 +14,7 @@ from webscraper import app, db, mail
 from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               LoginForm, RegisterForm, RemoveToFavoritesForm,
                               ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
-                              UpdateReviewsForm)
+                              UpdateReviewsForm, LoadRecommendedProductsForm)
 from webscraper.helper import HelpMe, UrlHelper, SummarizeThis
 from webscraper.models import (ProductDataReviewsTable, ProductDataTable,
                                ProductDetailsTable, User)
@@ -40,6 +40,7 @@ def dashboard_page():
     replace_product_modal_form = ReplaceProductModalForm()
     update_product_modal_form = UpdateProductModalForm()
     update_reviews_form = UpdateReviewsForm()
+    load_recommended_products_form = LoadRecommendedProductsForm()
     load_reviews_form = LoadReviewsForm()
 
     if session.get('list_of_products') is None:
@@ -487,6 +488,11 @@ def dashboard_page():
             flash('Wala pang logic to', category='info')
             return redirect(url_for('dashboard_page'))
 
+        # Load Recommended Products Logic
+        if request.args.get("req") == "load_recommended_products":
+            flash('Wala pang logic to', category='info')
+            return redirect(url_for('dashboard_page'))
+
         # Favorites Logic
         if request.args.get("req") == "fav":
             favorite_item_id = request.form.get('favorite_item')
@@ -683,6 +689,7 @@ def dashboard_page():
                                replace_product_modal_form=replace_product_modal_form,
                                update_product_modal_form=update_product_modal_form,
                                load_reviews_form=load_reviews_form,
+                               load_recommended_products_form=load_recommended_products_form,
                                update_reviews_form=update_reviews_form,
                                list_of_history=list_of_history,
                                shopee_dataframe=shopee_data_dict,

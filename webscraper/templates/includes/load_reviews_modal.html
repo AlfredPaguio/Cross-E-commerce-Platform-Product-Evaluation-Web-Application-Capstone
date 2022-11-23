@@ -4,7 +4,7 @@
     }
 </style>
 
-<div class="modal fade" id="Modal-UpdateReviews-{{ prod.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
+<div class="modal fade" id="Modal-LoadReviews-{{ prod.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -15,17 +15,17 @@
             </div>
 
             <div class="modal-body">
-                <form action="/dashboard?req=update_reviews"  onsubmit="loading();" method="POST">
-                    {{ update_reviews_form.hidden_tag() }}
+                <form action="/dashboard?req=load_reviews"  onsubmit="loading();" method="POST">
+                    {{ load_reviews_form.hidden_tag() }}
                     <h4 class="text-center">
-                        Are you sure you want to update reviews for this product?
+                        Load reviews for this product?
                     </h4>
                     <br>
-                    <input name="update_review_index" type="hidden" value="{{ loop.index0 }}">
-                    <input name="update_review_link" type="hidden" value="{{ prod.link }}">
-                    <input name="update_review_item" type="hidden" value="{{ prod.product_id }}">
+                    <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
+                    <input name="load_review_link" type="hidden" value="{{ prod.link }}">
+                    <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
                     <div class="text-center">
-                        {{ update_reviews_form.submit(class="btn btn-outline-success", style="color:white;") }}
+                        {{ load_reviews_form.submit(class="btn btn-outline-success", style="color:white;") }}
                     </div>
                 </form>
             </div>
