@@ -62,3 +62,7 @@ class UpdateProductModalForm(FlaskForm):
 
 class LoadReviewsForm(FlaskForm):
     submit = SubmitField(label='Load Reviews')
+
+
+class UpdateReviewsForm(FlaskForm):
+    submit = SubmitField(label='Update')

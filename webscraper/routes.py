@@ -1,6 +1,5 @@
 import time
 import pandas as pd
-
 from flask import flash, redirect, render_template, request, url_for, session
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_mail import Message
@@ -14,8 +13,9 @@ from wtforms import Label
 from webscraper import app, db, mail
 from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               LoginForm, RegisterForm, RemoveToFavoritesForm,
-                              ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm)
-from webscraper.helper import HelpMe, UrlHelper
+                              ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
+                              UpdateReviewsForm)
+from webscraper.helper import HelpMe, UrlHelper, SummarizeThis
 from webscraper.models import (ProductDataReviewsTable, ProductDataTable,
                                ProductDetailsTable, User)
 from webscraper.productdetails import ProductDetails
@@ -39,6 +39,7 @@ def dashboard_page():
     remove_to_favorites_form = RemoveToFavoritesForm()
     replace_product_modal_form = ReplaceProductModalForm()
     update_product_modal_form = UpdateProductModalForm()
+    update_reviews_form = UpdateReviewsForm()
     load_reviews_form = LoadReviewsForm()
 
     if session.get('list_of_products') is None:
@@ -49,6 +50,12 @@ def dashboard_page():
 
     if session.get('reviews_2') is None:
         session['reviews_2'] = []
+
+    if session.get('reviews_summary_1') is None:
+        session['reviews_summary_1'] = []
+
+    if session.get('reviews_summary_2') is None:
+        session['reviews_summary_2'] = []
 
     if request.method == 'POST':
         # Scraper Logic
@@ -98,11 +105,12 @@ def dashboard_page():
                     helpme.reorder_list_of_products(_product)
                     session.pop('reviews_1')
                     session.pop('reviews_2')
-
+                    session.pop('reviews_summary_1')
+                    session.pop('reviews_summary_2')
                     flash(f'This product exists from current user database', category='info')
                     flash(f'This product is pre-loaded from the database, information might be outdated',
                           category='info')
-                    return redirect(url_for('dashboard_page',))
+                    return redirect(url_for('dashboard_page', ))
 
                 # data not existing in current_user, but existing in other user
                 elif exist_in_database is not None:
@@ -133,7 +141,8 @@ def dashboard_page():
                     helpme.reorder_list_of_products(_product)
                     session.pop('reviews_1')
                     session.pop('reviews_2')
-
+                    session.pop('reviews_summary_1')
+                    session.pop('reviews_summary_2')
                     flash(f'This product exists from other user', category='info')
                     flash(f'This product is pre-loaded from the database, information might be outdated',
                           category='info')
@@ -218,7 +227,8 @@ def dashboard_page():
                                 helpme.reorder_list_of_products(that_product)
                                 session.pop('reviews_1')
                                 session.pop('reviews_2')
-
+                                session.pop('reviews_summary_1')
+                                session.pop('reviews_summary_2')
                                 # Check if webdriver is undetected
                                 status = scraper.driver.execute_script('return navigator.webdriver')
 
@@ -238,8 +248,110 @@ def dashboard_page():
                 flash(f'This host: {what_hostname} is not a link either from Shopee or Lazada.', category='danger')
                 return redirect(url_for('dashboard_page'))
 
+        # Update Product Logic
+        if request.args.get("req") == "update_product":
+            selected_product = request.form.get('selected_product')
+            product_on_database = db.session.query(ProductDetailsTable).filter(
+                ProductDetailsTable.product_id == selected_product
+            ).first()
+
+            if product_on_database is not None:
+                scraper = Webscraper()
+                scraper.land_first_page(product_on_database.product_link)
+
+                is_loaded = None
+                time_out = 15
+                url_helper = UrlHelper()
+                what_hostname = url_helper.get_hostname(product_on_database.product_link)
+                try:
+                    print(scraper.driver.title)
+                    is_loaded = WebDriverWait(scraper.driver, time_out).until(
+                        EC.visibility_of_element_located(
+                            (By.CSS_SELECTOR,
+                             'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="root"]'
+                             )))
+                except TimeoutException:
+                    flash("Timed out: Waiting for target page to load took to long. Please try again",
+                          category='danger')
+                    scraper.driver.quit()
+                    return redirect(url_for('dashboard_page'))
+                finally:
+                    if is_loaded:
+                        time.sleep(3)
+                        # Getting Product Information
+                        try:
+
+                            prod_info = scraper.find_product_info_shopee(
+                                scraper.driver.page_source) if 'shopee.ph' in what_hostname \
+                                else scraper.find_product_info_lazada(scraper.driver.page_source)
+
+                            if what_hostname == 'shopee.ph':
+                                target_website = 'Shopee'
+                            else:
+                                target_website = 'Lazada'
+                                # adding new product to database
+
+                            product_on_database.product_name = prod_info.get('prod_name')
+                            product_on_database.product_price = prod_info.get('prod_price')
+                            product_on_database.product_rating = prod_info.get('prod_rating')
+                            product_on_database.product_sold = prod_info.get('prod_sold')
+                            product_on_database.product_description = prod_info.get('prod_desc')
+                            product_on_database.product_image = prod_info.get('prod_image')
+                            product_on_database.shop_rating = prod_info.get('shop_rating')
+                            product_on_database.shop_response_rate = prod_info.get('shop_res_rate')
+                            product_on_database.category = prod_info.get('category')
+                            product_on_database.category_link = prod_info.get('category_link')
+                            product_on_database.target_website = target_website
+
+                            helpme = HelpMe()
+                            in_dict = helpme.dict_isvalue_exist(session['list_of_products'], "link",
+                                                                product_on_database.product_link)
+
+                            if in_dict:
+                                i = helpme.list_find_index_of_dict(session['list_of_products'], "link",
+                                                                   product_on_database.product_link)
+                                session['list_of_products'][i].update({"name": product_on_database.product_name})
+                                session['list_of_products'][i].update({"price": product_on_database.product_price})
+                                session['list_of_products'][i].update(
+                                    {"rating": product_on_database.product_rating})
+                                session['list_of_products'][i].update({"sold": product_on_database.product_sold})
+                                session['list_of_products'][i].update(
+                                    {"description": product_on_database.product_description})
+                                session['list_of_products'][i].update(
+                                    {"product_image": product_on_database.product_image})
+                                session['list_of_products'][i].update(
+                                    {"shop_rating": product_on_database.shop_rating})
+                                session['list_of_products'][i].update(
+                                    {"shop_response_rate": product_on_database.shop_response_rate})
+
+                            db.session.commit()  # commit
+                            session.pop('reviews_1')
+                            session.pop('reviews_2')
+                            session.pop('reviews_summary_1')
+                            session.pop('reviews_summary_2')
+                            # Check if webdriver is undetected
+                            status = scraper.driver.execute_script('return navigator.webdriver')
+
+                            # Close headless browser and webdriver instance gracefully
+                            scraper.driver.quit()
+
+                            # alisin pag deployment na.
+                            flash(f'Webdriver Status: {status}', category='info')
+                            flash(f"Product {product_on_database.product_name} successfully updated.",
+                                  category='success')
+                            return redirect(url_for('dashboard_page'))
+
+                        except AttributeError:
+                            flash("Something went wrong. Please try agan in a few seconds.", category='danger')
+                            db.session.rollback()  # nag ka error kaya rerevert yung data sa database or shit
+                            scraper.driver.quit()
+                            return redirect(url_for('dashboard_page'))
+
         # Load Reviews Logic
         if request.args.get('req') == "load_reviews":
+            get_percentage = SummarizeThis()
+            url_helper = UrlHelper()
+
             load_review_link = request.form.get('load_review_link')
             load_review_index = int(request.form.get('load_review_index'))
             load_review_item = int(request.form.get('load_review_item'))
@@ -250,9 +362,9 @@ def dashboard_page():
 
             if list_of_reviews.first() is None:
                 scraper = Webscraper()
-                url_helper = UrlHelper()
                 what_hostname = url_helper.get_hostname(load_review_link)
 
+                reviews = None
                 try:
                     shop_id = []
                     item_id = []
@@ -266,7 +378,17 @@ def dashboard_page():
                     reviews = scraper.find_product_reviews_shopee(
                         str(load_review_link + "?sp_atk")) \
                         if 'shopee.ph' in what_hostname else scraper.find_product_reviews_lazada(shop_id[0], item_id[0])
-
+                except TimeoutException as e:
+                    print(f'Error: {e}')
+                    flash("Something went wrong. Please try agan in a few seconds.", category='danger')
+                    scraper.driver.quit()
+                    return redirect(url_for('dashboard_page'))
+                except AttributeError as e:
+                    print(f'Error: {e}')
+                    flash("Something went wrong. Please try agan in a few seconds.", category='danger')
+                    scraper.driver.quit()
+                    return redirect(url_for('dashboard_page'))
+                finally:
                     for review in reviews:
                         review_data = ProductDataReviewsTable(product_id=load_review_item,
                                                               review_author=review.get('author'),
@@ -285,9 +407,20 @@ def dashboard_page():
                     if load_review_index == 0:
                         for reviews in new_reviews:
                             session['reviews_1'].append(reviews)
+
+                        review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
+                                                                                     product_index=load_review_index)
+
+                        session['reviews_summary_1'].append(review_summary)
+
                     else:
                         for reviews in new_reviews:
                             session['reviews_2'].append(reviews)
+
+                        review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
+                                                                                     product_index=load_review_index)
+
+                        session['reviews_summary_2'].append(review_summary)
 
                     # Check if webdriver is undetected
                     status = scraper.driver.execute_script('return navigator.webdriver')
@@ -299,24 +432,43 @@ def dashboard_page():
                     flash(f'Webdriver Status: {status}', category='info')
                     flash(f"Reviews loaded successfully", category='success')
                     return redirect(url_for('dashboard_page'))
-
-                except AttributeError or TimeoutException as e:
-                    print(f'Error: {e}')
-                    flash("Something went wrong. Please try agan in a few seconds.", category='danger')
-                    db.session.rollback()
-                    scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
-
             else:
                 if load_review_index == 0:
                     for reviews in list_of_reviews:
                         session['reviews_1'].append(reviews)
+
+                    review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
+                                                                                 product_index=load_review_index)
+                    session['reviews_summary_1'] = review_summary
                 else:
                     for reviews in list_of_reviews:
                         session['reviews_2'].append(reviews)
 
+                    review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
+                                                                                 product_index=load_review_index)
+                    session['reviews_summary_2'] = review_summary
+
                 flash(f"Reviews loaded successfully", category='success')
                 return redirect(url_for('dashboard_page'))
+
+        # Update Reviews Logic
+        if request.args.get("req") == "update_reviews":
+            # scraper = Webscraper()
+            # url_helper = UrlHelper()
+            #
+            # update_review_link = request.form.get('update_review_link')
+            # update_review_index = int(request.form.get('update_review_index'))
+            # update_review_item = int(request.form.get('update_review_item'))
+            # what_hostname = url_helper.get_hostname(update_review_link)
+
+            # reviews_on_database = db.session.query(ProductDataReviewsTable).filter(
+            #     ProductDataReviewsTable.product_id == update_review_item
+            # ).delete()
+            #
+            # db.session.commit()
+            # print(update_review_item)
+            flash('Wala pang logic to', category='info')
+            return redirect(url_for('dashboard_page'))
 
         # Favorites Logic
         if request.args.get("req") == "fav":
@@ -390,8 +542,10 @@ def dashboard_page():
                         if session['list_of_products']:
                             if int(replace_selected_item) == 0:
                                 session.pop('reviews_1')
+                                session.pop('reviews_summary_1')
                             else:
                                 session.pop('reviews_2')
+                                session.pop('reviews_summary_2')
 
                             session['list_of_products'][int(replace_selected_item)] = updated_product.get_details
 
@@ -433,102 +587,6 @@ def dashboard_page():
                     session['list_of_products'].append(updated_product.get_details)
                     flash(f'Showing {product[1].product_name} on the view', category='success')
                     return redirect(url_for('dashboard_page'))
-
-        # Update Logic
-        if request.args.get("req") == "update_product":
-            selected_product = request.form.get('selected_product')
-            product_on_database = db.session.query(ProductDetailsTable).filter(
-                ProductDetailsTable.product_id == selected_product
-            ).first()
-
-            if product_on_database is not None:
-                scraper = Webscraper()
-                scraper.land_first_page(product_on_database.product_link)
-
-                is_loaded = None
-                time_out = 15
-                url_helper = UrlHelper()
-                what_hostname = url_helper.get_hostname(product_on_database.product_link)
-                try:
-                    print(scraper.driver.title)
-                    is_loaded = WebDriverWait(scraper.driver, time_out).until(
-                        EC.visibility_of_element_located(
-                            (By.CSS_SELECTOR,
-                             'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="root"]'
-                             )))
-                except TimeoutException:
-                    flash("Timed out: Waiting for target page to load took to long. Please try again",
-                          category='danger')
-                    scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
-                finally:
-                    if is_loaded:
-                        time.sleep(3)
-                        # Getting Product Information
-                        try:
-
-                            prod_info = scraper.find_product_info_shopee(
-                                scraper.driver.page_source) if 'shopee.ph' in what_hostname \
-                                else scraper.find_product_info_lazada(scraper.driver.page_source)
-
-                            if what_hostname == 'shopee.ph':
-                                target_website = 'Shopee'
-                            else:
-                                target_website = 'Lazada'
-                                # adding new product to database
-
-                            product_on_database.product_name = prod_info.get('prod_name')
-                            product_on_database.product_price = prod_info.get('prod_price')
-                            product_on_database.product_rating = prod_info.get('prod_rating')
-                            product_on_database.product_sold = prod_info.get('prod_sold')
-                            product_on_database.product_description = prod_info.get('prod_desc')
-                            product_on_database.product_image = prod_info.get('prod_image')
-                            product_on_database.shop_rating = prod_info.get('shop_rating')
-                            product_on_database.shop_response_rate = prod_info.get('shop_res_rate')
-                            product_on_database.category = prod_info.get('category')
-                            product_on_database.category_link = prod_info.get('category_link')
-                            product_on_database.target_website = target_website
-
-                            helpme = HelpMe()
-                            in_dict = helpme.dict_isvalue_exist(session['list_of_products'], "link",
-                                                                product_on_database.product_link)
-
-                            if in_dict:
-                                i = helpme.list_find_index_of_dict(session['list_of_products'], "link",
-                                                                   product_on_database.product_link)
-                                session['list_of_products'][i].update({"name": product_on_database.product_name})
-                                session['list_of_products'][i].update({"price": product_on_database.product_price})
-                                session['list_of_products'][i].update({"rating": product_on_database.product_rating})
-                                session['list_of_products'][i].update({"sold": product_on_database.product_sold})
-                                session['list_of_products'][i].update(
-                                    {"description": product_on_database.product_description})
-                                session['list_of_products'][i].update(
-                                    {"product_image": product_on_database.product_image})
-                                session['list_of_products'][i].update({"shop_rating": product_on_database.shop_rating})
-                                session['list_of_products'][i].update(
-                                    {"shop_response_rate": product_on_database.shop_response_rate})
-
-                            db.session.commit()  # commit
-                            session.pop('reviews_1')
-                            session.pop('reviews_2')
-
-                            # Check if webdriver is undetected
-                            status = scraper.driver.execute_script('return navigator.webdriver')
-
-                            # Close headless browser and webdriver instance gracefully
-                            scraper.driver.quit()
-
-                            # alisin pag deployment na.
-                            flash(f'Webdriver Status: {status}', category='info')
-                            flash(f"Product {product_on_database.product_name} successfully updated.",
-                                  category='success')
-                            return redirect(url_for('dashboard_page'))
-
-                        except AttributeError:
-                            flash("Something went wrong. Please try agan in a few seconds.", category='danger')
-                            db.session.rollback()  # nag ka error kaya rerevert yung data sa database or shit
-                            scraper.driver.quit()
-                            return redirect(url_for('dashboard_page'))
 
     if request.method == 'GET':
         # ranks -- used sql statement
@@ -608,11 +666,14 @@ def dashboard_page():
                                replace_product_modal_form=replace_product_modal_form,
                                update_product_modal_form=update_product_modal_form,
                                load_reviews_form=load_reviews_form,
+                               update_reviews_form=update_reviews_form,
                                list_of_history=list_of_history,
                                shopee_dataframe=shopee_data_dict,
                                lazada_dataframe=lazada_data_dict,
                                reviews_1=session['reviews_1'],
-                               reviews_2=session['reviews_2']
+                               reviews_2=session['reviews_2'],
+                               reviews_summary_1=session['reviews_summary_1'],
+                               reviews_summary_2=session['reviews_summary_2']
                                )
 
 

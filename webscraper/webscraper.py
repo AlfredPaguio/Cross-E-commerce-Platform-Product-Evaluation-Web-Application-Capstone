@@ -6,6 +6,7 @@ import json
 from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 # from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -50,7 +51,7 @@ class Webscraper:
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
@@ -147,6 +148,8 @@ class Webscraper:
         self.driver.get(review_url)
 
         print('Getting Reviews..')
+        reviews_loaded = None
+
         reviews_loaded = WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((
             By.CSS_SELECTOR,
             'div[class="app-container"]'
@@ -162,7 +165,7 @@ class Webscraper:
                 )
 
                 self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
-                time.sleep(1.5)
+                time.sleep(2)
 
                 # optimize - need to scroll also less than 50 if total reviews is less than 50
                 if len(reviews) >= 50:

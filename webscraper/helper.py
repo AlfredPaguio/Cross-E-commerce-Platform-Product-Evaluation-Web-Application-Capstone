@@ -1,7 +1,9 @@
 import re
+import pandas as pd
 from urllib.parse import urlparse
 from flask import session
 from webscraper.productdetails import ProductDetails
+from webscraper import db
 import random
 import string
 
@@ -68,3 +70,21 @@ class HelpMe():
             # appending a random character to password
             password.append(randomchar)
         return "".join(password)  # return array as string
+
+
+class SummarizeThis:
+    def get_percentage_of_sentiments(self, product_id, product_index):
+        reviews_query = pd.read_sql(f'SELECT product_id, review_sentiment FROM product_data_reviews_table WHERE '
+                                    f'product_id == {session["list_of_products"][product_index].get("product_id")}'
+                                    f' LIMIT 50', db.session.bind)
+        review_data = pd.DataFrame(reviews_query)
+
+        review_index = review_data.loc[
+            review_data['product_id'] == session["list_of_products"][product_index].get('product_id')]
+        review_index_df = review_index.groupby(['review_sentiment'], as_index=False).size()
+        review_index_df['percentage'] = (review_index_df['size'] / review_index_df['size'].sum() * 100).round(2)
+
+        new_review_df = pd.DataFrame(review_index_df.sort_values('review_sentiment', ascending=False))
+        new_review_dict = new_review_df.to_dict('records')
+
+        return new_review_dict

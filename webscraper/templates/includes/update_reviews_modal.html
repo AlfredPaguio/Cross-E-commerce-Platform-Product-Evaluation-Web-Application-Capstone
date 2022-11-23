@@ -1,0 +1,39 @@
+<style>
+    .modal-content {
+        background-color: #212121
+    }
+</style>
+
+<div class="modal fade" id="Modal-UpdateReviews-{{ prod.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="ModalLabel">
+                    {{ prod.name }}
+                </h5>
+            </div>
+
+            <div class="modal-body">
+                <form action="/dashboard?req=update_reviews"  onsubmit="loading();" method="POST">
+                    {{ update_reviews_form.hidden_tag() }}
+                    <h4 class="text-center">
+                        Are you sure you want to update reviews for this product?
+                    </h4>
+                    <br>
+                    <input name="update_review_index" type="hidden" value="{{ loop.index0 }}">
+                    <input name="update_review_link" type="hidden" value="{{ prod.link }}">
+                    <input name="update_review_item" type="hidden" value="{{ prod.product_id }}">
+                    <div class="text-center">
+                        By pressing UPDATE, it will update the product reviews <br>
+                        {{ update_reviews_form.submit(class="btn btn-outline-success", style="color:white;") }}
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                 <button type="button" class="btn btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
