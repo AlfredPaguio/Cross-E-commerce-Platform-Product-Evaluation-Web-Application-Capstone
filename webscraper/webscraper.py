@@ -148,8 +148,6 @@ class Webscraper:
         self.driver.get(review_url)
 
         print('Getting Reviews..')
-        reviews_loaded = None
-
         reviews_loaded = WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((
             By.CSS_SELECTOR,
             'div[class="app-container"]'
