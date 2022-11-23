@@ -1,80 +1,101 @@
-   <!-- container for the loop values -->
+{% if reviews_1|length == 0 %}
+   <div class="row mt-3 mx-auto">
+      <div class="col text-center">
+         <form onsubmit="loading();" action="/dashboard?req=load_reviews" method="POST">
+             {{ load_reviews_form.hidden_tag() }}
+            <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
+            <input name="load_review_link" type="hidden" value="{{ prod.link }}">
+           <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
+           <div class="text-center">
+               {{ load_reviews_form.submit(class="btn btn-outline-primary", style="color:white;") }}
+           </div>
+         </form>
+      </div>
+   </div>
+{% else %}
+   {% for review in reviews_1 %}
+      {% if review.product_id == prod.product_id %}
+         <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+            <div class="col-2 p-3 pt-4">
+               {% if review.review_sentiment == 1 %}
+               <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+               {% elif review.review_sentiment == 0 %}
+               <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+               {% else %}
+               <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+               {% endif %}
+            </div>
+            <div class="col-10 p-3">
+               <h5>Review Author | {{ review.review_author }}</h5>
+               <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+               <hr style="background-color:white;">
+               <label  class="font-weight-bold" for="productView1">Review Comment</label>
+               <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+            </div>
+         </div>
+      {% endif %}
+   {% endfor %}
+{% endif %}
+
+---------------------------------------------------------
+
+{% if reviews_2|length == 0 %}
+   <div class="row mt-3 mx-auto">
+      <div class="col text-center">
+         <form onsubmit="loading();" action="/dashboard?req=load_reviews" method="POST">
+             {{ load_reviews_form.hidden_tag() }}
+            <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
+            <input name="load_review_link" type="hidden" value="{{ prod.link }}">
+           <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
+           <div class="text-center">
+               {{ load_reviews_form.submit(class="btn btn-outline-primary", style="color:white;") }}
+           </div>
+         </form>
+      </div>
+   </div>
+{% else %}
+   {% for review in reviews_2 %}
+      {% if review.product_id == prod.product_id %}
+         <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
+            <div class="col-2 p-3 pt-4">
+               {% if review.review_sentiment == 1 %}
+               <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+               {% elif review.review_sentiment == 0 %}
+               <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+               {% else %}
+               <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+               {% endif %}
+            </div>
+            <div class="col-10 p-3">
+               <h5>Review Author | {{ review.review_author }}</h5>
+               <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+               <hr style="background-color:white;">
+               <label  class="font-weight-bold" for="productView1">Review Comment</label>
+               <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+            </div>
+         </div>
+      {% endif %}
+   {% endfor%}
+{% endif %}
+
+---------------------------------------
+
+<div class="row mt-3 mb-3">
    {% if loop.index0 == 0 %}
-      {% for review in reviews_pagination_1.items %}
-          {% if review.product_id == prod.product_id %}
-            <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
-               <div class="col-2 p-3 pt-4">
-                  {% if review.review_sentiment == 1 %}
-                  <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
-                  {% elif review.review_sentiment == 0 %}
-                  <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
-                  {% else %}
-                  <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
-                  {% endif %}
-               </div>
-               <div class="col-10 p-3">
-                  <h5>Review Author | {{ review.review_author }}</h5>
-                  <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
-                  <hr style="background-color:white;">
-                  <label  class="font-weight-bold" for="productView1">Review Comment</label>
-                  <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
-               </div>
+      {% if reviews_1|length >= 1  %}
+         <div class="row mt-3 mx-auto">
+            <div class="col text-center">
+               <button type="submit" class="btn btn-outline-primary mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
             </div>
-         {% endif %}
-      {% endfor %}
-
-      <div class="pt-3">
-         <ul class="pagination justify-content-center">
-            {% for page in reviews_pagination_1.iter_pages(left_current=5) %}
-               {% if page %}
-                  <li class="page-item {{'active' if page == value1 }}">
-                     <a class="page-link" href="{{ url_for('dashboard_page', page_of_list1=page|int, page_of_list2=value2) }}">{{ page }}</a>
-                  </li>
-               {% else %}
-                  <li class="page-item">
-                     <a class="page-link" href="#">...</a>
-                  </li>
-               {% endif %}
-            {% endfor%}
-         </ul>
-      </div>
-   {% elif loop.index0 == 1 %}
-      {% for review in reviews_pagination_2.items %}
-          {% if review.product_id == prod.product_id %}
-            <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
-               <div class="col-2 p-3 pt-4">
-                  {% if review.review_sentiment == 1 %}
-                  <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
-                  {% elif review.review_sentiment == 0 %}
-                  <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
-                  {% else %}
-                  <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
-                  {% endif %}
-               </div>
-               <div class="col-10 p-3">
-                  <h5>Review Author | {{ review.review_author }}</h5>
-                  <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
-                  <hr style="background-color:white;">
-                  <label  class="font-weight-bold" for="productView1">Review Comment</label>
-                  <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
-               </div>
+         </div>
+      {% endif %}
+   {% else%}
+      {% if reviews_2|length >= 1  %}
+         <div class="row mt-3 mx-auto">
+            <div class="col text-center">
+               <button type="submit" class="btn btn-outline-primary mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
             </div>
-         {% endif %}
-      {% endfor %}
-
-      <div class="pt-3">
-         <ul class="pagination justify-content-center">
-            {% for page in reviews_pagination_2.iter_pages(left_current=5) %}
-               {% if page %}
-                  <li class="page-item {{'active' if page == value2 }}">
-                     <a class="page-link" href="{{ url_for('dashboard_page', page_of_list1=value1, page_of_list2=page|int) }}">{{ page }}</a>
-                  </li>
-               {% else %}
-                  <li class="page-item">
-                     <a class="page-link" href="#">...</a>
-                  </li>
-               {% endif %}
-            {% endfor%}
-         </ul>
-      </div>
+         </div>
+      {% endif %}
    {% endif %}
+</div>

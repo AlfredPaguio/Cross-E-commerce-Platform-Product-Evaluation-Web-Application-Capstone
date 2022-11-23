@@ -2,8 +2,9 @@ import re
 import pandas as pd
 from urllib.parse import urlparse
 from flask import session
-from webscraper.productdetails import ProductDetails
 from webscraper import db
+from webscraper.productdetails import ProductDetails
+from webscraper.models import ProductDataReviewsTable
 import random
 import string
 
@@ -73,10 +74,16 @@ class HelpMe():
 
 
 class SummarizeThis:
-    def get_percentage_of_sentiments(self, product_id, product_index):
+    def get_percentage_of_sentiments(self, product_index):
+
         reviews_query = pd.read_sql(f'SELECT product_id, review_sentiment FROM product_data_reviews_table WHERE '
                                     f'product_id == {session["list_of_products"][product_index].get("product_id")}'
                                     f' LIMIT 50', db.session.bind)
+
+        reviews_query = pd.read_sql(db.session.query(ProductDataReviewsTable).filter(
+            ProductDataReviewsTable.product_id == session["list_of_products"][product_index].get("product_id")
+        ).limit(50).statement, db.session.bind)
+
         review_data = pd.DataFrame(reviews_query)
 
         review_index = review_data.loc[

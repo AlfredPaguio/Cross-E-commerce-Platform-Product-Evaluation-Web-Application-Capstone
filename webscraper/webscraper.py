@@ -2,20 +2,12 @@ import time
 # import os
 import json
 # import base64
-
 from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-# from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
-
 from bs4 import BeautifulSoup
-
 from webdriver_manager.chrome import ChromeDriverManager
-
 from webscraper import sentiment
 
 
@@ -34,10 +26,9 @@ class Webscraper:
         # set chrome options
         options = webdriver.ChromeOptions()
         # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+
         options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-blink-features=AutomationControlled')
-        # options.add_argument("window-size=1920x1480")
-        # options.add_argument('--headless')
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
@@ -47,9 +38,7 @@ class Webscraper:
         options.add_argument('--disable-notifications')
         options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
         options.add_experimental_option("mobileEmulation", mobile_emulation)
-        # options.add_experimental_option("prefs", prefs)
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
         # options.headless = True
 
@@ -128,77 +117,51 @@ class Webscraper:
             'category_link': category_link
         }
 
-    def find_product_reviews_shopee(self, url):
+    def find_product_reviews_shopee(self):
+        print('Running initial loop')
+        for _ in range(5):
+            reviews = self.driver.find_elements(
+                By.CSS_SELECTOR,
+                'div[class="xSd-kj"]'
+            )
 
-        if '/product/' in url:
-            # print('mobile url')
-            start = url.find('/product/')
-            end = url.find('?smtt=0')
-            split_ = url[start:end].split('/')
+            self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
+            time.sleep(2)
 
-            review_url = f'https://shopee.ph/shop/{split_[2]}/item/{split_[3]}/rating'
-        else:
-            # print('desktop url')
-            start = url.find('-i.')
-            end = url.find('?sp_atk')
-            split_ = url[start:end].split('.')
-
-            review_url = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
-
-        self.driver.get(review_url)
+            # optimize - need to scroll also less than 50 if total reviews is less than 50
+            if len(reviews) >= 50:
+                break
 
         print('Getting Reviews..')
-        reviews_loaded = WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((
-            By.CSS_SELECTOR,
-            'div[class="app-container"]'
-        )))
+        time.sleep(3)
+        review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
+        all_reviews = review_soup.find_all('div', class_='xSd-kj')
 
-        if reviews_loaded:
-            print('Reviews loaded: Success')
-            print('Running initial loop')
-            for _ in range(5):
-                reviews = self.driver.find_elements(
-                    By.CSS_SELECTOR,
-                    'div[class="xSd-kj"]'
-                )
+        reviews = []
+        for review in all_reviews:
+            author = review.find_next('div', class_='_33kUIp').text
 
-                self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
-                time.sleep(2)
+            date_time = review.find_next('div', class_='yu9aaY').text
 
-                # optimize - need to scroll also less than 50 if total reviews is less than 50
-                if len(reviews) >= 50:
-                    break
+            # div.class from inspect element from div.class from driver.page_source is different.
+            # used the element from driver.page_source as div.class 'iLqFOu' not working
+            try:
+                comment = review.find_next('div', class_='iLqFOu').text
+            except AttributeError:
+                comment = review.find_next('div', class_='pqiYNA').text
 
-            print('Getting Reviews..')
-            time.sleep(3)
-            review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
-            all_reviews = review_soup.find_all('div', class_='xSd-kj')
+            review_sentiment = sentiment.do_sentiment(comment)
 
-            reviews = []
-            for review in all_reviews:
-                author = review.find_next('div', class_='_33kUIp').text
-
-                date_time = review.find_next('div', class_='yu9aaY').text
-
-                # div.class from inspect element from div.class from driver.page_source is different.
-                # used the element from driver.page_source as div.class 'iLqFOu' not working
-                try:
-                    comment = review.find_next('div', class_='iLqFOu').text
-                except AttributeError:
-                    comment = review.find_next('div', class_='pqiYNA').text
-
-                review_sentiment = sentiment.do_sentiment(comment)
-
-                reviews.append(
-                    {
-                        'author': author,
-                        'date_time': date_time,
-                        'comment': comment,
-                        'review_sentiment': review_sentiment
-                    }
-                )
-            print('Getting reviews: Success')
-            return reviews
+            reviews.append(
+                {
+                    'author': author,
+                    'date_time': date_time,
+                    'comment': comment,
+                    'review_sentiment': review_sentiment
+                }
+            )
+        print('Getting reviews: Success')
+        return reviews
 
     # ----------------------------------------------------------------------------------------------------------------#
 
@@ -271,53 +234,40 @@ class Webscraper:
             'category_link': category_link
         }
 
-    def find_product_reviews_lazada(self, shop_id, item_id):
-        review_url = f'https://my-m.lazada.com.ph/review/product-reviews?itemId={item_id}&skuId={shop_id}&spm=a2o4l' \
-                     f'.pdp_revamp_css.pdp_top_tab.rating_and_review&wh_weex=true '
+    def find_product_reviews_lazada(self):
+        print('Running initial loop')
+        for _ in range(5):
+            reviews = self.driver.find_elements(
+                By.CSS_SELECTOR,
+                'div[class="review-item"]'
+            )
 
-        self.driver.get(review_url)
+            self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
+            time.sleep(1.5)
+
+            if len(reviews) == 50:
+                break
 
         print('Getting Reviews..')
-        reviews_loaded = WebDriverWait(self.driver, 30).until(EC.visibility_of_element_located((
-            By.CSS_SELECTOR,
-            'div[class="rax-scrollview"]'
-        )))
+        time.sleep(3)
+        review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
+        all_reviews = review_soup.find_all('div', class_="review-item")
 
-        if reviews_loaded:
-            print('Reviews loaded: Success')
-            print('Running initial loop')
-            for _ in range(5):
-                reviews = self.driver.find_elements(
-                    By.CSS_SELECTOR,
-                    'div[class="review-item"]'
-                )
+        reviews = []
+        for review in all_reviews:
+            spans = review.find_all_next('span')
+            author = spans[1].text
+            date_time = spans[2].text
+            comment = spans[3].text
+            review_sentiment = sentiment.do_sentiment(comment)
 
-                self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
-                time.sleep(1.5)
-
-                if len(reviews) == 50:
-                    break
-
-            print('Getting Reviews..')
-            time.sleep(3)
-            review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
-            all_reviews = review_soup.find_all('div', class_="review-item")
-
-            reviews = []
-            for review in all_reviews:
-                spans = review.find_all_next('span')
-                author = spans[1].text
-                date_time = spans[2].text
-                comment = spans[3].text
-                review_sentiment = sentiment.do_sentiment(comment)
-
-                reviews.append(
-                    {
-                        'author': author,
-                        'date_time': date_time,
-                        'comment': comment,
-                        'review_sentiment': review_sentiment
-                    }
-                )
-            print('Getting reviews: Success')
-            return reviews
+            reviews.append(
+                {
+                    'author': author,
+                    'date_time': date_time,
+                    'comment': comment,
+                    'review_sentiment': review_sentiment
+                }
+            )
+        print('Getting reviews: Success')
+        return reviews

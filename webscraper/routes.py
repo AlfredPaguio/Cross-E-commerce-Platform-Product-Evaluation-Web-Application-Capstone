@@ -325,10 +325,7 @@ def dashboard_page():
                                     {"shop_response_rate": product_on_database.shop_response_rate})
 
                             db.session.commit()  # commit
-                            session.pop('reviews_1')
-                            session.pop('reviews_2')
-                            session.pop('reviews_summary_1')
-                            session.pop('reviews_summary_2')
+
                             # Check if webdriver is undetected
                             status = scraper.driver.execute_script('return navigator.webdriver')
 
@@ -364,88 +361,108 @@ def dashboard_page():
                 scraper = Webscraper()
                 what_hostname = url_helper.get_hostname(load_review_link)
 
-                reviews = None
+                if what_hostname == 'shopee.ph':
+                    start = load_review_link.find('-i.')
+                    split_ = load_review_link[start:].strip(' ').split('.')
+
+                    review_link = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
+                else:
+                    end = load_review_link.find('.html')
+                    split = load_review_link[:end].split('-')
+
+                    shop_id = split[-1].strip(split[-1][0])
+                    item_id = split[-2].strip(split[-2][0])
+
+                    review_link = f'https://my-m.lazada.com.ph/review/product-reviews?itemId={item_id}&skuId=' \
+                                  f'{shop_id}&spm=a2o4l.pdp_revamp_css.pdp_top_tab.rating_and_review&wh_weex=true '
+
+                # run new scraper
+                scraper.land_first_page(review_link)
+                reviews_loaded = None
+
                 try:
-                    shop_id = []
-                    item_id = []
-                    if what_hostname == 'www.lazada.com.ph':
-                        end = load_review_link.find('.html')
-                        split = load_review_link[:end].split('-')
-
-                        shop_id.append(split[-1].strip(split[-1][0]))
-                        item_id.append(split[-2].strip(split[-2][0]))
-
-                    reviews = scraper.find_product_reviews_shopee(
-                        str(load_review_link + "?sp_atk")) \
-                        if 'shopee.ph' in what_hostname else scraper.find_product_reviews_lazada(shop_id[0], item_id[0])
-                except TimeoutException as e:
-                    print(f'Error: {e}')
-                    flash("Something went wrong. Please try agan in a few seconds.", category='danger')
-                    scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
-                except AttributeError as e:
-                    print(f'Error: {e}')
-                    flash("Something went wrong. Please try agan in a few seconds.", category='danger')
+                    print('Getting Reviews..')
+                    reviews_loaded = WebDriverWait(scraper.driver, 30).until(EC.visibility_of_element_located((
+                        By.CSS_SELECTOR, 'div[class="app-container"]' if "shopee.ph" in what_hostname
+                        else 'div[class="rax-scrollview"]'
+                    )))
+                except TimeoutException:
+                    flash("Timed out: Waiting for target page to load took to long. Please try again",
+                          category='danger')
                     scraper.driver.quit()
                     return redirect(url_for('dashboard_page'))
                 finally:
-                    for review in reviews:
-                        review_data = ProductDataReviewsTable(product_id=load_review_item,
-                                                              review_author=review.get('author'),
-                                                              review_data_time=review.get('date_time'),
-                                                              review_comment=review.get('comment'),
-                                                              review_sentiment=review.get(
-                                                                  'review_sentiment')
-                                                              )
-                        db.session.add(review_data)
-                    db.session.commit()
+                    if reviews_loaded:
+                        time.sleep(3)
+                        print('Reviews loaded: Success')
+                        try:
+                            reviews = scraper.find_product_reviews_shopee() if 'shopee.ph' in what_hostname else \
+                                scraper.find_product_reviews_lazada()
 
-                    new_reviews = db.session.query(ProductDataReviewsTable).filter(
-                        ProductDataReviewsTable.product_id == load_review_item
-                    ).limit(50)
+                            for review in reviews:
+                                review_data = ProductDataReviewsTable(product_id=load_review_item,
+                                                                      review_author=review.get('author'),
+                                                                      review_data_time=review.get('date_time'),
+                                                                      review_comment=review.get('comment'),
+                                                                      review_sentiment=review.get(
+                                                                          'review_sentiment')
+                                                                      )
+                                db.session.add(review_data)
+                            db.session.commit()
 
-                    if load_review_index == 0:
-                        for reviews in new_reviews:
-                            session['reviews_1'].append(reviews)
+                            new_reviews = db.session.query(ProductDataReviewsTable).filter(
+                                ProductDataReviewsTable.product_id == load_review_item
+                            ).limit(50)
 
-                        review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
-                                                                                     product_index=load_review_index)
+                            print(new_reviews)
 
-                        session['reviews_summary_1'].append(review_summary)
+                            if load_review_index == 0:
+                                for reviews in new_reviews:
+                                    session['reviews_1'].append(reviews)
 
-                    else:
-                        for reviews in new_reviews:
-                            session['reviews_2'].append(reviews)
+                                review_summary = get_percentage.get_percentage_of_sentiments(
+                                    product_index=load_review_index)
+                                session['reviews_summary_1'] = review_summary
 
-                        review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
-                                                                                     product_index=load_review_index)
+                            else:
+                                for reviews in new_reviews:
+                                    session['reviews_2'].append(reviews)
 
-                        session['reviews_summary_2'].append(review_summary)
+                                review_summary = get_percentage.get_percentage_of_sentiments(
+                                    product_index=load_review_index)
+                                session['reviews_summary_2'] = review_summary
 
-                    # Check if webdriver is undetected
-                    status = scraper.driver.execute_script('return navigator.webdriver')
+                            # Check if webdriver is undetected
+                            status = scraper.driver.execute_script('return navigator.webdriver')
 
-                    # Close headless browser and webdriver instance gracefully
-                    scraper.driver.quit()
+                            # Close headless browser and webdriver instance gracefully
+                            scraper.driver.quit()
 
-                    # alisin pag deployment na..
-                    flash(f'Webdriver Status: {status}', category='info')
-                    flash(f"Reviews loaded successfully", category='success')
-                    return redirect(url_for('dashboard_page'))
+                            # alisin pag deployment na
+                            flash(f'Webdriver Status: {status}', category='info')
+                            flash(f"Reviews loaded successfully", category='success')
+                            return redirect(url_for('dashboard_page'))
+                        except AttributeError:
+                            if load_review_index == 0:
+                                session.pop('reviews_summary_1')
+                            else:
+                                session.pop('reviews_summary_2')
+
+                            flash("Something went wrong. Please try agan in a few seconds.", category='danger')
+                            scraper.driver.quit()
+                            return redirect(url_for('dashboard_page'))
             else:
                 if load_review_index == 0:
                     for reviews in list_of_reviews:
                         session['reviews_1'].append(reviews)
 
-                    review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
-                                                                                 product_index=load_review_index)
+                    review_summary = get_percentage.get_percentage_of_sentiments(product_index=load_review_index)
                     session['reviews_summary_1'] = review_summary
                 else:
                     for reviews in list_of_reviews:
                         session['reviews_2'].append(reviews)
 
-                    review_summary = get_percentage.get_percentage_of_sentiments(product_id=load_review_item,
-                                                                                 product_index=load_review_index)
+                    review_summary = get_percentage.get_percentage_of_sentiments(product_index=load_review_index)
                     session['reviews_summary_2'] = review_summary
 
                 flash(f"Reviews loaded successfully", category='success')
