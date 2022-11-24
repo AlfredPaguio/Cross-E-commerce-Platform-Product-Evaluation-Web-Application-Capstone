@@ -1,7 +1,5 @@
 import time
-# import os
 import json
-# import base64
 from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -40,7 +38,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        # options.headless = True
+        options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
@@ -133,7 +131,7 @@ class Webscraper:
                 break
 
         print('Getting Reviews..')
-        time.sleep(3)
+        time.sleep(2)
         review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
         all_reviews = review_soup.find_all('div', class_='xSd-kj')
 
@@ -243,13 +241,13 @@ class Webscraper:
             )
 
             self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
-            time.sleep(1.5)
+            time.sleep(2)
 
             if len(reviews) == 50:
                 break
 
         print('Getting Reviews..')
-        time.sleep(3)
+        time.sleep(2)
         review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
         all_reviews = review_soup.find_all('div', class_="review-item")
 
