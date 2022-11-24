@@ -241,7 +241,8 @@ def dashboard_page():
                                 flash(f'Displaying product information from {what_hostname}', category='success')
                                 return redirect(url_for('dashboard_page'))
 
-                            except AttributeError:
+                            except AttributeError as e:
+                                print(e)
                                 flash("Something went wrong. Please try agan in a few seconds.", category='danger')
                                 scraper.driver.quit()
                                 return redirect(url_for('dashboard_page'))
@@ -265,7 +266,6 @@ def dashboard_page():
                 url_helper = UrlHelper()
                 what_hostname = url_helper.get_hostname(product_on_database.product_link)
                 try:
-                    print(scraper.driver.title)
                     is_loaded = WebDriverWait(scraper.driver, time_out).until(
                         EC.visibility_of_element_located(
                             (By.CSS_SELECTOR,
@@ -277,6 +277,7 @@ def dashboard_page():
                     scraper.driver.quit()
                     return redirect(url_for('dashboard_page'))
                 finally:
+                    print(scraper.driver.title)
                     if is_loaded:
                         time.sleep(3)
                         # Getting Product Information
@@ -339,7 +340,8 @@ def dashboard_page():
                                   category='success')
                             return redirect(url_for('dashboard_page'))
 
-                        except AttributeError:
+                        except TimeoutException as e:
+                            print(e)
                             flash("Something went wrong. Please try agan in a few seconds.", category='danger')
                             db.session.rollback()  # nag ka error kaya rerevert yung data sa database or shit
                             scraper.driver.quit()

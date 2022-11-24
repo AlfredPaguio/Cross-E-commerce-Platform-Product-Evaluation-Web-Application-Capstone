@@ -38,7 +38,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
@@ -55,15 +55,18 @@ class Webscraper:
 
         soup = BeautifulSoup(soup_text, 'lxml')
 
-        prod_name = soup.find('div', class_='_3Iuey2').text
+        try:
+            prod_name = soup.find('div', class_='_26jnYM typo-r16 two-line-text').text
+        except AttributeError:
+            # Mall
+            prod_name = soup.find('div', class_='JuNyef').text
 
         try:
-            prod_price = soup.find('div', class_='_2ebSoR').text
+            prod_price = soup.find('div', class_='GNcIuD typo-m18').text
         except AttributeError:
-            # prices in flash sales
             prod_price = soup.find('div', class_='_1oOw3J').text
 
-        prod_rating = soup.find('div', class_='u4PHcM').text
+        prod_rating = soup.find('div', class_='E35R5h').text
 
         prod_sold = soup.find('div', class_='product-review__sold-count').select_one('div').text
         prod_sold_end = prod_sold.find(' Sold')
@@ -72,9 +75,9 @@ class Webscraper:
         prod_desc = soup.find('meta', attrs={'name': 'description'})
 
         # Shop rating and response rate
-        div = soup.find_all('div', class_='_2hdgiL')
-        shop_rating = div[1].find_next('div', class_='_2HsjnQ').text
-        shop_response_rate = div[2].find_next('div', class_='_2HsjnQ').text
+        div = soup.find_all('div', class_='Mh34aP')
+        shop_rating = div[1].find_next('div', class_='Y9Ery0').text
+        shop_response_rate = div[2].find_next('div', class_='Y9Ery0').text
 
         # Category
         scripts = soup.find_all('script', type='application/ld+json')
@@ -95,7 +98,7 @@ class Webscraper:
         # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
 
         try:
-            prod_image_ = soup.find('img', class_='product-carousel__item _35N8Pu')
+            prod_image_ = soup.find('img', class_='product-carousel__item _1AkNaT')
             prod_image = prod_image_['src']
         except AttributeError:
             prod_image_ = soup.find('video', class_='product-video__video')
