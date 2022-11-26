@@ -247,8 +247,10 @@ def dashboard_page():
                                 session.pop('recommended_2')
                                 session.pop('reviews_summary_1')
                                 session.pop('reviews_summary_2')
+
                                 # Check if webdriver is undetected
                                 status = scraper.driver.execute_script('return navigator.webdriver')
+                                print(f'Webdriver status: {status}')
 
                                 # Close headless browser and webdriver instance gracefully
                                 scraper.driver.quit()
@@ -344,6 +346,7 @@ def dashboard_page():
 
                             # Check if webdriver is undetected
                             status = scraper.driver.execute_script('return navigator.webdriver')
+                            print(f'Webdriver status: {status}')
 
                             # Close headless browser and webdriver instance gracefully
                             scraper.driver.quit()
@@ -449,6 +452,7 @@ def dashboard_page():
 
                             # Check if webdriver is undetected
                             status = scraper.driver.execute_script('return navigator.webdriver')
+                            print(f'Webdriver status: {status}')
 
                             # Close headless browser and webdriver instance gracefully
                             scraper.driver.quit()
@@ -710,6 +714,7 @@ def dashboard_page():
 
                             # Check if webdriver is undetected
                             status = scraper.driver.execute_script('return navigator.webdriver')
+                            print(f'Webdriver status: {status}')
 
                             # Close headless browser and webdriver instance gracefully
                             scraper.driver.quit()

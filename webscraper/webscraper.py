@@ -164,13 +164,12 @@ class Webscraper:
         return reviews
 
     def find_recommendations_shopee(self):
-        print('Getting product recommendations..')
-
         scroll = self.driver.find_elements(
             By.CSS_SELECTOR,
             'div[class="item-card-list__item-card-wrapper"]'
         )
 
+        print('Running initial loop')
         if scroll:
             add = 3
             for _ in range(5):
@@ -182,6 +181,8 @@ class Webscraper:
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
 
         recommended_products = soup.find_all('div', class_='item-card-list__item-card-wrapper')
+
+        print('Getting product recommendations..')
 
         recommended_products_list = []
         for recommended in recommended_products:
@@ -314,8 +315,7 @@ class Webscraper:
         return reviews
 
     def find_recommendations_lazada(self):
-        print('Getting product recommendations..')
-
+        print('Running initial loop')
         scroll = self.driver.find_elements(
             By.CSS_SELECTOR,
             'div[class="product-card__container "]'
@@ -331,6 +331,8 @@ class Webscraper:
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
 
         recommended_products = soup.find_all('div', class_='product-card__container')
+
+        print('Getting product recommendations..')
 
         recommended_products_list = []
         for recommended in recommended_products:
