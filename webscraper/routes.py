@@ -170,10 +170,9 @@ def dashboard_page():
                     scraper.land_first_page(input_link)
 
                     is_loaded = None
-                    time_out = 10
 
                     try:
-                        is_loaded = WebDriverWait(scraper.driver, time_out).until(
+                        is_loaded = WebDriverWait(scraper.driver, 3).until(
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR,
                                  'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="container"]'
@@ -279,11 +278,10 @@ def dashboard_page():
                 scraper.land_first_page(product_on_database.product_link)
 
                 is_loaded = None
-                time_out = 10
                 url_helper = UrlHelper()
                 what_hostname = url_helper.get_hostname(product_on_database.product_link)
                 try:
-                    is_loaded = WebDriverWait(scraper.driver, time_out).until(
+                    is_loaded = WebDriverWait(scraper.driver, 3).until(
                         EC.visibility_of_element_located(
                             (By.CSS_SELECTOR,
                              'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="root"]'
@@ -400,7 +398,7 @@ def dashboard_page():
 
                 try:
                     print('Getting Reviews..')
-                    reviews_loaded = WebDriverWait(scraper.driver, 10).until(EC.visibility_of_element_located((
+                    reviews_loaded = WebDriverWait(scraper.driver, 3).until(EC.visibility_of_element_located((
                         By.CSS_SELECTOR, 'div[class="app-container"]' if "shopee.ph" in what_hostname
                         else 'div[class="rax-scrollview"]'
                     )))
@@ -505,7 +503,7 @@ def dashboard_page():
                 recommended_products_loaded = None
                 try:
                     print('Getting recommended products..')
-                    recommended_products_loaded = WebDriverWait(scraper.driver, 10).until(
+                    recommended_products_loaded = WebDriverWait(scraper.driver, 3).until(
                         EC.visibility_of_element_located((
                             By.CSS_SELECTOR, 'div[class="app-container"]' if "shopee.ph" in what_hostname
                             else 'div[class="content-list"]'
@@ -644,10 +642,9 @@ def dashboard_page():
                 scraper.land_first_page(input_link)
 
                 is_loaded = None
-                time_out = 10
 
                 try:
-                    is_loaded = WebDriverWait(scraper.driver, time_out).until(
+                    is_loaded = WebDriverWait(scraper.driver, 3).until(
                         EC.visibility_of_element_located(
                             (By.CSS_SELECTOR,
                              'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="container"]'
