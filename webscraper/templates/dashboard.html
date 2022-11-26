@@ -69,7 +69,6 @@ Dashboard Page
             {% for prod in list_of_products %}
             {% include 'includes/add_to_favorites_modal.html' %}
             {% include 'includes/update_product_modal.html' %}
-            {% include 'includes/update_reviews_modal.html' %}
             {% include 'includes/load_reviews_modal.html' %}
             {% include 'includes/load_recommended_products_modal.html' %}
             <div class="col-6 mx-auto">
@@ -104,11 +103,13 @@ Dashboard Page
                      {% endif %}
                   </div>
                </div>
+
                <div class="text-center pt-3 pb-3">
-                  <button type="submit" class="btn btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateProduct-{{ prod.product_id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>  Update</button>
-                  <a href='{{ prod.link }}' class="btn btn-outline-info mt-2" style="color:white;" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
-                  <button type="submit" class="btn btn-outline-danger mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-AddToFavoritesConfirm-{{ prod.product_id }}"><i class="fa fa-heart-o" aria-hidden="true"></i>  Favorite</button>
+                  <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateProduct-{{ prod.product_id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>  Update</button>
+                  <a href='{{ prod.link }}' class="btn btn-outline-info btn-sm mt-2" style="color:white;" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
+                  <button type="submit" class="btn btn-outline-danger btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-AddToFavoritesConfirm-{{ prod.product_id }}"><i class="fa fa-heart-o" aria-hidden="true"></i>  Favorite</button>
                </div>
+
                <div class="row">
                   <div class="col-12 mt-2">
                      <label  class="font-weight-bold" for="productView1">Product Description</label>
@@ -116,8 +117,8 @@ Dashboard Page
                   </div>
                </div>
 
-               <div class="row mt-3 mb-3 pl-3">
-                  <div class="col-12">
+               <div class="row mt-3 mb-3">
+                  <div class="col-12 pl-3">
                      <label class="font-weight-bold" for="productView1">Customer Reviews</label>
                   </div>
 
@@ -228,25 +229,82 @@ Dashboard Page
                   {% if loop.index0 == 0 %}
                      <div class="text-center pt-3 pb-3 mx-auto">
                         {% if reviews_1|length == 0  %}
-                        <!-- Load Reviews -->
-                              <button type="submit" class="btn btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
-                        {% else %}
-                        <!-- Update Reviews -->
-                              <button type="submit" class="btn btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
+                           <!-- Load Reviews -->
+                           <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
                         {% endif %}
-                              <button type="submit" class="btn btn-outline-info mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+
+                        {% if recommended_1|length == 0 %}
+                           <!-- Load Recommended -->
+                           <button type="submit" class="btn btn-outline-info btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+                        {% endif %}
                      </div>
                   {% else%}
                      <div class="text-center pt-3 pb-3 mx-auto">
                         {% if reviews_2|length == 0  %}
-                        <!-- Load Reviews -->
-                              <button type="submit" class="btn btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
-                        {% else %}
-                        <!-- Update Reviews -->
-                              <button type="submit" class="btn btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
+                           <!-- Load Reviews -->
+                           <button type="submit" class="btn btn-sm btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
                         {% endif %}
-                              <button type="submit" class="btn btn-outline-info mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+
+                        {% if recommended_2|length == 0 %}
+                           <!-- Load Recommended -->
+                           <button type="submit" class="btn btn-sm btn-outline-info mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+                        {% endif %}
                      </div>
+                  {% endif %}
+               </div>
+
+               <div class="row mt-3 mb-3">
+                  {% if loop.index0 == 0 %}
+                     {% if recommended_1|length >= 1 %}
+                        <label  class="font-weight-bold mb-3 pl-3">Recommended Products</label>
+                        {% for recommended in recommended_1[:20] %}
+                        {% include 'includes/view_product_modal_1.html' %}
+                           <div class="col-12 mb-3" style="height:150px;">
+                              <div class="row">
+                                 <div class="col-4">
+                                     <img class="img-fluid rounded" src="{{ recommended.recommendation_image }}" style="max-height:150px;" alt="{{ recommended.recommendation_name }}">
+                                 </div>
+
+                                 <div class="col-8">
+                                    <h6 class="font-weight-bold overflow-hidden" style="height:55px;">{{ recommended.recommendation_name }}</h6>
+                                    <h6 class="font-weight-bold text-warning">{{ recommended.recommendation_price }}</h6>
+
+                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-ViewRecommendedProduct1-{{ loop.index0 }}">View</button>
+                                    <a href='{{ recommended.recommendation_link }}' style="color:white;" class="btn btn-outline-info btn-sm  mt-2" target="_blank" >Visit</a>
+                                 </div>
+                              </div>
+                           </div>
+                        {% endfor %}
+                        <div class="mx-auto pt-3 mb-3">
+                           <a href="{{ url_for('dashboard_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
+                        </div>
+                     {% endif %}
+                  {% endif %}
+
+                  {% if loop.index0 == 1 %}
+                     {% if recommended_2|length >= 1 %}
+                        <label  class="font-weight-bold mb-3 pl-3">Recommended Products</label>
+                        {% for recommended in recommended_2[:20] %}
+                        {% include 'includes/view_product_modal_2.html' %}
+                           <div class="col-12 mb-3" style="height:150px;">
+                              <div class="row">
+                                 <div class="col-4">
+                                     <img class="img-fluid rounded" src="{{ recommended.recommendation_image }}" style="max-height:150px;" alt="{{ recommended.recommendation_name }}">
+                                 </div>
+
+                                 <div class="col-8">
+                                    <h6 class="font-weight-bold overflow-hidden" style="height:55px;">{{ recommended.recommendation_name }}</h6>
+                                    <h6 class="font-weight-bold text-warning">{{ recommended.recommendation_price }}</h6>
+                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-ViewRecommendedProduct2-{{ loop.index0 }}">View</button>
+                                    <a href='{{ recommended.recommendation_link }}' style="color:white;" class="btn btn-outline-info btn-sm mt-2" target="_blank">Visit</a>
+                                 </div>
+                              </div>
+                           </div>
+                        {% endfor %}
+                        <div class="mx-auto pt-3 mb-3">
+                           <a href="{{ url_for('dashboard_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
+                        </div>
+                     {% endif %}
                   {% endif %}
                </div>
             </div>

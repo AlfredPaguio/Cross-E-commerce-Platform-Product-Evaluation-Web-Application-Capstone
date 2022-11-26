@@ -9,25 +9,25 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-center" id="ModalLabel">
+                <h6 class="modal-title text-center" id="ModalLabel">
                     {{ favorite.product_name }}
-                </h5>
+                </h6>
             </div>
             <div class="modal-body">
-                <form action="/dashboard?req=remove" method="POST">
+                <form action="/dashboard?req=remove" onsubmit="loading();" method="POST">
                     {{ remove_to_favorites_form.hidden_tag() }}
-                    <h4 class="text-center">
+                    <h6 class="text-center">
                         Are you sure you want to remove this item to Favorites?
-                    </h4>
+                    </h6>
                     <br>
                     <input id="remove_item" name="remove_item" type="hidden" value="{{ favorite.product_id }}">
                     <div class="text-center">
-                        {{ remove_to_favorites_form.submit(class="btn btn-outline-danger", style="color:white;") }}
+                        {{ remove_to_favorites_form.submit(class="btn btn-sm btn-outline-danger", style="color:white;") }}
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

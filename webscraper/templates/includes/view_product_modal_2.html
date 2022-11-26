@@ -3,18 +3,18 @@
    background-color: #212121
    }
 </style>
-<div class="modal fade" id="Modal-ReplaceProduct-{{ favorite.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
+<div class="modal fade" id="Modal-ViewRecommendedProduct2-{{ loop.index0 }}" tabindex="-1" aria-labelledby="exampleModallable"
    aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title text-center" id="ModalLabel">
-               {{ favorite.product_name }}
+               {{ recommended.recommendation_name }}
             </h5>
          </div>
          <div class="modal-body">
-            <form action="/dashboard?req=replace_item" onsubmit="loading();" method="POST">
-               {{ replace_product_modal_form.hidden_tag() }}
+            <form action="/dashboard?req=view_recommended_product" onsubmit="loading();" method="POST">
+               {{ view_recommended_products_form.hidden_tag() }}
                {% if list_of_products|length > 1 %}
                <h6 class="text-center mb-3">
                   Choose which product do you want to replace for:
@@ -27,7 +27,7 @@
 
                   <div class="col-2 mt-3">
                       <div class="form-check form-check-inline">
-                       <input class="form-check-input" type="radio" name="productselect" id="inlineRadio-{{ prod.product_id }}" value="{{ loop.index0 }}">
+                       <input class="form-check-input" type="radio" name="view_product_index" id="inlineRadio-{{ prod.product_id }}" value="{{ loop.index0 }}">
                        <label class="form-check-label" for="inlineRadio-{{ prod.product_id }}"></label>
                      </div>
                   </div>
@@ -35,13 +35,13 @@
                {% endfor %}
                {% else %}
                <h6 class="text-center mb-3">
-                  Do you want to add the item? 
+                  Do you want to add the item?
                </h6>
                {% endif %}
                <br>
-               <input id="replace_item" name="replace_item" type="hidden" value="{{ favorite.product_id }}">
+               <input id="recommended_item_link" name="recommended_item_link" type="hidden" value="{{ recommended.recommendation_link }}">
                <div class="text-center">
-                  {{ replace_product_modal_form.submit(class="btn btn-sm btn-outline-success", style="color:white;") }}
+                  {{ view_recommended_products_form.submit(class="btn btn-sm btn-outline-success", style="color:white;") }}
                </div>
 
             </form>

@@ -24,12 +24,12 @@ Register Page
             <input type="checkbox" onclick="password_show_register()"> Show Password <br>
 
             <div class="checkbox mb-3 text-center mt-3">
-                {{ register_form.submit(class="btn btn-sn btn-block btn-outline-primary", style="color:white;") }}
+                {{ register_form.submit(class="btn btn-sm btn-block btn-outline-primary", style="color:white;") }}
             </div>
 
             <div class="checkbox mb-3 text-center">
                 <h6>Already have an account?</h6>
-                <a class="btn btn-sn btn-outline-secondary" href="{{ url_for('login_page') }}" style="color:white;">Login</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('login_page') }}" style="color:white;">Login</a>
             </div>
         </form>
     </div>

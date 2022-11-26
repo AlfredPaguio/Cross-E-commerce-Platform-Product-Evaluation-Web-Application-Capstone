@@ -9,25 +9,25 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-center" id="ModalLabel">
+                <h6 class="modal-title text-center" id="ModalLabel">
                     {{ prod.name }}
-                </h5>
+                </h6>
             </div>
             <div class="modal-body">
-                <form action="/dashboard?req=fav" method="POST">
+                <form action="/dashboard?req=fav" onsubmit="loading();" method="POST">
                     {{ add_to_favorites_form.hidden_tag() }}
-                    <h4 class="text-center">
+                    <h6 class="text-center">
                         Are you sure you want to add this item to Favorites?
-                    </h4>
+                    </h6>
                     <br>
                     <input id="favorite_item" name="favorite_item" type="hidden" value="{{ prod.product_id }}">
                     <div class="text-center">
-                        {{ add_to_favorites_form.submit(class="btn btn-outline-danger", style="color:white;") }}
+                        {{ add_to_favorites_form.submit(class="btn btn-sm btn-outline-danger", style="color:white;") }}
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

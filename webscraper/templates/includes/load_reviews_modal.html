@@ -9,29 +9,29 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-center" id="ModalLabel">
+                <h6 class="modal-title text-center" id="ModalLabel">
                     {{ prod.name }}
-                </h5>
+                </h6>
             </div>
 
             <div class="modal-body">
-                <form action="/dashboard?req=load_reviews"  onsubmit="loading();" method="POST">
+                <form action="/dashboard?req=load_reviews" onsubmit="loading();" method="POST">
                     {{ load_reviews_form.hidden_tag() }}
-                    <h4 class="text-center">
+                    <h6 class="text-center">
                         Load reviews for this product?
-                    </h4>
+                    </h6>
                     <br>
                     <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
                     <input name="load_review_link" type="hidden" value="{{ prod.link }}">
                     <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
                     <div class="text-center">
-                        {{ load_reviews_form.submit(class="btn btn-outline-success", style="color:white;") }}
+                        {{ load_reviews_form.submit(class="btn btn-sm btn-outline-success", style="color:white;") }}
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                 <button type="button" class="btn btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+                 <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

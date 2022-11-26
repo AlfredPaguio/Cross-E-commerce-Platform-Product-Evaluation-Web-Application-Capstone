@@ -50,11 +50,10 @@ class Webscraper:
         self.driver.get(input_link)
 
     # Shopee
-    def find_product_info_shopee(self, soup_text):
+    def find_product_info_shopee(self):
         print('Getting product info..')
 
-        soup = BeautifulSoup(soup_text, 'lxml')
-
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
         try:
             prod_name = soup.find('div', class_='_26jnYM typo-r16 two-line-text').text
         except AttributeError:
@@ -92,8 +91,8 @@ class Webscraper:
         # Image
         # prod_image_raw = self.driver.find_element(
         #     By.CSS_SELECTOR,
-        #     'img[class="product-carousel__item _35N8Pu"]'
-        # # ).screenshot_as_png
+        #     'div[class="stardust-carousel"]'
+        # ).screenshot_as_png
         #
         # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
 
@@ -139,7 +138,7 @@ class Webscraper:
         all_reviews = review_soup.find_all('div', class_='xSd-kj')
 
         reviews = []
-        for review in all_reviews:
+        for review in all_reviews[:50]:
             author = review.find_next('div', class_='_33kUIp').text
 
             date_time = review.find_next('div', class_='yu9aaY').text
@@ -164,13 +163,54 @@ class Webscraper:
         print('Getting reviews: Success')
         return reviews
 
+    def find_recommendations_shopee(self):
+        print('Getting product recommendations..')
+
+        scroll = self.driver.find_elements(
+            By.CSS_SELECTOR,
+            'div[class="item-card-list__item-card-wrapper"]'
+        )
+
+        if scroll:
+            add = 3
+            for _ in range(5):
+                self.driver.execute_script('arguments[0].scrollIntoView(true);', scroll[add])
+                add += 3
+                time.sleep(1.5)
+
+        time.sleep(3)
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
+
+        recommended_products = soup.find_all('div', class_='item-card-list__item-card-wrapper')
+
+        recommended_products_list = []
+        for recommended in recommended_products:
+            if recommended.text == '':
+                continue
+            else:
+                link = recommended.find_next('a', href=True)
+                name = recommended.find_next('div', class_='tu81r+ OTeZxR').text
+                price = recommended.find_next('div', class_='Mf5O4D yEHyRY').text
+                image = recommended.find_next('img', class_='gO-UHJ c63hlp')
+
+                recommended_products_list.append(
+                    {
+                        'recommendation_link': f'https://shopee.ph{link["href"]}',
+                        'recommendation_name': name,
+                        'recommendation_price': price,
+                        'recommendation_image': image['src']
+                    }
+                )
+        print('Getting product recommendations: Success')
+        return recommended_products_list
+
     # ----------------------------------------------------------------------------------------------------------------#
 
     # Lazada
-    def find_product_info_lazada(self, soup_text):
+    def find_product_info_lazada(self):
         print('Getting product info..')
         # scroll down to product name to trigger lazy load
-        soup = BeautifulSoup(soup_text, 'lxml')
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
 
         prod_name = soup.find('h1', class_='pdp-mod-product-title').text
 
@@ -255,7 +295,7 @@ class Webscraper:
         all_reviews = review_soup.find_all('div', class_="review-item")
 
         reviews = []
-        for review in all_reviews:
+        for review in all_reviews[:50]:
             spans = review.find_all_next('span')
             author = spans[1].text
             date_time = spans[2].text
@@ -272,3 +312,47 @@ class Webscraper:
             )
         print('Getting reviews: Success')
         return reviews
+
+    def find_recommendations_lazada(self):
+        print('Getting product recommendations..')
+
+        scroll = self.driver.find_elements(
+            By.CSS_SELECTOR,
+            'div[class="product-card__container "]'
+        )
+
+        if scroll:
+            add = 3
+            for _ in range(5):
+                self.driver.execute_script('arguments[0].scrollIntoView(true);', scroll[add])
+                add += 3
+                time.sleep(1.5)
+
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
+
+        recommended_products = soup.find_all('div', class_='product-card__container')
+
+        recommended_products_list = []
+        for recommended in recommended_products:
+
+            image_ = recommended.find_next('div', class_='picture-wrapper')
+            image = image_.find('img', class_='image image_loaded')
+
+            if image is None:
+                continue
+            else:
+                link = recommended.find_next('a', href=True)
+                name = recommended.find_next('div', class_='product-card__name').text
+                price = recommended.find_next('span', class_='product-card__price-current').text
+
+                recommended_products_list.append(
+                    {
+                        'recommendation_link': f'https:{link["href"]}',
+                        'recommendation_name': name,
+                        'recommendation_price': price,
+                        'recommendation_image': image['src']
+                    }
+                )
+
+        print('Getting product recommendations: Success')
+        return recommended_products_list
