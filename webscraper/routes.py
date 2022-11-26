@@ -258,7 +258,7 @@ def dashboard_page():
                                 return redirect(url_for('dashboard_page'))
 
                             except AttributeError as e:
-                                print(e)
+                                print(f'Error: {e}')
                                 flash("Something went wrong.", category='danger')
                                 scraper.driver.quit()
                                 return redirect(url_for('dashboard_page'))
@@ -354,7 +354,7 @@ def dashboard_page():
                             return redirect(url_for('dashboard_page'))
 
                         except AttributeError as e:  # TimeoutError
-                            print(e)
+                            print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             db.session.rollback()  # nag ka error kaya rerevert yung data sa database or shit
                             scraper.driver.quit()
@@ -457,12 +457,13 @@ def dashboard_page():
 
                             flash(f"Reviews loaded successfully", category='success')
                             return redirect(url_for('dashboard_page'))
-                        except AttributeError:
+                        except AttributeError as e:
                             if load_review_index == 0:
                                 session.pop('reviews_summary_1')
                             else:
                                 session.pop('reviews_summary_2')
 
+                            print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
                             return redirect(url_for('dashboard_page'))
@@ -529,7 +530,7 @@ def dashboard_page():
                             flash("Recommended products loaded successfully", category='success')
                             return redirect(url_for('dashboard_page'))
                         except AttributeError as e:
-                            print(e)
+                            print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
                             return redirect(url_for('dashboard_page'))
@@ -736,7 +737,7 @@ def dashboard_page():
                                 return redirect(url_for('dashboard_page'))
 
                         except AttributeError as e:
-                            print(e)
+                            print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
                             return redirect(url_for('dashboard_page'))

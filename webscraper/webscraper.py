@@ -126,14 +126,14 @@ class Webscraper:
             )
 
             self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
-            time.sleep(2)
+            time.sleep(1.5)
 
             # optimize - need to scroll also less than 50 if total reviews is less than 50
             if len(reviews) >= 50:
                 break
 
         print('Getting Reviews..')
-        time.sleep(2)
+        # time.sleep(2)
         review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
         all_reviews = review_soup.find_all('div', class_='xSd-kj')
 
@@ -177,7 +177,7 @@ class Webscraper:
                 add += 3
                 time.sleep(1.5)
 
-        time.sleep(3)
+        # time.sleep(3)
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
 
         recommended_products = soup.find_all('div', class_='item-card-list__item-card-wrapper')
@@ -285,13 +285,13 @@ class Webscraper:
             )
 
             self.driver.execute_script('arguments[0].scrollIntoView(true);', reviews[-1])
-            time.sleep(2)
+            time.sleep(1.5)
 
             if len(reviews) == 50:
                 break
 
         print('Getting Reviews..')
-        time.sleep(2)
+        # time.sleep(2)
         review_soup = BeautifulSoup(self.driver.page_source, 'lxml')
         all_reviews = review_soup.find_all('div', class_="review-item")
 
