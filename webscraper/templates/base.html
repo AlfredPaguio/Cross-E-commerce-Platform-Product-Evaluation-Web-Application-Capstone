@@ -33,10 +33,12 @@
             {% if current_user.is_authenticated %}
             <ul class="navbar-nav">
                <li class="nav-item">
-                  <a class="nav-link">Welcome, {{ current_user.username }}</a>
+                  <a class="nav-link d-none d-md-block">Welcome, {{ current_user.username }}</a>
+                  <a class="nav-link d-sm-block d-md-none" href="{{ url_for('account_page') }}">Account</a>
+                  <a class="nav-link d-sm-block d-md-none" href="{{ url_for('logout_page') }}">Logout</a>
                </li>
             </ul>
-            <div class="btn-group">
+            <div class="btn-group d-none d-md-block">
                <button type="button" class="btn rounded" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                <i class="fa fa-caret-down" aria-hidden="true" style="color:white;"></i>
                </button>

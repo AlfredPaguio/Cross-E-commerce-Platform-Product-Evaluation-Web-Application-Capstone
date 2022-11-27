@@ -1,7 +1,59 @@
 body {
+    font-family: 'Poppins', sans-serif;
     background-color: #212121;
     color: white
     }
+
+.main-content {
+    padding-top: 40px;
+}
+
+.his-fav-menu .sidebar-btn {
+    position: fixed;
+    right:30px;
+    padding-right:20px;
+    z-index: 2;
+}
+
+.his-fav-menu .sidebar-btn .open-btn {
+    font-size: 30px;
+    color: #ffffff;
+    justify-content: right;
+}
+
+.modal-z-index {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.offcanvas-menu {
+    position: fixed;
+    z-index: 2;
+    top: 5px;
+    right: 0px;
+    background: #212121;
+    width: 350px;
+    display: flex;
+    align-items: center;
+    transform: translatex(100%);
+    transition: all .4s ease;
+    border-radius: 20px 0 0 20px;
+    box-shadow: 5px 5px 10px #000000;
+}
+
+.offcanvas-menu.active {
+    transform: translateX(0);
+}
+
+.close-btn {
+    position: absolute;
+    top: 0px;
+    left: 10px;
+    font-size: 30px;
+    color: #fff;
+}
 
 #hideMe {
     -moz-animation: cssAnimation 0s ease-in 5s forwards;

@@ -292,7 +292,6 @@ def dashboard_page():
                     scraper.driver.quit()
                     return redirect(url_for('dashboard_page'))
                 finally:
-                    print(scraper.driver.title)
                     if is_loaded:
                         time.sleep(3)
                         # Getting Product Information
@@ -429,8 +428,6 @@ def dashboard_page():
                             new_reviews = db.session.query(ProductDataReviewsTable).filter(
                                 ProductDataReviewsTable.product_id == load_review_item
                             ).limit(50)
-
-                            print(new_reviews)
 
                             if load_review_index == 0:
                                 for reviews in new_reviews:
