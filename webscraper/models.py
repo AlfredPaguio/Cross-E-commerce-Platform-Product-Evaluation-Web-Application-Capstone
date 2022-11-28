@@ -12,7 +12,7 @@ class User(db.Model, UserMixin):  # User has one-to-many relationship with Produ
     # Keys
     id = db.Column(db.Integer(), primary_key=True)  # Account_ID PK
 
-    # Infos
+    # Info's
     username = db.Column(db.String(length=30), nullable=False, unique=True)
     email_address = db.Column(db.String(length=50), nullable=False, unique=True)
     password_hash = db.Column(db.String(length=60), nullable=False)

@@ -19,8 +19,7 @@ class Webscraper:
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
-        # prefs = {"profile.default_content_setting_values.notifications": 2}
-
+    
         # set chrome options
         options = webdriver.ChromeOptions()
         # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')

@@ -6,11 +6,6 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 app = Flask(__name__)
-mail = Mail(app)  # instantiate the mail class
-
-# list_of_products = []
-# https://stackoverflow.com/questions/17925674/jinja2-local-global-variable
-# app.jinja_env.add_extension('jinja2.ext.do')
 
 # database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rewrite_db3.db'
@@ -37,4 +32,4 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login_page'
 login_manager.login_message_category = 'info'
 
-from webscraper import routes
+from webscraper import routes, models

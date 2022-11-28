@@ -22,10 +22,6 @@ from webscraper.productdetails import ProductDetails
 from webscraper.webscraper import Webscraper
 
 
-def get_reviews(reviews=None, offset=0, per_page=5):
-    return reviews[offset: offset + per_page]
-
-
 @app.route('/')
 @app.route('/home')
 def home_page():
@@ -873,6 +869,7 @@ def dashboard_page():
                          'product_data_table LEFT JOIN product_details_table ON product_data_table.product_id = '
                          'product_details_table.product_id WHERE category NOT LIKE "Breadcrumblist Empty%" AND '
                          'category_link NOT LIKE "Breadcrumblist Empty%"', db.session.bind)
+
         data = pd.DataFrame(df)
 
         # shopee ranking
