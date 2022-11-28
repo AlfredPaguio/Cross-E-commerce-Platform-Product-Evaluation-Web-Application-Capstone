@@ -1,6 +1,7 @@
 import time
 import json
-from fake_useragent import UserAgent
+import os
+# from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -14,17 +15,17 @@ class Webscraper:
         service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
-        ua = UserAgent()
-        user_agent = ua.chrome
+        # ua = UserAgent()
+        # user_agent = ua.chrome
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
     
         # set chrome options
         options = webdriver.ChromeOptions()
-        # options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+        options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 
-        options.add_argument(f'user-agent={user_agent}')
+        # options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
@@ -40,7 +41,8 @@ class Webscraper:
         options.headless = True
 
         # set webdriver
-        self.driver = webdriver.Chrome(options=options, service=service)
+        self.driver = webdriver.Chrome(executable_path=os.environ.get('CHROMDRIVER_PATH'), options=options,
+                                       service=service)
         self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')
