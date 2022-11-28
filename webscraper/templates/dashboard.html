@@ -11,7 +11,7 @@ Dashboard Page
             <a class="open-btn" href="#"><i class="fa fa-bars" aria-hidden="true"></i></a>
          </div>
          <div class="offcanvas-menu">
-            <a class="close-btn" href="#"><i class="fa fa-times-circle-o" aria-hidden="true"></i></a>
+            <a class="close-btn" href="#"><i class="fa fa-bars" aria-hidden="true"></i></a>
             <div class="row pt-5 mx-auto">
                <div class="col-12 pt-1 mx-auto pr-3 mb-5">
                   <nav class="border rounded navbar navbar-expand navbar-dark mb-3">
@@ -60,7 +60,7 @@ Dashboard Page
                      {% endfor %}
                      </div>
                      <div class="tab-pane fade"  id="history"  role="tabpanel" aria-labelledby="history-tab">
-                        <div class="row overflow-auto" style="height:500px;">
+                        <div class="row" style="height:500px; overflow-y:auto; overflow-x:hidden; !important;">
                            <div class="col-12">
                               <ul class="list-group list-group-flush">
                                  {% for history in list_of_history %}
