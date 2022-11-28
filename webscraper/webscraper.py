@@ -1,7 +1,7 @@
 import time
 import json
 import os
-# from fake_useragent import UserAgent
+from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -15,8 +15,8 @@ class Webscraper:
         service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
-        # ua = UserAgent()
-        # user_agent = ua.chrome
+        ua = UserAgent()
+        user_agent = ua.chrome
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
@@ -25,7 +25,7 @@ class Webscraper:
         options = webdriver.ChromeOptions()
         options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 
-        # options.add_argument(f'user-agent={user_agent}')
+        options.add_argument(f'user-agent={user_agent}')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
@@ -98,10 +98,19 @@ class Webscraper:
 
         try:
             prod_image_ = soup.find('img', class_='product-carousel__item _1AkNaT')
-            prod_image = prod_image_['src']
+
+            try:
+                prod_image = prod_image_['src']
+            except TypeError:
+                prod_image = "url_for('static',filename='images/broken-image.png')"
+
         except AttributeError:
             prod_image_ = soup.find('video', class_='product-video__video')
-            prod_image = prod_image_['poster']
+
+            try:
+                prod_image = prod_image_['poster']
+            except TypeError:
+                prod_image = "url_for('static',filename='images/broken-image.png')"
 
         print('Getting product info: Success')
         return {
