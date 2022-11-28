@@ -27,7 +27,7 @@ Dashboard Page
                      </div>
                   </nav>
                   <div class="tab-content" id="myTabContent">
-                     <div class="overflow-auto tab-pane fade show active" style="height:500px;" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
+                     <div class="tab-pane fade show active" style="height:500px; overflow-y:auto; overflow-x:hidden; !important;" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
                      {% for favorite in list_of_favorites %}
                         <div class="row border mb-3 rounded" style="width:300px">
                            <div class="col-4 mt-4">
@@ -59,12 +59,12 @@ Dashboard Page
                         </div>
                      {% endfor %}
                      </div>
-                     <div class="overflow-auto tab-pane fade overflow-auto" style="height: 500px;" id="history"  role="tabpanel" aria-labelledby="history-tab">
-                        <div class="row">
+                     <div class="tab-pane fade"  id="history"  role="tabpanel" aria-labelledby="history-tab">
+                        <div class="row overflow-auto" style="height:500px;">
                            <div class="col-12">
                               <ul class="list-group list-group-flush">
                                  {% for history in list_of_history %}
-                                    <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded" style="width:300px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
+                                    <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded" style="width:210px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
                                  {% endfor %}
                               </ul>
                            </div>
