@@ -5,6 +5,12 @@ body {
     color: white
     }
 
+.modal-content {
+   background-color: #212121
+}
+
+/* Off canvas */
+
 .main-content {
     padding-top: 40px;
 }

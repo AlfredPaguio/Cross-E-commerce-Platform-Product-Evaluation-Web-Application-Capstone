@@ -8,13 +8,13 @@ Dashboard Page
    <div class="row">
       <div class="col-12 his-fav-menu">
          <div class="sidebar-btn">
-            <a class="open-btn" href="#"><i class="fa fa-bars"></i></a>
+            <a class="open-btn" href="#"><i class="fa fa-bars" aria-hidden="true"></i></a>
          </div>
          <div class="offcanvas-menu">
             <a class="close-btn" href="#"><i class="fa fa-times-circle-o" aria-hidden="true"></i></a>
             <div class="row pt-5 mx-auto">
                <div class="col-12 pt-1 mx-auto pr-3 mb-5">
-                  <nav class="navbar navbar-expand navbar-dark mb-3">
+                  <nav class="border rounded navbar navbar-expand navbar-dark mb-3">
                      <div class="collapse navbar-collapse nav-tabs align-items-center">
                         <ul class="mx-auto nav align-items-center" id="myTab" role="tablist">
                            <li class="nav-item">
@@ -64,7 +64,7 @@ Dashboard Page
                            <div class="col-12">
                               <ul class="list-group list-group-flush">
                                  {% for history in list_of_history %}
-                                    <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded" style="width:210px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
+                                    <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded" style="width:270px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
                                  {% endfor %}
                               </ul>
                            </div>
