@@ -1,7 +1,7 @@
 class ProductDetails:
     def __init__(self, product_id=0, product_name=None, product_price=0, product_rating=0, product_sold=0,
-                 product_description=None, product_image=None, shop_rating=0, shop_response_rate=0, product_link=None, target_website=None,
-                 product_data_owner=None, category_link=None):
+                 product_description=None, product_image=None, shop_rating=0, shop_response_rate=0, product_link=None,
+                 target_website=None, product_data_owner=None, category_link=None, sku=None):
         self.product_id = product_id
         self.name = product_name
         self.price = product_price
@@ -15,6 +15,7 @@ class ProductDetails:
         self.target_website = target_website
         self.product_details_owner = product_data_owner
         self.category_link = category_link
+        self.sku = sku
 
     @property
     def get_details(self):
@@ -31,6 +32,7 @@ class ProductDetails:
             "link": self.link,
             "target_website": self.target_website,
             "product_details_owner": self.product_details_owner,
-            "category_link": self.category_link
+            "category_link": self.category_link,
+            "sku": self.sku
         }
         return details

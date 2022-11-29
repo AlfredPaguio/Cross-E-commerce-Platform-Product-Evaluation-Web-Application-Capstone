@@ -102,6 +102,7 @@ def dashboard_page():
                                               product_link=exists_in_current_user[1].product_link,
                                               target_website=exists_in_current_user[1].target_website,
                                               category_link=exists_in_current_user[1].category_link,
+                                              sku=exists_in_current_user[1].sku,
                                               product_data_owner=current_user.id)
 
                     # list indexing
@@ -142,6 +143,7 @@ def dashboard_page():
                                               product_link=exist_in_database[1].product_link,
                                               target_website=exist_in_database[1].target_website,
                                               category_link=exist_in_database[1].category_link,
+                                              sku=exist_in_database[1].sku,
                                               product_data_owner=current_user.id)
 
                     # list indexing
@@ -205,6 +207,7 @@ def dashboard_page():
                                                                    shop_response_rate=prod_info.get('shop_res_rate'),
                                                                    category=prod_info.get('category'),
                                                                    category_link=prod_info.get('category_link'),
+                                                                   sku=prod_info.get('sku'),
                                                                    target_website=target_website)
                                 db.session.add(prod_details)
 
@@ -231,6 +234,7 @@ def dashboard_page():
                                                               product_link=prod_details.product_link,
                                                               target_website=prod_details.target_website,
                                                               category_link=prod_details.category_link,
+                                                              sku=prod_details.sku,
                                                               product_data_owner=current_user.id)
 
                                 # list indexing
@@ -361,6 +365,7 @@ def dashboard_page():
             url_helper = UrlHelper()
 
             load_review_link = request.form.get('load_review_link')
+            load_review_sku = request.form.get('load_review_sku')
             load_review_index = int(request.form.get('load_review_index'))
             load_review_item = int(request.form.get('load_review_item'))
 
@@ -378,11 +383,9 @@ def dashboard_page():
 
                     review_link = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
                 else:
-                    end = load_review_link.find('.html')
-                    split = load_review_link[:end].split('-')
-
-                    shop_id = split[-1].strip(split[-1][0])
-                    item_id = split[-2].strip(split[-2][0])
+                    sku_split = load_review_sku.split('_PH-')
+                    item_id = sku_split[0]
+                    shop_id = sku_split[1]
 
                     review_link = f'https://my-m.lazada.com.ph/review/product-reviews?itemId={item_id}&skuId=' \
                                   f'{shop_id}&spm=a2o4l.pdp_revamp_css.pdp_top_tab.rating_and_review&wh_weex=true '
@@ -567,6 +570,7 @@ def dashboard_page():
                                           product_link=exists_in_current_user[1].product_link,
                                           target_website=exists_in_current_user[1].target_website,
                                           category_link=exists_in_current_user[1].category_link,
+                                          sku=exists_in_current_user[1].sku,
                                           product_data_owner=current_user.id)
 
                 if len(session['list_of_products']) > 1:
@@ -611,6 +615,7 @@ def dashboard_page():
                                           product_link=exist_in_database[1].product_link,
                                           target_website=exist_in_database[1].target_website,
                                           category_link=exist_in_database[1].category_link,
+                                          sku=exist_in_database[1].sku,
                                           product_data_owner=current_user.id)
 
                 if len(session['list_of_products']) > 1:
@@ -675,6 +680,7 @@ def dashboard_page():
                                                                shop_response_rate=prod_info.get('shop_res_rate'),
                                                                category=prod_info.get('category'),
                                                                category_link=prod_info.get('category_link'),
+                                                               sku=prod_info.get('sku'),
                                                                target_website=target_website)
                             db.session.add(prod_details)
 
@@ -701,6 +707,7 @@ def dashboard_page():
                                                       product_link=prod_details.product_link,
                                                       target_website=prod_details.target_website,
                                                       category_link=prod_details.category_link,
+                                                      sku=prod_details.sku,
                                                       product_data_owner=current_user.id)
 
                             # Check if webdriver is undetected
@@ -800,6 +807,7 @@ def dashboard_page():
                                                          product_link=product[1].product_link,
                                                          target_website=product[1].target_website,
                                                          category_link=product[1].category_link,
+                                                         sku=product[1].sku,
                                                          product_data_owner=product[0].user_id)
 
                         in_dict = helpme.dict_isvalue_exist(session['list_of_products'], "link", updated_product.link)
@@ -846,6 +854,7 @@ def dashboard_page():
                                                      product_link=product[1].product_link,
                                                      target_website=product[1].target_website,
                                                      category_link=product[1].category_link,
+                                                     sku=product[1].sku,
                                                      product_data_owner=product[0].user_id)
                     helpme = HelpMe()
                     in_dict = helpme.dict_isvalue_exist(session['list_of_products'],
@@ -1101,6 +1110,8 @@ def login_page():
 @app.route('/logout')
 @login_required
 def logout_page():
+    scraper = Webscraper()
+    scraper.driver.quit()
     session.clear()
     logout_user()
     flash('You have been logged out successfully.', category='info')

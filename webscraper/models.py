@@ -68,6 +68,7 @@ class ProductDetailsTable(db.Model):  # ProductData has one-to-many relationship
     category = db.Column(db.String(length=50), nullable=False)
     category_link = db.Column(db.String(), nullable=False)
     target_website = db.Column(db.String(length=10), nullable=False)
+    sku = db.Column(db.String(), nullable=False)
 
     # Relationships
     datas = db.relationship('ProductDataTable', backref='owned_item', lazy=True)

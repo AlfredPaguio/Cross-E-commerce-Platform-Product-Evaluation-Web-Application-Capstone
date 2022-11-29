@@ -23,6 +23,7 @@
                     <br>
                     <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">
                     <input name="load_review_link" type="hidden" value="{{ prod.link }}">
+                    <input name="load_review_sku" type="hidden" value="{{ prod.sku }}">
                     <input name="load_review_item" type="hidden" value="{{ prod.product_id }}">
                     <div class="text-center">
                         {{ load_reviews_form.submit(class="btn btn-sm btn-outline-success", style="color:white;") }}

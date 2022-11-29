@@ -38,7 +38,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
@@ -123,7 +123,8 @@ class Webscraper:
             'shop_rating': shop_rating,
             'shop_res_rate': shop_response_rate,
             'category': category,
-            'category_link': category_link
+            'category_link': category_link,
+            'sku': 'Lazada Only'
         }
 
     def find_product_reviews_shopee(self):
@@ -257,6 +258,9 @@ class Webscraper:
                     category = 'Breadcrumblist Empty'
                     category_link = 'BreadCrumbList Empty'
 
+            if json_object['@type'] == 'Product':
+                sku = json_object['sku']
+
         try:
             prod_image_ = soup.find('div', class_='mod-pdp-item-gallery-video-item').find('img')
             prod_image = prod_image_['src']
@@ -282,7 +286,8 @@ class Webscraper:
             'shop_rating': shop_rating,
             'shop_res_rate': shop_response_rate,
             'category': category,
-            'category_link': category_link
+            'category_link': category_link,
+            'sku': sku
         }
 
     def find_product_reviews_lazada(self):
