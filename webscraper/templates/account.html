@@ -16,7 +16,7 @@ Account Page
    </p>
    <div class="collapse" id="collapseExample">
       <div class="">
-         <form method="POST" class="form-signin" style="color:white">
+         <form method="POST" onsubmit="loading();" class="form-signin" style="color:white">
             {{ change_password_form.hidden_tag() }}
 
             {{ change_password_form.old_password.label() }}

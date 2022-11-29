@@ -4,7 +4,7 @@ Login Page
 {% endblock %}
 {% block content %}
     <div class="container col-md-4 col-sm-12 p-4 mx-auto">
-        <form method="POST" class="form-signin" style="color:white">
+        <form method="POST" onsubmit="loading();" class="form-signin" style="color:white">
             {{ login_form.hidden_tag() }}
             <h1 class="h3 mb-3 font-weight-normal text-center">
                 Login
@@ -22,11 +22,11 @@ Login Page
 
             <div class="checkbox mb-3 text-center">
                 <h6>Don't have an account?</h6>
-                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('register_page') }}" style="color:white;">Sign Up</a>
+                <a class="btn btn-sm btn-outline-secondary" onclick="loading();" href="{{ url_for('register_page') }}" style="color:white;">Sign Up</a>
             </div>
 
             <div class="mb-3 text-center">
-                <a class="" href="{{ url_for('forgot_password_page') }}"> <h6>Forgot Password?</h6></a>
+                <a class="" onclick="loading();" href="{{ url_for('forgot_password_page') }}"> <h6>Forgot Password?</h6></a>
             </div>
         </form>
     </div>

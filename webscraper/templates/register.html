@@ -5,7 +5,7 @@ Register Page
 
 {% block content %}
     <div class="container col-md-4 col-sm-12 p-4 mx-auto">
-        <form method="POST" class="form-register" style="color:white">
+        <form method="POST" onsubmit="loading();" class="form-register" style="color:white">
             {{ register_form.hidden_tag() }}
             <h1 class="h3 mb-3 font-weight-normal text-center">
                 Register
