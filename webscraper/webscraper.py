@@ -26,7 +26,7 @@ class Webscraper:
         prox.socks_proxy = "ip_addr:port"
         prox.ssl_proxy = "ip_addr:port"
         prox.socks_version = 5
-        
+
         capabilities = webdriver.DesiredCapabilities.CHROME
         prox.add_to_capabilities(capabilities)
 
