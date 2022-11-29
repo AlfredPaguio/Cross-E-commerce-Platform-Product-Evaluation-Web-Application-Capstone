@@ -5,7 +5,6 @@ from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.proxy import Proxy, ProxyType
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 from webscraper import sentiment
@@ -18,17 +17,6 @@ class Webscraper:
         # random user agent for Chrome
         ua = UserAgent()
         user_agent = ua.chrome
-
-        # proxy
-        prox = Proxy()
-        prox.proxy_type = ProxyType.MANUAL
-        prox.http_proxy = 'ip_addr:port'
-        prox.socks_proxy = "ip_addr:port"
-        prox.ssl_proxy = "ip_addr:port"
-        prox.socks_version = 5
-
-        capabilities = webdriver.DesiredCapabilities.CHROME
-        prox.add_to_capabilities(capabilities)
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
@@ -53,7 +41,7 @@ class Webscraper:
         options.headless = True
 
         # set webdriver
-        self.driver = webdriver.Chrome(options=options, service=service, desired_capabilities=capabilities)
+        self.driver = webdriver.Chrome(options=options, service=service)
         self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')
