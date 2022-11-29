@@ -38,7 +38,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        # options.headless = True
+        options.headless = True
 
         # set webdriver
         self.driver = webdriver.Chrome(options=options, service=service)
