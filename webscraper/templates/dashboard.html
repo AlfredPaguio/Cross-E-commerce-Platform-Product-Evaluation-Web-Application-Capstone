@@ -31,7 +31,7 @@ Dashboard Page
                      {% for favorite in list_of_favorites %}
                         <div class="row border mb-3 rounded" style="width:300px">
                            <div class="col-4 mt-4">
-                              <img class="img-fluid rounded" src="{{ favorite.product_image }}"  alt="Product Image">
+                              <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ favorite.product_image }}"  alt="Product Image">
                            </div>
 
                            <div class="col-8 mt-3 mb-3">
@@ -174,7 +174,7 @@ Dashboard Page
                         <!-- Product Information -->
                         <div class="row" style="height:300px;">
                            <div class="col-6 mt-3">
-                              <img class="img-fluid rounded mx-auto d-block" src="{{ prod.product_image }}" height="300px;" alt="Product Image">
+                              <img class="img-fluid rounded mx-auto d-block" src="data:image/jpeg;base64,{{ prod.product_image }}" height="300px;" alt="Product Image">
 
                               <div class="mt-3 ml-2">
                                  <small class="font-weight-bold">Chat Response Rate: {{ prod.shop_response_rate }}</small><br>

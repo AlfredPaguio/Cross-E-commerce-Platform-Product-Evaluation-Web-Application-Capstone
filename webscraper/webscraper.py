@@ -1,4 +1,5 @@
 import random
+import base64
 import time
 import json
 import os
@@ -67,7 +68,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         capabilities = options.to_capabilities()
         # set webdriver
@@ -119,28 +120,28 @@ class Webscraper:
                 category_link = json_object['itemListElement'][1]['item']['@id']
 
         # Image
-        # prod_image_raw = self.driver.find_element(
-        #     By.CSS_SELECTOR,
-        #     'div[class="stardust-carousel"]'
-        # ).screenshot_as_png
+        prod_image_raw = self.driver.find_element(
+            By.CSS_SELECTOR,
+            'div[class="stardust-carousel"]'
+        ).screenshot_as_png
+
+        prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
+
+        # try:
+        #     prod_image_ = soup.find('img', class_='product-carousel__item _1AkNaT')
         #
-        # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
-
-        try:
-            prod_image_ = soup.find('img', class_='product-carousel__item _1AkNaT')
-
-            try:
-                prod_image = prod_image_['src']
-            except TypeError:
-                prod_image = "url_for('static',filename='images/broken-image.png')"
-
-        except AttributeError:
-            prod_image_ = soup.find('video', class_='product-video__video')
-
-            try:
-                prod_image = prod_image_['poster']
-            except TypeError:
-                prod_image = "url_for('static',filename='images/broken-image.png')"
+        #     try:
+        #         prod_image = prod_image_['src']
+        #     except TypeError:
+        #         prod_image = "url_for('static',filename='images/broken-image.png')"
+        #
+        # except AttributeError:
+        #     prod_image_ = soup.find('video', class_='product-video__video')
+        #
+        #     try:
+        #         prod_image = prod_image_['poster']
+        #     except TypeError:
+        #         prod_image = "url_for('static',filename='images/broken-image.png')"
 
         print('Getting product info: Success')
         return {
@@ -149,7 +150,7 @@ class Webscraper:
             'prod_rating': prod_rating,
             'prod_sold': prod_sold[:prod_sold_end],
             'prod_desc': prod_desc["content"],
-            'prod_image': prod_image,
+            'prod_image': prod_image_encoded,
             'shop_rating': shop_rating,
             'shop_res_rate': shop_response_rate,
             'category': category,
@@ -291,19 +292,19 @@ class Webscraper:
             if json_object['@type'] == 'Product':
                 sku = json_object['sku']
 
-        try:
-            prod_image_ = soup.find('div', class_='mod-pdp-item-gallery-video-item').find('img')
-            prod_image = prod_image_['src']
-        except AttributeError:
-            prod_image_ = soup.find('div', class_='slick-slide slick-active').find('img')
-            prod_image = prod_image_['src']
+        # try:
+        #     prod_image_ = soup.find('div', class_='mod-pdp-item-gallery-video-item').find('img')
+        #     prod_image = prod_image_['src']
+        # except AttributeError:
+        #     prod_image_ = soup.find('div', class_='slick-slide slick-active').find('img')
+        #     prod_image = prod_image_['src']
 
-        # prod_image_raw = self.driver.find_element(
-        #     By.CSS_SELECTOR,
-        #     'div[class="mod-pdp-item-gallery-inner"]'
-        # ).screenshot_as_png
-        #
-        # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
+        prod_image_raw = self.driver.find_element(
+            By.CSS_SELECTOR,
+            'div[class="mod-pdp-item-gallery-inner"]'
+        ).screenshot_as_png
+
+        prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
 
         print('Getting product info: Success')
         return {
@@ -312,7 +313,7 @@ class Webscraper:
             'prod_rating': prod_rating,
             'prod_sold': prod_sold,
             'prod_desc': prod_desc['content'],
-            'prod_image': prod_image,
+            'prod_image': prod_image_encoded,
             'shop_rating': shop_rating,
             'shop_res_rate': shop_response_rate,
             'category': category,
