@@ -18,7 +18,7 @@
                 <form action="/dashboard?req=load_recommended_products"  onsubmit="loading();" method="POST">
                     {{ load_recommended_products_form.hidden_tag() }}
                     <h6 class="text-center">
-                        Load similar items for this product?
+                        Are you sure you want to load similar items for this product?
                     </h6>
                     <br>
                     <input name="load_product_index" type="hidden" value="{{ loop.index0 }}">

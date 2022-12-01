@@ -14,7 +14,7 @@ from webscraper import app, db, mail
 from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               LoginForm, RegisterForm, RemoveToFavoritesForm,
                               ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
-                              LoadRecommendedProductsForm, ViewRecommendedProductForm)
+                              LoadRecommendedProductsForm, ViewRecommendedProductForm, UpdateReviewsForm)
 from webscraper.helper import HelpMe, UrlHelper, SummarizeThis
 from webscraper.models import (ProductDataReviewsTable, ProductDataTable,
                                ProductDetailsTable, User)
@@ -38,6 +38,7 @@ def dashboard_page():
     load_recommended_products_form = LoadRecommendedProductsForm()
     view_recommended_products_form = ViewRecommendedProductForm()
     load_reviews_form = LoadReviewsForm()
+    update_reviews_form = UpdateReviewsForm()
 
     if session.get('list_of_products') is None:
         session['list_of_products'] = []
@@ -479,6 +480,113 @@ def dashboard_page():
 
                 flash(f"Reviews loaded successfully", category='success')
                 return redirect(url_for('dashboard_page'))
+
+        # Update Reviews
+        if request.args.get('req') == "update_reviews":
+            update_review_index = request.form.get('update_review_index')
+            update_review_link = request.form.get('update_review_link')
+            update_review_item = request.form.get('update_review_item')
+            update_review_sku = request.form.get('update_review_sku')
+
+            list_of_reviews = db.session.query(ProductDataReviewsTable).filter(
+                ProductDataReviewsTable.product_id == update_review_item
+            ).limit(50)
+
+            if list_of_reviews is not None:
+                get_percentage = SummarizeThis()
+                url_helper = UrlHelper()
+                scraper = Webscraper()
+
+                what_hostname = url_helper.get_hostname(update_review_link)
+
+                if what_hostname == 'shopee.ph':
+                    start = update_review_link.find('-i.')
+                    split_ = update_review_link[start:].strip(' ').split('.')
+
+                    review_link = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
+                else:
+                    sku_split = update_review_sku.split('_PH-')
+                    item_id = sku_split[0]
+                    shop_id = sku_split[1]
+
+                    review_link = f'https://my-m.lazada.com.ph/review/product-reviews?itemId={item_id}&skuId=' \
+                                  f'{shop_id}&spm=a2o4l.pdp_revamp_css.pdp_top_tab.rating_and_review&wh_weex=true '
+
+                # run new scraper
+                scraper.land_first_page(review_link)
+                reviews_loaded = None
+
+                try:
+                    print('Getting Reviews..')
+                    reviews_loaded = WebDriverWait(scraper.driver, 3).until(EC.visibility_of_element_located((
+                        By.CSS_SELECTOR, 'div[class="app-container"]' if "shopee.ph" in what_hostname
+                        else 'div[class="rax-scrollview"]'
+                    )))
+                except TimeoutException:
+                    flash("Timed out: Waiting for target page to load took to long.",
+                          category='danger')
+                    scraper.driver.quit()
+                    return redirect(url_for('dashboard_page'))
+                finally:
+                    if reviews_loaded:
+                        time.sleep(3)
+                        print('Reviews loaded: Success')
+                        try:
+                            updated_reviews = scraper.find_product_reviews_shopee() if 'shopee.ph' in what_hostname \
+                                else scraper.find_product_reviews_lazada()
+
+                            for i in range(list_of_reviews.count()):
+                                try:
+                                    list_of_reviews[i].review_author = updated_reviews[i].get('author')
+                                    list_of_reviews[i].review_data_time = updated_reviews[i].get('date_time')
+                                    list_of_reviews[i].review_comment = updated_reviews[i].get('comment')
+                                    list_of_reviews[i].review_sentiment = updated_reviews[i].get('review_sentiment')
+                                except IndexError:
+                                    break
+
+                            db.session.commit()
+
+                            new_reviews = db.session.query(ProductDataReviewsTable).filter(
+                                ProductDataReviewsTable.product_id == update_review_item
+                            ).limit(50)
+
+                            if update_review_index == 0:
+                                del session['reviews_1'][:]
+
+                                for reviews in new_reviews:
+                                    session['reviews_1'].append(reviews)
+
+                                review_summary = get_percentage.get_percentage_of_sentiments(
+                                    product_index=int(update_review_index))
+                                session['reviews_summary_1'] = review_summary
+                            else:
+                                del session['reviews_2'][:]
+
+                                for reviews in new_reviews:
+                                    session['reviews_2'].append(reviews)
+
+                                review_summary = get_percentage.get_percentage_of_sentiments(
+                                    product_index=int(update_review_index))
+                                session['reviews_summary_2'] = review_summary
+
+                            # Check if webdriver is undetected
+                            status = scraper.driver.execute_script('return navigator.webdriver')
+                            print(f'Webdriver status: {status}')
+
+                            # Close headless browser and webdriver instance gracefully
+                            scraper.driver.quit()
+                            flash(f"Reviews updated successfully", category='success')
+                            return redirect(url_for('dashboard_page'))
+                        except AttributeError as e:
+                            if update_review_index == 0:
+                                session.pop('reviews_summary_1')
+                            else:
+                                session.pop('reviews_summary_2')
+
+                            print(f'Error: {e}')
+                            flash("Something went wrong.", category='danger')
+                            scraper.driver.quit()
+                            return redirect(url_for('dashboard_page'))
 
         # Load Recommended Products Logic
         if request.args.get("req") == "load_recommended_products":
@@ -952,6 +1060,7 @@ def dashboard_page():
                                replace_product_modal_form=replace_product_modal_form,
                                update_product_modal_form=update_product_modal_form,
                                load_reviews_form=load_reviews_form,
+                               update_reviews_form=update_reviews_form,
                                load_recommended_products_form=load_recommended_products_form,
                                view_recommended_products_form=view_recommended_products_form,
                                list_of_history=list_of_history,
