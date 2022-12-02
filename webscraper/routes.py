@@ -16,7 +16,7 @@ from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
                               LoadRecommendedProductsForm, ViewRecommendedProductForm, UpdateReviewsForm)
 from webscraper.helper import HelpMe, UrlHelper, SummarizeThis
-from webscraper.models import (ProductDataReviewsTable, ProductDataTable,
+from webscraper.models import (ProductDataReviewsTable, ProductReferenceTable,
                                ProductDetailsTable, User)
 from webscraper.productdetails import ProductDetails
 from webscraper.webscraper import Webscraper
@@ -80,12 +80,12 @@ def dashboard_page():
                     flash(f'This product is already on the view.', category='info')
                     return redirect(url_for('dashboard_page'))
 
-                exists_in_current_user = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+                exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                     ProductDetailsTable.product_link == input_link,
-                    ProductDataTable.user_id == current_user.id
+                    ProductReferenceTable.user_id == current_user.id
                 ).join(ProductDetailsTable).first()
 
-                exist_in_database = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+                exist_in_database = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                     ProductDetailsTable.product_link == input_link
                 ).join(ProductDetailsTable).first()
 
@@ -126,8 +126,8 @@ def dashboard_page():
 
                     # get product info from database
                     # add new entry for current user referencing the product_id from product_details
-                    prod_data = ProductDataTable(product_id=exist_in_database[0].product_id,
-                                                 user_id=current_user.id)
+                    prod_data = ProductReferenceTable(product_id=exist_in_database[0].product_id,
+                                                      user_id=current_user.id)
 
                     db.session.add(prod_data)
                     db.session.commit()
@@ -218,8 +218,8 @@ def dashboard_page():
                                 db.session.flush()
 
                                 # referencing new product to current user
-                                prod_data = ProductDataTable(product_id=prod_details.product_id,
-                                                             user_id=current_user.id)
+                                prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                                  user_id=current_user.id)
                                 db.session.add(prod_data)
                                 db.session.commit()
 
@@ -655,12 +655,12 @@ def dashboard_page():
                 flash(f'This product is already on the view.', category='info')
                 return redirect(url_for('dashboard_page'))
 
-            exists_in_current_user = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+            exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                 ProductDetailsTable.product_link == input_link,
-                ProductDataTable.user_id == current_user.id
+                ProductReferenceTable.user_id == current_user.id
             ).join(ProductDetailsTable).first()
 
-            exist_in_database = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+            exist_in_database = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                 ProductDetailsTable.product_link == input_link
             ).join(ProductDetailsTable).first()
 
@@ -705,8 +705,8 @@ def dashboard_page():
 
                 # get product info from database
                 # add new entry for current user referencing the product_id from product_details
-                prod_data = ProductDataTable(product_id=exist_in_database[0].product_id,
-                                             user_id=current_user.id)
+                prod_data = ProductReferenceTable(product_id=exist_in_database[0].product_id,
+                                                  user_id=current_user.id)
 
                 db.session.add(prod_data)
                 db.session.commit()
@@ -798,8 +798,8 @@ def dashboard_page():
                             db.session.flush()
 
                             # referencing new product to current user
-                            prod_data = ProductDataTable(product_id=prod_details.product_id,
-                                                         user_id=current_user.id)
+                            prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                              user_id=current_user.id)
                             db.session.add(prod_data)
                             db.session.commit()
 
@@ -854,11 +854,11 @@ def dashboard_page():
         if request.args.get("req") == "fav":
             favorite_item_id = request.form.get('favorite_item')
 
-            # set_to_favorites[0] = a dict contains ProductDataTable
+            # set_to_favorites[0] = a dict contains ProductReferenceTable
             # set_to_favorites[1] = a dict contains ProductDetailsTable
 
-            set_to_favorites = db.session.query(ProductDataTable, ProductDetailsTable).filter(
-                ProductDataTable.product_id == favorite_item_id, ProductDataTable.user_id == current_user.id
+            set_to_favorites = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                ProductReferenceTable.product_id == favorite_item_id, ProductReferenceTable.user_id == current_user.id
             ).join(ProductDetailsTable).first()
 
             if set_to_favorites[0].favorite == 1:
@@ -866,7 +866,7 @@ def dashboard_page():
                 return redirect(url_for('dashboard_page'))
             else:
                 # add to favorites
-                ProductDataTable.set_to_favorite(set_to_favorites[0])
+                ProductReferenceTable.set_to_favorite(set_to_favorites[0])
                 flash(f"{set_to_favorites[1].product_name} successfully added to your favorites!", category='success')
                 return redirect(url_for('dashboard_page'))
 
@@ -874,15 +874,15 @@ def dashboard_page():
         if request.args.get("req") == "remove":
             remove_item_id = request.form.get('remove_item')
 
-            # remove_to_favorites[0] = a dict contains ProductDataTable
+            # remove_to_favorites[0] = a dict contains ProductReferenceTable
             # remove_to_favorites[1] = a dict contains ProductDetailsTable
 
-            remove_to_favorites = db.session.query(ProductDataTable, ProductDetailsTable).filter(
-                ProductDataTable.product_id == remove_item_id, ProductDataTable.user_id == current_user.id
+            remove_to_favorites = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                ProductReferenceTable.product_id == remove_item_id, ProductReferenceTable.user_id == current_user.id
             ).join(ProductDetailsTable).first()
 
             # remove to favorites
-            ProductDataTable.remove_to_favorite(remove_to_favorites[0])
+            ProductReferenceTable.remove_to_favorite(remove_to_favorites[0])
 
             flash(f"{remove_to_favorites[1].product_name} successfully removed to your favorites!", category='danger')
             return redirect(url_for('dashboard_page'))
@@ -894,10 +894,10 @@ def dashboard_page():
                 replace_selected_item = request.form.get('productselect')  # returns index of 'prod'
 
                 if replace_selected_item:
-                    product = db.session.query(ProductDataTable, ProductDetailsTable).filter(
-                        ProductDataTable.product_id == replace_selected_item_with,
-                        ProductDataTable.favorite == 1,
-                        ProductDataTable.user_id == current_user.id
+                    product = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                        ProductReferenceTable.product_id == replace_selected_item_with,
+                        ProductReferenceTable.favorite == 1,
+                        ProductReferenceTable.user_id == current_user.id
                     ).join(ProductDetailsTable).first()
 
                     if product:
@@ -943,10 +943,10 @@ def dashboard_page():
                     return redirect(url_for('dashboard_page'))
             else:
 
-                product = db.session.query(ProductDataTable, ProductDetailsTable).join(ProductDetailsTable).filter(
-                    ProductDataTable.product_id == replace_selected_item_with,
-                    ProductDataTable.favorite == 1,
-                    ProductDataTable.user_id == current_user.id
+                product = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
+                    ProductReferenceTable.product_id == replace_selected_item_with,
+                    ProductReferenceTable.favorite == 1,
+                    ProductReferenceTable.user_id == current_user.id
                 ).first()
 
                 if product:
@@ -980,10 +980,11 @@ def dashboard_page():
     if request.method == 'GET':
         # ranks -- used sql statement
         # getting all queries expect if category and category_link value is Breadcrumblist Empty
-        df = pd.read_sql('SELECT product_data_table.data_id, product_data_table.product_id, '
+        df = pd.read_sql('SELECT product_reference_table.data_id, product_reference_table.product_id, '
                          'product_details_table.product_name, product_details_table.category, '
                          'product_details_table.category_link, product_details_table.target_website from '
-                         'product_data_table LEFT JOIN product_details_table ON product_data_table.product_id = '
+                         'product_reference_table LEFT JOIN product_details_table ON '
+                         'product_reference_table.product_id = '
                          'product_details_table.product_id WHERE category NOT LIKE "Breadcrumblist Empty%" AND '
                          'category_link NOT LIKE "Breadcrumblist Empty%"', db.session.bind)
 
@@ -1005,9 +1006,10 @@ def dashboard_page():
 
         # favorites
         list_of_favorites = []
-        favourites = db.session.query(ProductDataTable, ProductDetailsTable).join(ProductDetailsTable).filter(
-            ProductDataTable.favorite == 1, ProductDataTable.user_id == current_user.id  # favorite == 1 is True
-        ).order_by(ProductDataTable.product_id.desc())
+        favourites = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
+            ProductReferenceTable.favorite == 1, ProductReferenceTable.user_id == current_user.id  # favorite == 1 is
+            # True
+        ).order_by(ProductReferenceTable.product_id.desc())
 
         for pdata, pdetails in favourites:
             list_of_favorites.append(
@@ -1026,9 +1028,9 @@ def dashboard_page():
 
         # history
         list_of_history = []
-        histories = db.session.query(ProductDataTable, ProductDetailsTable).join(ProductDetailsTable).filter(
-            ProductDataTable.user_id == current_user.id
-        ).order_by(ProductDataTable.product_id.desc())
+        histories = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
+            ProductReferenceTable.user_id == current_user.id
+        ).order_by(ProductReferenceTable.product_id.desc())
 
         for pdata, pdetails in histories:
             list_of_history.append(
