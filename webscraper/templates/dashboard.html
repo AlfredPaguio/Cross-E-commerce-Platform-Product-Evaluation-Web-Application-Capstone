@@ -166,6 +166,7 @@ Dashboard Page
                      {% include 'includes/add_to_favorites_modal.html' %}
                      {% include 'includes/update_product_modal.html' %}
                      {% include 'includes/load_reviews_modal.html' %}
+                     {% include 'includes/update_reviews_modal.html' %}
                      {% include 'includes/load_recommended_products_modal.html' %}
                      <div class="col-xs-12 col-lg-6 mx-auto pb-5  ">
                         <h6 class="font-weight-bold">Product Information</h6>
@@ -324,32 +325,38 @@ Dashboard Page
 
                         <!-- Load Reviews/Recommended -->
                         <div class="row mt-3 mb-3">
-                  {% if loop.index0 == 0 %}
-                     <div class="text-center pt-3 pb-3 mx-auto">
-                        {% if reviews_1|length == 0  %}
-                           <!-- Load Reviews -->
-                           <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
-                        {% endif %}
+                           {% if loop.index0 == 0 %}
+                              <div class="text-center pt-3 pb-3 mx-auto">
+                                 {% if reviews_1|length == 0  %}
+                                    <!-- Load Reviews -->
+                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
+                                 {% else %}
+                                    <!-- Update Reviews -->
+                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
+                                 {% endif %}
 
-                        {% if recommended_1|length == 0 %}
-                           <!-- Load Recommended -->
-                           <button type="submit" class="btn btn-outline-info btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
-                        {% endif %}
-                     </div>
-                  {% else%}
-                     <div class="text-center pt-3 pb-3 mx-auto">
-                        {% if reviews_2|length == 0  %}
-                           <!-- Load Reviews -->
-                           <button type="submit" class="btn btn-sm btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
-                        {% endif %}
+                                 {% if recommended_1|length == 0 %}
+                                    <!-- Load Recommended -->
+                                    <button type="submit" class="btn btn-outline-info btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+                                 {% endif %}
+                              </div>
+                           {% else%}
+                              <div class="text-center pt-3 pb-3 mx-auto">
+                                 {% if reviews_2|length == 0  %}
+                                    <!-- Load Reviews -->
+                                    <button type="submit" class="btn btn-sm btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
+                                 {% else %}
+                                    <!-- Update Reviews -->
+                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
+                                 {% endif %}
 
-                        {% if recommended_2|length == 0 %}
-                           <!-- Load Recommended -->
-                           <button type="submit" class="btn btn-sm btn-outline-info mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
-                        {% endif %}
-                     </div>
-                  {% endif %}
-               </div>
+                                 {% if recommended_2|length == 0 %}
+                                    <!-- Load Recommended -->
+                                    <button type="submit" class="btn btn-sm btn-outline-info mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+                                 {% endif %}
+                              </div>
+                           {% endif %}
+                        </div>
 
                         <!-- Recommended Products -->
                         <div class="row mt-3 mb-3">

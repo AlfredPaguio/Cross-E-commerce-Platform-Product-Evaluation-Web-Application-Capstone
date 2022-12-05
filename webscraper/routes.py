@@ -14,9 +14,9 @@ from webscraper import app, db, mail
 from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               LoginForm, RegisterForm, RemoveToFavoritesForm,
                               ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
-                              LoadRecommendedProductsForm, ViewRecommendedProductForm)
+                              LoadRecommendedProductsForm, ViewRecommendedProductForm, UpdateReviewsForm)
 from webscraper.helper import HelpMe, UrlHelper, SummarizeThis
-from webscraper.models import (ProductDataReviewsTable, ProductDataTable,
+from webscraper.models import (ProductDataReviewsTable, ProductReferenceTable,
                                ProductDetailsTable, User)
 from webscraper.productdetails import ProductDetails
 from webscraper.webscraper import Webscraper
@@ -38,6 +38,7 @@ def dashboard_page():
     load_recommended_products_form = LoadRecommendedProductsForm()
     view_recommended_products_form = ViewRecommendedProductForm()
     load_reviews_form = LoadReviewsForm()
+    update_reviews_form = UpdateReviewsForm()
 
     if session.get('list_of_products') is None:
         session['list_of_products'] = []
@@ -79,12 +80,12 @@ def dashboard_page():
                     flash(f'This product is already on the view.', category='info')
                     return redirect(url_for('dashboard_page'))
 
-                exists_in_current_user = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+                exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                     ProductDetailsTable.product_link == input_link,
-                    ProductDataTable.user_id == current_user.id
+                    ProductReferenceTable.user_id == current_user.id
                 ).join(ProductDetailsTable).first()
 
-                exist_in_database = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+                exist_in_database = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                     ProductDetailsTable.product_link == input_link
                 ).join(ProductDetailsTable).first()
 
@@ -125,8 +126,8 @@ def dashboard_page():
 
                     # get product info from database
                     # add new entry for current user referencing the product_id from product_details
-                    prod_data = ProductDataTable(product_id=exist_in_database[0].product_id,
-                                                 user_id=current_user.id)
+                    prod_data = ProductReferenceTable(product_id=exist_in_database[0].product_id,
+                                                      user_id=current_user.id)
 
                     db.session.add(prod_data)
                     db.session.commit()
@@ -217,8 +218,8 @@ def dashboard_page():
                                 db.session.flush()
 
                                 # referencing new product to current user
-                                prod_data = ProductDataTable(product_id=prod_details.product_id,
-                                                             user_id=current_user.id)
+                                prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                                  user_id=current_user.id)
                                 db.session.add(prod_data)
                                 db.session.commit()
 
@@ -480,6 +481,113 @@ def dashboard_page():
                 flash(f"Reviews loaded successfully", category='success')
                 return redirect(url_for('dashboard_page'))
 
+        # Update Reviews
+        if request.args.get('req') == "update_reviews":
+            update_review_index = request.form.get('update_review_index')
+            update_review_link = request.form.get('update_review_link')
+            update_review_item = request.form.get('update_review_item')
+            update_review_sku = request.form.get('update_review_sku')
+
+            list_of_reviews = db.session.query(ProductDataReviewsTable).filter(
+                ProductDataReviewsTable.product_id == update_review_item
+            ).limit(50)
+
+            if list_of_reviews is not None:
+                get_percentage = SummarizeThis()
+                url_helper = UrlHelper()
+                scraper = Webscraper()
+
+                what_hostname = url_helper.get_hostname(update_review_link)
+
+                if what_hostname == 'shopee.ph':
+                    start = update_review_link.find('-i.')
+                    split_ = update_review_link[start:].strip(' ').split('.')
+
+                    review_link = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
+                else:
+                    sku_split = update_review_sku.split('_PH-')
+                    item_id = sku_split[0]
+                    shop_id = sku_split[1]
+
+                    review_link = f'https://my-m.lazada.com.ph/review/product-reviews?itemId={item_id}&skuId=' \
+                                  f'{shop_id}&spm=a2o4l.pdp_revamp_css.pdp_top_tab.rating_and_review&wh_weex=true '
+
+                # run new scraper
+                scraper.land_first_page(review_link)
+                reviews_loaded = None
+
+                try:
+                    print('Getting Reviews..')
+                    reviews_loaded = WebDriverWait(scraper.driver, 3).until(EC.visibility_of_element_located((
+                        By.CSS_SELECTOR, 'div[class="app-container"]' if "shopee.ph" in what_hostname
+                        else 'div[class="rax-scrollview"]'
+                    )))
+                except TimeoutException:
+                    flash("Timed out: Waiting for target page to load took to long.",
+                          category='danger')
+                    scraper.driver.quit()
+                    return redirect(url_for('dashboard_page'))
+                finally:
+                    if reviews_loaded:
+                        time.sleep(3)
+                        print('Reviews loaded: Success')
+                        try:
+                            updated_reviews = scraper.find_product_reviews_shopee() if 'shopee.ph' in what_hostname \
+                                else scraper.find_product_reviews_lazada()
+
+                            for i in range(list_of_reviews.count()):
+                                try:
+                                    list_of_reviews[i].review_author = updated_reviews[i].get('author')
+                                    list_of_reviews[i].review_data_time = updated_reviews[i].get('date_time')
+                                    list_of_reviews[i].review_comment = updated_reviews[i].get('comment')
+                                    list_of_reviews[i].review_sentiment = updated_reviews[i].get('review_sentiment')
+                                except IndexError:
+                                    break
+
+                            db.session.commit()
+
+                            new_reviews = db.session.query(ProductDataReviewsTable).filter(
+                                ProductDataReviewsTable.product_id == update_review_item
+                            ).limit(50)
+
+                            if update_review_index == 0:
+                                del session['reviews_1'][:]
+
+                                for reviews in new_reviews:
+                                    session['reviews_1'].append(reviews)
+
+                                review_summary = get_percentage.get_percentage_of_sentiments(
+                                    product_index=int(update_review_index))
+                                session['reviews_summary_1'] = review_summary
+                            else:
+                                del session['reviews_2'][:]
+
+                                for reviews in new_reviews:
+                                    session['reviews_2'].append(reviews)
+
+                                review_summary = get_percentage.get_percentage_of_sentiments(
+                                    product_index=int(update_review_index))
+                                session['reviews_summary_2'] = review_summary
+
+                            # Check if webdriver is undetected
+                            status = scraper.driver.execute_script('return navigator.webdriver')
+                            print(f'Webdriver status: {status}')
+
+                            # Close headless browser and webdriver instance gracefully
+                            scraper.driver.quit()
+                            flash(f"Reviews updated successfully", category='success')
+                            return redirect(url_for('dashboard_page'))
+                        except AttributeError as e:
+                            if update_review_index == 0:
+                                session.pop('reviews_summary_1')
+                            else:
+                                session.pop('reviews_summary_2')
+
+                            print(f'Error: {e}')
+                            flash("Something went wrong.", category='danger')
+                            scraper.driver.quit()
+                            return redirect(url_for('dashboard_page'))
+
         # Load Recommended Products Logic
         if request.args.get("req") == "load_recommended_products":
             load_product_category_link = request.form.get('load_product_category_link')
@@ -547,12 +655,12 @@ def dashboard_page():
                 flash(f'This product is already on the view.', category='info')
                 return redirect(url_for('dashboard_page'))
 
-            exists_in_current_user = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+            exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                 ProductDetailsTable.product_link == input_link,
-                ProductDataTable.user_id == current_user.id
+                ProductReferenceTable.user_id == current_user.id
             ).join(ProductDetailsTable).first()
 
-            exist_in_database = db.session.query(ProductDataTable, ProductDetailsTable).filter(
+            exist_in_database = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                 ProductDetailsTable.product_link == input_link
             ).join(ProductDetailsTable).first()
 
@@ -597,8 +705,8 @@ def dashboard_page():
 
                 # get product info from database
                 # add new entry for current user referencing the product_id from product_details
-                prod_data = ProductDataTable(product_id=exist_in_database[0].product_id,
-                                             user_id=current_user.id)
+                prod_data = ProductReferenceTable(product_id=exist_in_database[0].product_id,
+                                                  user_id=current_user.id)
 
                 db.session.add(prod_data)
                 db.session.commit()
@@ -690,8 +798,8 @@ def dashboard_page():
                             db.session.flush()
 
                             # referencing new product to current user
-                            prod_data = ProductDataTable(product_id=prod_details.product_id,
-                                                         user_id=current_user.id)
+                            prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                              user_id=current_user.id)
                             db.session.add(prod_data)
                             db.session.commit()
 
@@ -746,11 +854,11 @@ def dashboard_page():
         if request.args.get("req") == "fav":
             favorite_item_id = request.form.get('favorite_item')
 
-            # set_to_favorites[0] = a dict contains ProductDataTable
+            # set_to_favorites[0] = a dict contains ProductReferenceTable
             # set_to_favorites[1] = a dict contains ProductDetailsTable
 
-            set_to_favorites = db.session.query(ProductDataTable, ProductDetailsTable).filter(
-                ProductDataTable.product_id == favorite_item_id, ProductDataTable.user_id == current_user.id
+            set_to_favorites = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                ProductReferenceTable.product_id == favorite_item_id, ProductReferenceTable.user_id == current_user.id
             ).join(ProductDetailsTable).first()
 
             if set_to_favorites[0].favorite == 1:
@@ -758,7 +866,7 @@ def dashboard_page():
                 return redirect(url_for('dashboard_page'))
             else:
                 # add to favorites
-                ProductDataTable.set_to_favorite(set_to_favorites[0])
+                ProductReferenceTable.set_to_favorite(set_to_favorites[0])
                 flash(f"{set_to_favorites[1].product_name} successfully added to your favorites!", category='success')
                 return redirect(url_for('dashboard_page'))
 
@@ -766,15 +874,15 @@ def dashboard_page():
         if request.args.get("req") == "remove":
             remove_item_id = request.form.get('remove_item')
 
-            # remove_to_favorites[0] = a dict contains ProductDataTable
+            # remove_to_favorites[0] = a dict contains ProductReferenceTable
             # remove_to_favorites[1] = a dict contains ProductDetailsTable
 
-            remove_to_favorites = db.session.query(ProductDataTable, ProductDetailsTable).filter(
-                ProductDataTable.product_id == remove_item_id, ProductDataTable.user_id == current_user.id
+            remove_to_favorites = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                ProductReferenceTable.product_id == remove_item_id, ProductReferenceTable.user_id == current_user.id
             ).join(ProductDetailsTable).first()
 
             # remove to favorites
-            ProductDataTable.remove_to_favorite(remove_to_favorites[0])
+            ProductReferenceTable.remove_to_favorite(remove_to_favorites[0])
 
             flash(f"{remove_to_favorites[1].product_name} successfully removed to your favorites!", category='danger')
             return redirect(url_for('dashboard_page'))
@@ -786,10 +894,10 @@ def dashboard_page():
                 replace_selected_item = request.form.get('productselect')  # returns index of 'prod'
 
                 if replace_selected_item:
-                    product = db.session.query(ProductDataTable, ProductDetailsTable).filter(
-                        ProductDataTable.product_id == replace_selected_item_with,
-                        ProductDataTable.favorite == 1,
-                        ProductDataTable.user_id == current_user.id
+                    product = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                        ProductReferenceTable.product_id == replace_selected_item_with,
+                        ProductReferenceTable.favorite == 1,
+                        ProductReferenceTable.user_id == current_user.id
                     ).join(ProductDetailsTable).first()
 
                     if product:
@@ -835,10 +943,10 @@ def dashboard_page():
                     return redirect(url_for('dashboard_page'))
             else:
 
-                product = db.session.query(ProductDataTable, ProductDetailsTable).join(ProductDetailsTable).filter(
-                    ProductDataTable.product_id == replace_selected_item_with,
-                    ProductDataTable.favorite == 1,
-                    ProductDataTable.user_id == current_user.id
+                product = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
+                    ProductReferenceTable.product_id == replace_selected_item_with,
+                    ProductReferenceTable.favorite == 1,
+                    ProductReferenceTable.user_id == current_user.id
                 ).first()
 
                 if product:
@@ -872,10 +980,11 @@ def dashboard_page():
     if request.method == 'GET':
         # ranks -- used sql statement
         # getting all queries expect if category and category_link value is Breadcrumblist Empty
-        df = pd.read_sql('SELECT product_data_table.data_id, product_data_table.product_id, '
+        df = pd.read_sql('SELECT product_reference_table.data_id, product_reference_table.product_id, '
                          'product_details_table.product_name, product_details_table.category, '
                          'product_details_table.category_link, product_details_table.target_website from '
-                         'product_data_table LEFT JOIN product_details_table ON product_data_table.product_id = '
+                         'product_reference_table LEFT JOIN product_details_table ON '
+                         'product_reference_table.product_id = '
                          'product_details_table.product_id WHERE category NOT LIKE "Breadcrumblist Empty%" AND '
                          'category_link NOT LIKE "Breadcrumblist Empty%"', db.session.bind)
 
@@ -897,9 +1006,10 @@ def dashboard_page():
 
         # favorites
         list_of_favorites = []
-        favourites = db.session.query(ProductDataTable, ProductDetailsTable).join(ProductDetailsTable).filter(
-            ProductDataTable.favorite == 1, ProductDataTable.user_id == current_user.id  # favorite == 1 is True
-        ).order_by(ProductDataTable.product_id.desc())
+        favourites = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
+            ProductReferenceTable.favorite == 1, ProductReferenceTable.user_id == current_user.id  # favorite == 1 is
+            # True
+        ).order_by(ProductReferenceTable.product_id.desc())
 
         for pdata, pdetails in favourites:
             list_of_favorites.append(
@@ -918,9 +1028,9 @@ def dashboard_page():
 
         # history
         list_of_history = []
-        histories = db.session.query(ProductDataTable, ProductDetailsTable).join(ProductDetailsTable).filter(
-            ProductDataTable.user_id == current_user.id
-        ).order_by(ProductDataTable.product_id.desc())
+        histories = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
+            ProductReferenceTable.user_id == current_user.id
+        ).order_by(ProductReferenceTable.product_id.desc())
 
         for pdata, pdetails in histories:
             list_of_history.append(
@@ -952,6 +1062,7 @@ def dashboard_page():
                                replace_product_modal_form=replace_product_modal_form,
                                update_product_modal_form=update_product_modal_form,
                                load_reviews_form=load_reviews_form,
+                               update_reviews_form=update_reviews_form,
                                load_recommended_products_form=load_recommended_products_form,
                                view_recommended_products_form=view_recommended_products_form,
                                list_of_history=list_of_history,

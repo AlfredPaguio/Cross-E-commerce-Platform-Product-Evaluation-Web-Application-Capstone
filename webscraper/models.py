@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):  # User has one-to-many relationship with Produ
     password_hash = db.Column(db.String(length=60), nullable=False)
 
     # Relationships
-    datas = db.relationship('ProductDataTable', backref='prod_data_owner', lazy=True)
+    datas = db.relationship('ProductReferenceTable', backref='prod_data_owner', lazy=True)
 
     @property
     def password(self):
@@ -33,7 +33,7 @@ class User(db.Model, UserMixin):  # User has one-to-many relationship with Produ
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
 
 
-class ProductDataTable(db.Model):
+class ProductReferenceTable(db.Model):
     # Keys
     data_id = db.Column(db.Integer(), primary_key=True)
     product_id = db.Column(db.Integer(), db.ForeignKey('product_details_table.product_id'))
@@ -71,7 +71,7 @@ class ProductDetailsTable(db.Model):  # ProductData has one-to-many relationship
     sku = db.Column(db.String(), nullable=False)
 
     # Relationships
-    datas = db.relationship('ProductDataTable', backref='owned_item', lazy=True)
+    datas = db.relationship('ProductReferenceTable', backref='owned_item', lazy=True)
     reviews = db.relationship('ProductDataReviewsTable', backref='review_owner', lazy=True, passive_deletes=True,
                               cascade="all, delete")
 

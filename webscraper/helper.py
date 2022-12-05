@@ -80,10 +80,6 @@ class SummarizeThis:
                                     f'product_id == {session["list_of_products"][product_index].get("product_id")}'
                                     f' LIMIT 50', db.session.bind)
 
-        reviews_query = pd.read_sql(db.session.query(ProductDataReviewsTable).filter(
-            ProductDataReviewsTable.product_id == session["list_of_products"][product_index].get("product_id")
-        ).limit(50).statement, db.session.bind)
-
         review_data = pd.DataFrame(reviews_query)
 
         review_index = review_data.loc[

@@ -9,23 +9,24 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-center" id="ModalLabel">
+                <h6 class="modal-title text-center" id="ModalLabel">
                     {{ prod.name }}
-                </h5>
+                </h6>
             </div>
 
             <div class="modal-body">
                 <form action="/dashboard?req=update_reviews"  onsubmit="loading();" method="POST">
                     {{ update_reviews_form.hidden_tag() }}
-                    <h4 class="text-center">
+                    <h6 class="text-center">
                         Are you sure you want to update reviews for this product?
-                    </h4>
+                    </h6>
                     <br>
                     <input name="update_review_index" type="hidden" value="{{ loop.index0 }}">
                     <input name="update_review_link" type="hidden" value="{{ prod.link }}">
                     <input name="update_review_item" type="hidden" value="{{ prod.product_id }}">
+                    <input name="update_review_sku" type="hidden" value="{{ prod.sku }}">
                     <div class="text-center">
-                        {{ update_reviews_form.submit(class="btn btn-outline-success", style="color:white;") }}
+                        {{ update_reviews_form.submit(class="btn btn-outline-success btn-sm", style="color:white;") }}
                     </div>
                 </form>
             </div>

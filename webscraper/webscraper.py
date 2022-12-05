@@ -1,7 +1,8 @@
+import random
 import time
 import json
 import os
-from fake_useragent import UserAgent
+# from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -15,8 +16,35 @@ class Webscraper:
         service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
-        ua = UserAgent()
-        user_agent = ua.chrome
+        # ua = UserAgent()
+        # user_agent = ua.chrome
+
+        # mobile user agent
+        mobile_user_agent = [
+            'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; SM-A205U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 '
+            'Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; SM-A102U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 '
+            'Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 '
+            'Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; SM-N960U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 '
+            'Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; LM-Q720) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 '
+            'Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; LM-X420) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 '
+            'Mobile '
+            'Safari/537.36 ',
+            'Mozilla/5.0 (Linux; Android 13; LM-Q710(FGN)) AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/108.0.5359.61 Mobile '
+            'Safari/537.36 '
+        ]
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "iPhone 12 Pro"}
@@ -25,7 +53,8 @@ class Webscraper:
         options = webdriver.ChromeOptions()
         options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 
-        options.add_argument(f'user-agent={user_agent}')
+        # options.add_argument(f'user-agent={user_agent}')
+        options.add_argument(f'user-agent={random.choice(mobile_user_agent)}')
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
@@ -38,10 +67,11 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
+        capabilities = options.to_capabilities()
         # set webdriver
-        self.driver = webdriver.Chrome(options=options, service=service)
+        self.driver = webdriver.Chrome(options=options, service=service, desired_capabilities=capabilities)
         self.driver.maximize_window()
         self.driver.implicitly_wait(15)
         print('Create scraper instance: Success')

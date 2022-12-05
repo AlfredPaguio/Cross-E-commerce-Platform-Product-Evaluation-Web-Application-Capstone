@@ -18,7 +18,7 @@
                 <form action="/dashboard?req=load_reviews" onsubmit="loading();" method="POST">
                     {{ load_reviews_form.hidden_tag() }}
                     <h6 class="text-center">
-                        Load reviews for this product?
+                        Are you sure you want to load reviews for this product?
                     </h6>
                     <br>
                     <input name="load_review_index" type="hidden" value="{{ loop.index0 }}">

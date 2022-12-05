@@ -35,7 +35,15 @@
                <li class="nav-item">
                   <a class="nav-link d-none d-md-block active">Welcome, <span class="font-weight-bold">{{ current_user.username }}</span></a>
                   <a class="nav-link d-sm-block d-md-none" href="{{ url_for('account_page') }}">Account</a>
+                  <a class="nav-link d-sm-block d-md-none" href="https://forms.gle/uvBrLnAqJyHPTeA59" target="_blank">Survey for IT</a>
+                  <a class="nav-link d-sm-block d-md-none" href="https://forms.gle/DD7VJgtvBVfKbZDh8" target="_blank">Survey for Users</a>
                   <a class="nav-link d-sm-block d-md-none" onclick="loading();" href="{{ url_for('logout_page') }}">Logout</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link d-none d-md-block" href="https://forms.gle/uvBrLnAqJyHPTeA59" target="_blank">Survey for IT</a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link d-none d-md-block" href="https://forms.gle/DD7VJgtvBVfKbZDh8" target="_blank">Survey for Users</a>
                </li>
             </ul>
             <div class="btn-group d-none d-md-block">
