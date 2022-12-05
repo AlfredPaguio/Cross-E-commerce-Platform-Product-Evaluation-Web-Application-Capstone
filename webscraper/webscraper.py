@@ -2,7 +2,7 @@ import random
 import time
 import json
 import os
-from fake_useragent import UserAgent
+# from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -16,8 +16,8 @@ class Webscraper:
         service = Service(ChromeDriverManager().install())
 
         # random user agent for Chrome
-        ua = UserAgent()
-        user_agent = ua.chrome
+        # ua = UserAgent()
+        # user_agent = ua.chrome
 
         # mobile user agent
         mobile_user_agent = [
@@ -67,7 +67,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         capabilities = options.to_capabilities()
         # set webdriver
