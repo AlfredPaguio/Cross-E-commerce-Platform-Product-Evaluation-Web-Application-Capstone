@@ -54,15 +54,15 @@ class HelpMe():
         else:
             session['list_of_products'].append(product.get_details)
 
+    
+
+class Account:
     # from https://www.geeksforgeeks.org/create-a-random-password-generator-using-python/
     # modified, ayoko na magisip lol
     def generate_random_password(self):
         password_length = 12
-
         characterList = "" + string.ascii_letters + string.digits + string.punctuation
-
         password = []
-
         for i in range(password_length):
             # Picking a random character from our
             # character list
@@ -71,7 +71,17 @@ class HelpMe():
             # appending a random character to password
             password.append(randomchar)
         return "".join(password)  # return array as string
-
+    
+    def mask_email(self, email:str) -> str: 
+        address_sign = email.find('@')
+        if (address_sign > 0):
+            maskedEmail = email[0] + '*'*(len(email) - 1) + email[address_sign-1:]
+            #First letter/number of email [0] and before address sign [address - 1]
+            #Example paguioalfred_bsit@plmun.edu.ph > first letter is [p] and before address sign is [t]
+            #p****************************t@plmun.edu.ph
+            return maskedEmail
+        return email #if no address sign, it means that email is invalid and somewhat bypassed the register form's email verification
+        
 
 class SummarizeThis:
     def get_percentage_of_sentiments(self, product_index):
