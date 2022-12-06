@@ -141,14 +141,16 @@ Dashboard Page
 
           <!-- Search Bar -->
          <div class="row mt-5 mb-5">
-             <form class="col-xs-12 col-lg-10 mx-auto"  onsubmit="loading();" action="/dashboard?req=search" method="POST">
-               <div class="row mx-auto">
-                  <div class="col">
-                     <input type="url" class="form-control" id="inputLink" name="inputLink" placeholder="Please input product links from Shopee and Lazada" aria-label="Input Link" required>
+            <div class="col-xs-12 col-lg-10 mx-auto">
+               <form onsubmit="loading();" action="/dashboard?req=search" method="POST">
+                  <div class="row mx-auto">
+                     <div class="col">
+                        <input type="url" class="form-control" id="inputLink" name="inputLink" placeholder="Please input product links from Shopee and Lazada" aria-label="Input Link" required>
+                     </div>
+                     <button type="submit" class="btn btn-outline-primary" style="color:white;">Search</button>
                   </div>
-                  <button type="submit" class="btn btn-outline-primary" style="color:white;">Search</button>
-               </div>
-            </form>
+               </form>
+            </div>
          </div>
 
          <!-- Product View and Reccomendation -->
@@ -161,6 +163,10 @@ Dashboard Page
                </div>
             {% else %}
                <div class="col-xs-12 col-lg-10 mx-auto">
+                  <div class="row mx-auto mb-5">
+                     <button class="btn btn-outline-success mx-auto" style="color:white;">Clear View</button>
+                  </div>
+
                   <div class="row mx-auto">
                      {% for prod in list_of_products %}
                      {% include 'includes/add_to_favorites_modal.html' %}

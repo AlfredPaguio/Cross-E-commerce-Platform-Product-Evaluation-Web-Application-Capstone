@@ -4,12 +4,11 @@ from urllib.parse import urlparse
 from flask import session
 from webscraper import db
 from webscraper.productdetails import ProductDetails
-from webscraper.models import ProductDataReviewsTable
 import random
 import string
 
 
-class UrlHelper():
+class UrlHelper:
     # def __init__(self): do nothing
 
     # topic : https://stackoverflow.com/questions/205923/best-way-to-handle-security-and-avoid-xss-with-user-entered
@@ -27,7 +26,7 @@ class UrlHelper():
         return urlparse(url).hostname or ''
 
 
-class HelpMe():
+class HelpMe:
 
     # https://stackoverflow.com/questions/4391697/find-the-index-of-a-dict-within-a-list-by-matching-the-dicts-value
     # modified 
@@ -54,15 +53,14 @@ class HelpMe():
         else:
             session['list_of_products'].append(product.get_details)
 
+
+class Account:
     # from https://www.geeksforgeeks.org/create-a-random-password-generator-using-python/
     # modified, ayoko na magisip lol
     def generate_random_password(self):
         password_length = 12
-
         characterList = "" + string.ascii_letters + string.digits + string.punctuation
-
         password = []
-
         for i in range(password_length):
             # Picking a random character from our
             # character list
@@ -72,10 +70,20 @@ class HelpMe():
             password.append(randomchar)
         return "".join(password)  # return array as string
 
+    def mask_email(self, email: str) -> str:
+        address_sign = email.find('@')
+        if address_sign > 0:
+            maskedEmail = email[0] + '*' * (len(email) - 1) + email[address_sign - 1:]
+            # First letter/number of email [0] and before address sign [address - 1]
+            # Example paguioalfred_bsit@plmun.edu.ph > first letter is [p] and before address sign is [t]
+            # p****************************t@plmun.edu.ph
+            return maskedEmail
+        return email  # if no address sign, it means that email is invalid and somewhat bypassed the register form's
+        # email verification
+
 
 class SummarizeThis:
     def get_percentage_of_sentiments(self, product_index):
-
         reviews_query = pd.read_sql(f'SELECT product_id, review_sentiment FROM product_data_reviews_table WHERE '
                                     f'product_id == {session["list_of_products"][product_index].get("product_id")}'
                                     f' LIMIT 50', db.session.bind)
