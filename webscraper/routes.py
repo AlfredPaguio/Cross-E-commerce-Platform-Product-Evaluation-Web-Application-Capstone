@@ -15,7 +15,7 @@ from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               LoginForm, RegisterForm, RemoveToFavoritesForm,
                               ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
                               LoadRecommendedProductsForm, ViewRecommendedProductForm, UpdateReviewsForm)
-from webscraper.helper import HelpMe, UrlHelper, SummarizeThis
+from webscraper.helper import HelpMe, UrlHelper, SummarizeThis, Account
 from webscraper.models import (ProductDataReviewsTable, ProductReferenceTable,
                                ProductDetailsTable, User)
 from webscraper.productdetails import ProductDetails
@@ -1080,6 +1080,8 @@ def dashboard_page():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_page():
+    
+    
     change_password_form = ChangePasswordForm()
 
     if change_password_form.validate_on_submit():
@@ -1124,8 +1126,8 @@ def account_page():
                 flash(f"There is an error creating the user: ['Password didn't match.']", category='danger')
             else:
                 flash(f'There is an error with creating the user: {err_msg}', category='danger')
-
-    return render_template('account.html', change_password_form=change_password_form)
+    account = Account()
+    return render_template('account.html', change_password_form=change_password_form, maskedEmail=account.mask_email(current_user.email_address))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -1240,8 +1242,8 @@ def forgot_password_page():
         existing_email = User.query.filter_by(email_address=forgot_password_form.email.data).first()
 
         if registered_user.email_address and existing_email:
-            helpme = HelpMe()
-            generatedpassword = helpme.generate_random_password()
+            account = Account()
+            generatedpassword = account.generate_random_password()
             existing_email.password = generatedpassword
             db.session.commit()
             msg = Message(
@@ -1257,7 +1259,7 @@ def forgot_password_page():
                        f'\n\nYou can of course change this password yourself via the account page. If you have any ' \
                        f'difficulties please contact the administrator at capstone.it4f.flask@gmail.com'
             mail.send(msg)
-            flash(f'Reset Successful. You may check your email {existing_email.email_address} for the new password',
+            flash(f'Reset Successful. You may check your email {account.mask_email(existing_email.email_address)} for the new password',
                   category='success')
             return redirect(url_for('login_page'))
         else:
