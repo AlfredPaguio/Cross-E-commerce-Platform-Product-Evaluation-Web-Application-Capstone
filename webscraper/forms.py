@@ -74,3 +74,7 @@ class LoadRecommendedProductsForm(FlaskForm):
 
 class ViewRecommendedProductForm(FlaskForm):
     submit = SubmitField(label='Replace')
+
+
+class ClearProductViewForm(FlaskForm):
+    submit = SubmitField(label='Clear View')

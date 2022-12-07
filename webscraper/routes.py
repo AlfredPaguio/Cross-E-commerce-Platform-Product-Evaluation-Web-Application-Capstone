@@ -14,7 +14,8 @@ from webscraper import app, db, mail
 from webscraper.forms import (AddToFavoritesForm, ForgotPasswordForm,
                               LoginForm, RegisterForm, RemoveToFavoritesForm,
                               ReplaceProductModalForm, UpdateProductModalForm, ChangePasswordForm, LoadReviewsForm,
-                              LoadRecommendedProductsForm, ViewRecommendedProductForm, UpdateReviewsForm)
+                              LoadRecommendedProductsForm, ViewRecommendedProductForm, UpdateReviewsForm,
+                              ClearProductViewForm)
 from webscraper.helper import HelpMe, UrlHelper, SummarizeThis, Account
 from webscraper.models import (ProductDataReviewsTable, ProductReferenceTable,
                                ProductDetailsTable, User)
@@ -39,6 +40,7 @@ def dashboard_page():
     view_recommended_products_form = ViewRecommendedProductForm()
     load_reviews_form = LoadReviewsForm()
     update_reviews_form = UpdateReviewsForm()
+    clear_product_view_form = ClearProductViewForm()
 
     if session.get('list_of_products') is None:
         session['list_of_products'] = []
@@ -977,6 +979,12 @@ def dashboard_page():
                     flash(f'Showing {product[1].product_name} on the view', category='success')
                     return redirect(url_for('dashboard_page'))
 
+        # Clear View Logic
+        if request.args.get('req') == 'clear_product_view':
+            session.pop('list_of_products')
+            flash('Product view cleared!', category='success')
+            return redirect(url_for('dashboard_page'))
+
     if request.method == 'GET':
         # ranks -- used sql statement
         # getting all queries expect if category and category_link value is Breadcrumblist Empty
@@ -1065,6 +1073,7 @@ def dashboard_page():
                                update_reviews_form=update_reviews_form,
                                load_recommended_products_form=load_recommended_products_form,
                                view_recommended_products_form=view_recommended_products_form,
+                               clear_product_view_form=clear_product_view_form,
                                list_of_history=list_of_history,
                                shopee_dataframe=shopee_data_dict,
                                lazada_dataframe=lazada_data_dict,

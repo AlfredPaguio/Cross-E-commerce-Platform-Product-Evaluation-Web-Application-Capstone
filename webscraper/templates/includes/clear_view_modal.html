@@ -1,0 +1,33 @@
+<style>
+    .modal-content {
+        background-color: #212121
+    }
+</style>
+
+<div class="modal fade" id="Modal-ClearProductView" tabindex="-1" aria-labelledby="exampleModallable"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-center mx-auto" id="ModalLabel">
+                    Clear Product View
+                </h6>
+            </div>
+            <div class="modal-body">
+                <form action="/dashboard?req=clear_product_view" onsubmit="loading();" method="POST">
+                    {{ clear_product_view_form.hidden_tag() }}
+                    <h6 class="text-center">
+                        Are you sure you want to clear the products in the view?
+                    </h6>
+                    <br>
+                    <div class="text-center">
+                        {{ clear_product_view_form.submit(class="btn btn-sm btn-outline-danger", style="color:white;") }}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

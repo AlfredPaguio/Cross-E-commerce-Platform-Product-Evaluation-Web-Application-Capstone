@@ -164,7 +164,8 @@ Dashboard Page
             {% else %}
                <div class="col-xs-12 col-lg-10 mx-auto">
                   <div class="row mx-auto mb-5">
-                     <button class="btn btn-outline-success mx-auto" style="color:white;">Clear View</button>
+                     {% include 'includes/clear_view_modal.html' %}
+                     <button type="submit" class="btn btn-outline-danger btn-sm mt-2 mx-auto" style="color:white; " data-toggle="modal" data-target="#Modal-ClearProductView">Clear View</button>
                   </div>
 
                   <div class="row mx-auto">
