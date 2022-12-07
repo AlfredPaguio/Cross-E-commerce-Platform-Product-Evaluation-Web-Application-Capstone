@@ -1166,10 +1166,7 @@ def register_page():
 
             login_user(user_to_create)
             flash(f'Registration Successful. You are now logged in as {user_to_create.username}', category='success')
-            return redirect(url_for('content_page',
-                                    page_of_list1=1,
-                                    page_of_list2=1
-                                    ))
+            return redirect(url_for('content_page'))
         else:
             for e in policy.test(register_form.password1.data):
                 flash(f'Password needs atleast: {e}', category='danger')
@@ -1202,9 +1199,7 @@ def login_page():
                 login_user(attempted_user_login_username)
                 flash(f'Login Successful. You are now logged in as {attempted_user_login_username.username}',
                       category='success')
-                return redirect(url_for('content_page',
-                                        page_of_list1=1,
-                                        page_of_list2=1))
+                return redirect(url_for('content_page'))
 
             else:
                 flash("Username and password didn't match, please try again", category='danger')
@@ -1215,9 +1210,7 @@ def login_page():
                 login_user(attempted_user_login_email)
                 flash(f'Login Successful. You are now logged in as {attempted_user_login_email.username}',
                       category='success')
-                return redirect(url_for('content_page',
-                                        page_of_list1=1,
-                                        page_of_list2=1))
+                return redirect(url_for('content_page'))
 
             else:
                 flash("Email and password didn't match, please try again", category='danger')
