@@ -13,7 +13,7 @@
             </h5>
          </div>
          <div class="modal-body">
-            <form action="/dashboard?req=view_recommended_product" onsubmit="loading();" method="POST">
+            <form action="/content?req=view_recommended_product" onsubmit="loading();" method="POST">
                {{ view_recommended_products_form.hidden_tag() }}
                {% if list_of_products|length > 1 %}
                <h6 class="text-center mb-3">

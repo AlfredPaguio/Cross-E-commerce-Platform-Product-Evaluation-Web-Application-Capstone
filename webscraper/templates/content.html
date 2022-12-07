@@ -142,7 +142,7 @@ Dashboard Page
           <!-- Search Bar -->
          <div class="row mt-5 mb-5">
             <div class="col-xs-12 col-lg-10 mx-auto">
-               <form onsubmit="loading();" action="/dashboard?req=search" method="POST">
+               <form onsubmit="loading();" action="/content?req=search" method="POST">
                   <div class="row mx-auto">
                      <div class="col">
                         <input type="url" class="form-control" id="inputLink" name="inputLink" placeholder="Please input product links from Shopee and Lazada" aria-label="Input Link" required>
@@ -389,7 +389,7 @@ Dashboard Page
                                        </div>
                                     {% endfor %}
                                     <div class="mx-auto pt-3 mb-3">
-                                       <a href="{{ url_for('dashboard_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
+                                       <a href="{{ url_for('content_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
                                     </div>
                                  {% endif %}
                               {% endif %}
@@ -415,7 +415,7 @@ Dashboard Page
                                        </div>
                                     {% endfor %}
                                     <div class="mx-auto pt-3 mb-3">
-                                       <a href="{{ url_for('dashboard_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
+                                       <a href="{{ url_for('content_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
                                     </div>
                                  {% endif %}
                               {% endif %}
@@ -442,7 +442,7 @@ Dashboard Page
                </h5>
             </div>
             <div class="modal-body">
-               <form action="/dashboard?req=replace_item" onsubmit="loading();" method="POST">
+               <form action="/content?req=replace_item" onsubmit="loading();" method="POST">
                   {{ replace_product_modal_form.hidden_tag() }}
                   {% if list_of_products|length > 1 %}
                   <h6 class="text-center mb-3">
@@ -493,7 +493,7 @@ Dashboard Page
                 </h6>
             </div>
             <div class="modal-body">
-                <form action="/dashboard?req=remove" onsubmit="loading();" method="POST">
+                <form action="/content?req=remove" onsubmit="loading();" method="POST">
                     {{ remove_to_favorites_form.hidden_tag() }}
                     <h6 class="text-center">
                         Are you sure you want to remove this item to Favorites?

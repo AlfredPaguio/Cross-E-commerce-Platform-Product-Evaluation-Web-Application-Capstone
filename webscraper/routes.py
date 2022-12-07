@@ -29,9 +29,9 @@ def home_page():
     return render_template('home.html')
 
 
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/content', methods=['GET', 'POST'])
 @login_required
-def dashboard_page():
+def content_page():
     add_to_favorites_form = AddToFavoritesForm()
     remove_to_favorites_form = RemoveToFavoritesForm()
     replace_product_modal_form = ReplaceProductModalForm()
@@ -80,7 +80,7 @@ def dashboard_page():
 
                 if in_dict:
                     flash(f'This product is already on the view.', category='info')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
 
                 exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                     ProductDetailsTable.product_link == input_link,
@@ -121,7 +121,7 @@ def dashboard_page():
                           category='info')
                     flash(f'Press the "Update" button if you want to update the product information',
                           category='info')
-                    return redirect(url_for('dashboard_page', ))
+                    return redirect(url_for('content_page', ))
 
                 # data not existing in current_user, but existing in other user
                 elif exist_in_database is not None:
@@ -163,7 +163,7 @@ def dashboard_page():
                           category='info')
                     flash(f'Press the "Update" button if you want to update the product information',
                           category='info')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
 
                 # data not existing in current_user, not existing in other users, run scraper
                 else:
@@ -182,7 +182,7 @@ def dashboard_page():
                         flash("Timed out: Waiting for target page to load took to long.",
                               category='danger')
                         scraper.driver.quit()
-                        return redirect(url_for('dashboard_page'))
+                        return redirect(url_for('content_page'))
                     finally:
                         if is_loaded:
                             time.sleep(3)
@@ -258,16 +258,16 @@ def dashboard_page():
                                 scraper.driver.quit()
 
                                 flash(f'Displaying product information from {what_hostname}', category='success')
-                                return redirect(url_for('dashboard_page'))
+                                return redirect(url_for('content_page'))
 
                             except AttributeError as e:
                                 print(f'Error: {e}')
                                 flash("Something went wrong.", category='danger')
                                 scraper.driver.quit()
-                                return redirect(url_for('dashboard_page'))
+                                return redirect(url_for('content_page'))
             else:
                 flash(f'This host: {what_hostname}, is not a link either from Shopee or Lazada.', category='danger')
-                return redirect(url_for('dashboard_page'))
+                return redirect(url_for('content_page'))
 
         # Update Product Logic
         if request.args.get("req") == "update_product":
@@ -293,7 +293,7 @@ def dashboard_page():
                     flash("Timed out: Waiting for target page to load took to long.",
                           category='danger')
                     scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 finally:
                     if is_loaded:
                         time.sleep(3)
@@ -353,14 +353,14 @@ def dashboard_page():
 
                             flash(f"Product {product_on_database.product_name} successfully updated.",
                                   category='success')
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
 
                         except AttributeError as e:  # TimeoutError
                             print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             db.session.rollback()  # nag ka error kaya rerevert yung data sa database or shit
                             scraper.driver.quit()
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
 
         # Load Reviews Logic
         if request.args.get('req') == "load_reviews":
@@ -407,7 +407,7 @@ def dashboard_page():
                     flash("Timed out: Waiting for target page to load took to long.",
                           category='danger')
                     scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 finally:
                     if reviews_loaded:
                         time.sleep(3)
@@ -455,7 +455,7 @@ def dashboard_page():
                             scraper.driver.quit()
 
                             flash(f"Reviews loaded successfully", category='success')
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
                         except AttributeError as e:
                             if load_review_index == 0:
                                 session.pop('reviews_summary_1')
@@ -465,7 +465,7 @@ def dashboard_page():
                             print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
             else:
                 if load_review_index == 0:
                     for reviews in list_of_reviews:
@@ -481,7 +481,7 @@ def dashboard_page():
                     session['reviews_summary_2'] = review_summary
 
                 flash(f"Reviews loaded successfully", category='success')
-                return redirect(url_for('dashboard_page'))
+                return redirect(url_for('content_page'))
 
         # Update Reviews
         if request.args.get('req') == "update_reviews":
@@ -528,7 +528,7 @@ def dashboard_page():
                     flash("Timed out: Waiting for target page to load took to long.",
                           category='danger')
                     scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 finally:
                     if reviews_loaded:
                         time.sleep(3)
@@ -578,7 +578,7 @@ def dashboard_page():
                             # Close headless browser and webdriver instance gracefully
                             scraper.driver.quit()
                             flash(f"Reviews updated successfully", category='success')
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
                         except AttributeError as e:
                             if update_review_index == 0:
                                 session.pop('reviews_summary_1')
@@ -588,7 +588,7 @@ def dashboard_page():
                             print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
 
         # Load Recommended Products Logic
         if request.args.get("req") == "load_recommended_products":
@@ -598,7 +598,7 @@ def dashboard_page():
             if load_product_category_link == 'BreadCrumbList Empty':
                 flash(f"Something went wrong, can't load recommended products. "
                       f"Please check the original website instead", category='danger')
-                return redirect(url_for('dashboard_page'))
+                return redirect(url_for('content_page'))
             else:
                 url_helper = UrlHelper()
                 scraper = Webscraper()
@@ -619,7 +619,7 @@ def dashboard_page():
                     flash("Timed out: Waiting for target page to load took to long.",
                           category='danger')
                     scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 finally:
                     time.sleep(3)
                     if recommended_products_loaded:
@@ -634,12 +634,12 @@ def dashboard_page():
 
                             scraper.driver.quit()
                             flash("Recommended products loaded successfully", category='success')
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
                         except AttributeError as e:
                             print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
 
         # View Recommended Products Logic
         if request.args.get("req") == "view_recommended_product":
@@ -655,7 +655,7 @@ def dashboard_page():
 
             if in_dict:
                 flash(f'This product is already on the view.', category='info')
-                return redirect(url_for('dashboard_page'))
+                return redirect(url_for('content_page'))
 
             exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
                 ProductDetailsTable.product_link == input_link,
@@ -697,11 +697,11 @@ def dashboard_page():
                     session['list_of_products'][int(view_product_index)] = _product.get_details
 
                     flash(f"Replace success", category='success')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 else:
                     session['list_of_products'].append(_product.get_details)
                     flash(f'Showing {exists_in_current_user[1].product_name} on the view', category='success')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
 
             elif exist_in_database is not None:
 
@@ -741,11 +741,11 @@ def dashboard_page():
                     session['list_of_products'][int(view_product_index)] = _product.get_details
 
                     flash(f"Replace success", category='success')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 else:
                     session['list_of_products'].append(_product.get_details)
                     flash(f'Showing {exist_in_database[1].product_name} on the view', category='success')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
             else:
                 scraper = Webscraper()
                 scraper.land_first_page(input_link)
@@ -762,7 +762,7 @@ def dashboard_page():
                     flash("Timed out: Waiting for target page to load took to long.",
                           category='danger')
                     scraper.driver.quit()
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
                 finally:
                     if is_loaded:
                         time.sleep(3)
@@ -840,17 +840,17 @@ def dashboard_page():
                                 session['list_of_products'][int(view_product_index)] = _product.get_details
 
                                 flash(f"Replace success", category='success')
-                                return redirect(url_for('dashboard_page'))
+                                return redirect(url_for('content_page'))
                             else:
                                 session['list_of_products'].append(_product.get_details)
                                 flash(f'Showing {prod_details.product_name} on the view', category='success')
-                                return redirect(url_for('dashboard_page'))
+                                return redirect(url_for('content_page'))
 
                         except AttributeError as e:
                             print(f'Error: {e}')
                             flash("Something went wrong.", category='danger')
                             scraper.driver.quit()
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
 
         # Favorites Logic
         if request.args.get("req") == "fav":
@@ -865,12 +865,12 @@ def dashboard_page():
 
             if set_to_favorites[0].favorite == 1:
                 flash(f"{set_to_favorites[1].product_name} is already in the favorites!", category='info')
-                return redirect(url_for('dashboard_page'))
+                return redirect(url_for('content_page'))
             else:
                 # add to favorites
                 ProductReferenceTable.set_to_favorite(set_to_favorites[0])
                 flash(f"{set_to_favorites[1].product_name} successfully added to your favorites!", category='success')
-                return redirect(url_for('dashboard_page'))
+                return redirect(url_for('content_page'))
 
         # Remove Favorites Logic
         if request.args.get("req") == "remove":
@@ -887,7 +887,7 @@ def dashboard_page():
             ProductReferenceTable.remove_to_favorite(remove_to_favorites[0])
 
             flash(f"{remove_to_favorites[1].product_name} successfully removed to your favorites!", category='danger')
-            return redirect(url_for('dashboard_page'))
+            return redirect(url_for('content_page'))
 
         # Replace Logic
         if request.args.get("req") == "replace_item":
@@ -924,7 +924,7 @@ def dashboard_page():
 
                         if in_dict:
                             flash(f'This product is already on the view', category='info')
-                            return redirect(url_for('dashboard_page'))
+                            return redirect(url_for('content_page'))
 
                         if session['list_of_products']:
                             if int(replace_selected_item) == 0:
@@ -939,10 +939,10 @@ def dashboard_page():
                             session['list_of_products'][int(replace_selected_item)] = updated_product.get_details
 
                         flash(f"Replace success", category='success')
-                        return redirect(url_for('dashboard_page'))
+                        return redirect(url_for('content_page'))
                 else:
                     flash(f"Unable to swap item: Please select item to swap", category="danger")
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
             else:
 
                 product = db.session.query(ProductReferenceTable, ProductDetailsTable).join(ProductDetailsTable).filter(
@@ -973,17 +973,17 @@ def dashboard_page():
 
                     if in_dict:
                         flash(f'This product is already on the view', category='info')
-                        return redirect(url_for('dashboard_page'))
+                        return redirect(url_for('content_page'))
 
                     session['list_of_products'].append(updated_product.get_details)
                     flash(f'Showing {product[1].product_name} on the view', category='success')
-                    return redirect(url_for('dashboard_page'))
+                    return redirect(url_for('content_page'))
 
         # Clear View Logic
         if request.args.get('req') == 'clear_product_view':
             session.pop('list_of_products')
             flash('Product view cleared!', category='success')
-            return redirect(url_for('dashboard_page'))
+            return redirect(url_for('content_page'))
 
     if request.method == 'GET':
         # ranks -- used sql statement
@@ -1062,7 +1062,7 @@ def dashboard_page():
                                                             "Replace Item" if len(
                                                                 session['list_of_products']) >= 2 else "Add product")
 
-        return render_template('dashboard.html',
+        return render_template('content.html',
                                list_of_products=session['list_of_products'],
                                add_to_favorites_form=add_to_favorites_form,
                                remove_to_favorites_form=remove_to_favorites_form,
@@ -1142,7 +1142,7 @@ def account_page():
 def register_page():
     register_form = RegisterForm()
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard_page'))
+        return redirect(url_for('content_page'))
     # if registration is sucessful
     if register_form.validate_on_submit():
         policy = PasswordPolicy.from_names(
@@ -1166,7 +1166,7 @@ def register_page():
 
             login_user(user_to_create)
             flash(f'Registration Successful. You are now logged in as {user_to_create.username}', category='success')
-            return redirect(url_for('dashboard_page',
+            return redirect(url_for('content_page',
                                     page_of_list1=1,
                                     page_of_list2=1
                                     ))
@@ -1189,7 +1189,7 @@ def register_page():
 def login_page():
     login_form = LoginForm()
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard_page'))
+        return redirect(url_for('content_page'))
 
     if login_form.validate_on_submit():
         attempted_user_login_username = User.query.filter_by(username=login_form.username.data).first()
@@ -1202,7 +1202,7 @@ def login_page():
                 login_user(attempted_user_login_username)
                 flash(f'Login Successful. You are now logged in as {attempted_user_login_username.username}',
                       category='success')
-                return redirect(url_for('dashboard_page',
+                return redirect(url_for('content_page',
                                         page_of_list1=1,
                                         page_of_list2=1))
 
@@ -1215,7 +1215,7 @@ def login_page():
                 login_user(attempted_user_login_email)
                 flash(f'Login Successful. You are now logged in as {attempted_user_login_email.username}',
                       category='success')
-                return redirect(url_for('dashboard_page',
+                return redirect(url_for('content_page',
                                         page_of_list1=1,
                                         page_of_list2=1))
 
@@ -1243,7 +1243,7 @@ def logout_page():
 def forgot_password_page():
     forgot_password_form = ForgotPasswordForm()
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard_page'))
+        return redirect(url_for('content_page'))
     # if form submission is sucessful
     if forgot_password_form.validate_on_submit():
         registered_user = User.query.filter_by(username=forgot_password_form.username.data).first()
