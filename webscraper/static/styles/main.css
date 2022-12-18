@@ -1,13 +1,175 @@
-body {
+* {
+    box-sizing: border-box;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+  }
+  
+  h1 {
+    font-size: calc(32px + 0.5vw);
+  }
+  
+  h2 {
+    font-size: calc(26px + 0.5vw);
+  }
+  
+  h3 {
+    font-size: calc(22px + 0.5vw);
+  }
+  
+  h4 {
+    font-size: calc(20px + 0.5vw);
+  }
+  
+  h5 {
+    font-size: calc(15px + 0.5vw);
+  }
+  
+  h6 {
+    font-size: calc(13px + 0.5vw);
+  }
+  
+  body {
     font-family: 'Poppins', sans-serif;
-    overflow-x:hidden; !important;
-    background-color: #212121;
-    color: white
+    background-color: rgb(240, 240, 240);
+    background-size: 100% 100%;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    padding-top: 76px;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 76px;
+  }
+  
+  .navbar {
+    top: 0;
+    width: 100%;
+    z-index: 1;
+  }
+  
+  .navbar-nav .nav-item {
+    transition: 300ms;
+  }
+  
+  .navbar-nav .nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: 300ms;
+  }
+  
+  .homediv {
+    height: 30rem;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .homeimage {
+    background-color: rgb(87, 87, 87);
+    background-image: url("../img/bg-1.webp");
+    background-size: 15rem 15rem;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    background-position: top;
+  }
+  
+  .homeup {
+    opacity: 0.5;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    transition: 300ms;
+    z-index: 1;
+  }
+  
+  .homeup:hover {
+    opacity: 1;
+    transition: 300ms;
+  }
+  
+  .homekey {
+    min-height: 300px;
+    transition: 300ms;
+    position: relative;
+  }
+  
+  .homeregister {
+    background-color: rgb(190, 0, 0);
+    color: white;
+  }
+  
+  .homeregister:hover {
+    background-color: rgb(180, 0, 0);
+  }
+  
+  .homesection {
+    width: 100%;
+  }
+  
+  @media only screen and (min-width: 768px) {
+    .homesection {
+      padding-left: 10%;
+      padding-right: 10%;
     }
-
-.modal-content {
-   background-color: #212121
+  }
+  
+  @media only screen and (min-width: 992px) {
+    .homesection {
+      padding-left: 20%;
+      padding-right: 20%;
+    }
 }
+
+.btn-forgot {
+  width: 250px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.forgot-fading {
+  animation: fadeInAnimation 1.5s;
+}
+
+@keyframes fadeInAnimation {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.myStyle {
+    background-color: gainsboro;
+    position: fixed;
+    height: 100vh;
+    width: 20vw;
+    top: 0;
+    right: 0;
+    margin-right: -20vw !important;
+    transition: 1s;
+    z-index: 1;
+  }
+
+  .newStyle {
+    background-color: gainsboro;
+    position: fixed;
+    height: 100vh;
+    width: 20vw;
+    top: 0;
+    right: 0;
+    transition: 1s;
+    z-index: 1;
+  }
 
 /* Off canvas */
 
@@ -87,3 +249,18 @@ body {
     width: 0px;
     background: transparent; /* make scrollbar transparent */
 }
+
+
+#homearrow {
+    display: none;
+    transition: 1s;
+  }
+  
+  #homearrow.show {
+    display: block;
+  }
+  
+  #myDIV {
+    transition: 1s;
+  }
+  

@@ -1,6 +1,8 @@
 const openBtn = document.querySelector('.open-btn');
 const closeBtn = document.querySelector('.close-btn');
 const offcanvasMenu = document.querySelector('.offcanvas-menu')
+const homearrow = document.getElementById("homearrow");
+const myDIV = document.getElementById("myDIV");
 
 openBtn.addEventListener('click', function(e) {
     e.preventDefault();
@@ -21,30 +23,21 @@ function loading(){
     $("#staticLoadingModal").modal("hide")
  });
 
-function password_show_register() {
-  //register page
+ function password_show_register() {
   var x = document.getElementById("password1");
   var y = document.getElementById("password2");
 
-  if (x.type === "password" && y.type === "password") {
-    x.type = "text";
-    y.type = "text";
-  } else {
-    x.type = "password";
-    y.type = "password";
-  }
+  var type = x.type === "password" ? "text" : "password";
+  x.type = type;
+  y.type = type;
 }
 
 function password_show_login() {
-  //login page
-  var z = document.getElementById("password");
 
-  if (z.type === "password") {
-    z.type = "text";
-  } else {
-    z.type = "password";
-  }
+  var z = document.getElementById("password");
+  z.type = z.type === "password" ? "text" : "password";
 }
+
 
 function password_show_account() {
   //register page
@@ -63,3 +56,21 @@ function password_show_account() {
   }
 }
 
+window.onscroll = function () {
+  requestAnimationFrame(scrollFunction);
+};
+
+function scrollFunction() {
+  if (
+    document.body.scrollTop > 300 ||
+    document.documentElement.scrollTop > 300
+  ) {
+    homearrow.classList.add("show");
+  } else {
+    homearrow.classList.remove("show");
+  }
+}
+
+function myFunction() {
+  myDIV.classList.toggle("newStyle");
+}
