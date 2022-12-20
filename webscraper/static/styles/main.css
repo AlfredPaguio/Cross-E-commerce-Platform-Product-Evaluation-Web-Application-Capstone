@@ -129,13 +129,13 @@ html {
   }
 }
 
-.btn-forgot {
+.btn-universal {
   width: 250px;
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-.forgot-fading {
+.fading {
   animation: fadeInAnimation 1.5s;
 }
 

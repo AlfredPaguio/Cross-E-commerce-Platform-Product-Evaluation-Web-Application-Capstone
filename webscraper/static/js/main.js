@@ -34,7 +34,7 @@ function loading(){
 
 function password_show_login() {
 
-  var z = document.getElementById("password");
+  var z = document.getElementById("passwordForm");
   z.type = z.type === "password" ? "text" : "password";
 }
 
