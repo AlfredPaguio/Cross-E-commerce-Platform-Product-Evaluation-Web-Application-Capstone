@@ -70,7 +70,3 @@ function scrollFunction() {
     homearrow.classList.remove("show");
   }
 }
-
-function myFunction() {
-  myDIV.classList.toggle("newStyle");
-}

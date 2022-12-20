@@ -66,22 +66,22 @@
     transition: 300ms;
   }
   
-  .homediv {
-    height: 30rem;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .homeimage {
-    background-color: rgb(87, 87, 87);
-    background-image: url("../img/bg-1.webp");
-    background-size: 15rem 15rem;
-    background-repeat: repeat;
-    background-attachment: fixed;
+  .homediv{
+    height: 30rem !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.homeimage{
+    background-color: rgb(87, 87, 87) !important;
+
+    background-size: 15rem 15rem !important;
+    background-repeat: repeat !important;
+    background-attachment: fixed !important;
     background-position: top;
-  }
-  
+}
+
   .homeup {
     opacity: 0.5;
     position: fixed;
