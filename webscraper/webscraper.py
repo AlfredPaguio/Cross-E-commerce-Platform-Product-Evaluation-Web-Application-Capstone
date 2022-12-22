@@ -9,6 +9,7 @@ from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 from webscraper import sentiment
+from webscraper.helper import UrlHelper
 
 
 class Webscraper:
@@ -47,7 +48,7 @@ class Webscraper:
         ]
 
         # emulate mobile view
-        mobile_emulation = {"deviceName": "iPhone 12 Pro"}
+        mobile_emulation = {"deviceName": "Nest Hub"}
     
         # set chrome options
         options = webdriver.ChromeOptions()
@@ -67,7 +68,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         capabilities = options.to_capabilities()
         # set webdriver
@@ -156,6 +157,53 @@ class Webscraper:
             'category_link': category_link,
             'sku': 'Lazada Only'
         }
+
+    def find_product_by_keyword_shopee(self):
+        helper = UrlHelper()
+        print('Getting Product Infos')
+
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
+
+        divs = soup.find_all('div', class_='xcR77')
+
+        products = []
+        for div in divs[1:21]:
+            product_name = div.find_next('div', class_='rgHvZc').text
+
+            url = div.find_next('div', class_='rgHvZc').find('a', href=True)
+            url_sanitized = helper.rebuild_url(url['href'][9:])
+
+            striper = url_sanitized.find('/promotion')
+            url_rebuild_1 = url_sanitized[:striper]
+
+            striper2 = url_rebuild_1.find('&rct')
+
+            if striper2 == -1:
+                url_cleaned = url_rebuild_1
+            else:
+                url_cleaned = url_rebuild_1[:striper2]
+
+            if helper.get_hostname(url_cleaned) == 'Lazada':
+                continue
+            else:
+                url_hostname = 'Shopee'
+
+            product_price = div.find_next('span', class_='HRLxBb').text
+
+            product_image = div.find_next('div', class_='oR27Gd').find('img')
+            product_image_cleaned = product_image['src']
+
+            products.append(
+                {
+                    'keyword_product_name': product_name,
+                    'keyword_product_price': product_price,
+                    'keyword_product_link': url_cleaned,
+                    'keyword_product_image': product_image_cleaned,
+                    'keyword_target_webiste': url_hostname
+                }
+            )
+
+        return products
 
     def find_product_reviews_shopee(self):
         print('Running initial loop')
@@ -319,6 +367,46 @@ class Webscraper:
             'category_link': category_link,
             'sku': sku
         }
+
+    def find_product_by_keyword_lazada(self):
+        helper = UrlHelper()
+        print('Getting Product Infos')
+
+        soup = BeautifulSoup(self.driver.page_source, 'lxml')
+
+        divs = soup.find_all('div', class_='xcR77')
+
+        products = []
+        for div in divs[1:21]:
+            product_name = div.find_next('div', class_='rgHvZc').text
+
+            url = div.find_next('div', class_='rgHvZc').find('a', href=True)
+            url_sanitized = helper.rebuild_url(url['href'][9:])
+            striper = url_sanitized.find('&rct')
+
+            url_cleaned = url_sanitized[:striper]
+
+            if helper.get_hostname(url_cleaned) == 'Shopee':
+                continue
+            else:
+                url_hostname = 'Lazada'
+
+            product_price = div.find_next('span', class_='HRLxBb').text
+
+            product_image = div.find_next('div', class_='oR27Gd').find('img')
+            product_image_cleaned = product_image['src']
+
+            products.append(
+                {
+                    'keyword_product_name': product_name,
+                    'keyword_product_price': product_price,
+                    'keyword_product_link': url_cleaned,
+                    'keyword_product_image': product_image_cleaned,
+                    'keyword_target_webiste': url_hostname
+                }
+            )
+
+        return products
 
     def find_product_reviews_lazada(self):
         print('Running initial loop')

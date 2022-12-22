@@ -182,12 +182,20 @@ html {
   position: fixed;
   right: 30px;
   padding-right: 20px;
+<<<<<<< Updated upstream
   z-index: 2;
+=======
+  z-index: 0;
+>>>>>>> Stashed changes
 }
 
 .his-fav-menu .sidebar-btn .open-btn {
   font-size: 30px;
+<<<<<<< Updated upstream
   color: #ffffff;
+=======
+  color: #212121;
+>>>>>>> Stashed changes
   justify-content: right;
 }
 
@@ -196,7 +204,11 @@ html {
   z-index: 2;
   top: 5px;
   right: 0px;
+<<<<<<< Updated upstream
   background: #212121;
+=======
+  background: #ffffff;
+>>>>>>> Stashed changes
   width: 350px;
   display: flex;
   align-items: center;
@@ -215,7 +227,11 @@ html {
   top: 5px;
   left: 15px;
   font-size: 30px;
+<<<<<<< Updated upstream
   color: #fff;
+=======
+  color: #212121;
+>>>>>>> Stashed changes
 }
 
 #hideMe {

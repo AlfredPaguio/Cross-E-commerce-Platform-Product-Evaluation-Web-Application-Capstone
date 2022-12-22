@@ -1,13 +1,13 @@
 <style>
     .modal-content {
-        background-color: #212121
+        background-color: #ffffff;
     }
 </style>
 
 <div class="modal fade" id="Modal-AddToFavoritesConfirm-{{ prod.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
      aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-white">
             <div class="modal-header">
                 <h6 class="modal-title text-center" id="ModalLabel">
                     {{ prod.name }}
@@ -22,12 +22,12 @@
                     <br>
                     <input id="favorite_item" name="favorite_item" type="hidden" value="{{ prod.product_id }}">
                     <div class="text-center">
-                        {{ add_to_favorites_form.submit(class="btn btn-sm btn-outline-danger", style="color:white;") }}
+                        {{ add_to_favorites_form.submit(class="btn-universal btn btn-sm btn-danger rounded-pill", style="color:white;") }}
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-secondary rounded-pill" style="color:white;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
