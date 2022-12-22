@@ -12,21 +12,6 @@ Register Page
                     {{ register_form.hidden_tag() }}
                     <h4 class="font-weight-normal pb-5">Register a new account</h4>
                     <div class="form-group text-left">
-<<<<<<< Updated upstream
-                        <label for="usernameForm"> {{ register_form.username.label() }}</label>
-                        {{ register_form.username(class="form-control mb-2", id="usernameForm", placeholder="Username") }}
-                    </div>
-                    <div class="form-group text-left">
-                        <label for="emailForm"> {{ register_form.email_address.label() }}</label>
-                        {{ register_form.email_address(class="form-control mb-2", id="emailForm", placeholder="Email Address") }}
-                    </div>
-                    <div class="form-group text-left">
-                        <label for="password1">{{ register_form.password1.label() }}</label>
-                        {{ register_form.password1(class="form-control mb-2", id="password1", placeholder="Password (Requires a combination of uppercase, numbers, and special characters") }}
-                    </div>
-                    <div class="form-group text-left mb-4">
-                        <label for="password2">{{ register_form.password2.label() }}</label>
-=======
                         {{ register_form.username.label() }}
                         {{ register_form.username(class="form-control mb-2", id="usernameForm", placeholder="Username") }}
                     </div>
@@ -40,7 +25,6 @@ Register Page
                     </div>
                     <div class="form-group text-left mb-4">
                         {{ register_form.password2.label() }}
->>>>>>> Stashed changes
                         {{ register_form.password2(class="form-control mb-2", id="password2", placeholder="Confirm Password") }}
                         <div class="form-check pt-2">
                             <input class="form-check-input" type="checkbox" onclick="password_show_register()" id="showPassword">
@@ -50,11 +34,7 @@ Register Page
                         </div>
                     </div>
                     <div class="justify-content-center">
-<<<<<<< Updated upstream
-                        {{ register_form.submit(class="btn-universal btn btn btn-info btn-lg rounded-pill mb-3", style="color:white;") }}
-=======
                         {{ register_form.submit(class="btn-universal btn btn-info btn-sm rounded-pill mb-3", style="color:white;") }}
->>>>>>> Stashed changes
                         <br>
                         <a class="font-weight-normal text-decoration-none" href="{{ url_for('login_page') }}">Already have an account?</a>
                     </div>
