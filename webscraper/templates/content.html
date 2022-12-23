@@ -2,7 +2,6 @@
 {% block title %}
 Dashboard Page
 {% endblock %}
-{{ super() }}
 {% block content %}
 <div class="container-fluid">
    <div class="row">
@@ -577,4 +576,20 @@ Dashboard Page
    </div>
    {% endfor %}
 </div>
+{% endblock %}
+{% block javascripts_local %}
+  {{ super() }} {# to load the parent assets #}
+  <script>
+   const openBtn = document.querySelector('.open-btn');
+   const closeBtn = document.querySelector('.close-btn');
+   openBtn.addEventListener('click', function(e) {
+       e.preventDefault();
+       offcanvasMenu.classList.add('active');
+   });
+   
+   closeBtn.addEventListener('click', function (e) {
+       e.preventDefault();
+       offcanvasMenu.classList.remove('active');
+   });
+  </script>
 {% endblock %}

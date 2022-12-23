@@ -222,6 +222,12 @@ html {
   color: #212121;
 }
 
+a.open-btn {
+  display: block;
+  width: 1em; /* same as the font size of the i tag */
+  height: 1em; /* same as the font size of the i tag */
+}
+
 #hideMe {
   -moz-animation: cssAnimation 0s ease-in 5s forwards;
   /* Firefox */
@@ -262,8 +268,8 @@ html {
   transition: 1s;
 }
 
-#homearrow.show {
-  display: block;
+.show {
+  display: block !important;
 }
 
 #myDIV {

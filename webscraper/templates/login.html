@@ -19,7 +19,7 @@ Login Page
                         {{ login_form.password.label() }}
                         {{ login_form.password(class="form-control", id="passwordForm", placeholder="Password") }}
                         <div class="form-check pt-2">
-                            <input class="form-check-input" type="checkbox" onclick="password_show_login()"
+                            <input class="form-check-input" type="checkbox" onclick="password_show()"
                                 id="showPassword">
                             <label class="form-check-label" for="showPassword">
                                 Show Password
@@ -42,4 +42,13 @@ Login Page
             <div class="col"></div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts_local %}
+  {{ super() }} {# to load the parent assets #}
+  <script>
+    function password_show() {
+        var z = document.getElementById("passwordForm");
+        z.type = z.type === "password" ? "text" : "password";
+      }
+  </script>
 {% endblock %}

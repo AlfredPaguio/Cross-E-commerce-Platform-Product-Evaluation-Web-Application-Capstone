@@ -26,15 +26,15 @@ Account Page
                      {{ change_password_form.hidden_tag() }}
 
                      {{ change_password_form.old_password.label() }}
-                     {{ change_password_form.old_password(class="form-control mb-2", placeholder="Old Password") }}
+                     {{ change_password_form.old_password(class="password-input form-control mb-2", placeholder="Old Password") }}
 
                      {{ change_password_form.new_password.label() }}
-                     {{ change_password_form.new_password(class="form-control mb-2", placeholder="New Password (Requires a combination of uppercase, numbers, and special characters") }}
+                     {{ change_password_form.new_password(class="password-input form-control mb-2", placeholder="New Password (Requires a combination of uppercase, numbers, and special characters") }}
 
                      {{ change_password_form.confirm_new_password.label() }}
-                     {{ change_password_form.confirm_new_password(class="form-control mb-2", placeholder="Confirm New Password") }}
+                     {{ change_password_form.confirm_new_password(class="password-input form-control mb-2", placeholder="Confirm New Password") }}
 
-                     <input type="checkbox" onclick="password_show_account()"> Show Password <br>
+                     <input type="checkbox" onclick="password_show()"> Show Password <br>
                   </div>
 
                   <div class="checkbox mb-3 text-center mt-3">
@@ -47,4 +47,20 @@ Account Page
       <div class="col"></div>
    </div>
 </div>
+{% endblock %}
+{% block javascripts_local %}
+  {{ super() }} {# to load the parent assets #}
+  <script>
+   function password_show() {
+      var passwordInputs = document.getElementsByClassName('password-input');
+      for (var i = 0; i < passwordInputs.length; i++) {
+        var input = passwordInputs[i];
+        if (input.type === "password") {
+          input.type = "text";
+        } else {
+          input.type = "password";
+        }
+      }
+    }
+  </script>
 {% endblock %}
