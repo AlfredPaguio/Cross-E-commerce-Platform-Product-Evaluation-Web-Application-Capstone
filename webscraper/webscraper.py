@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from webdriver_manager.chrome import ChromeDriverManager
 from webscraper import sentiment
 from webscraper.helper import UrlHelper
+from flask import url_for
 
 
 class Webscraper:
@@ -133,7 +134,7 @@ class Webscraper:
             try:
                 prod_image = prod_image_['src']
             except TypeError:
-                prod_image = "url_for('static',filename='images/broken-image.png')"
+                prod_image = url_for('static',filename='images/broken-image.png') 
 
         except AttributeError:
             prod_image_ = soup.find('video', class_='product-video__video')
@@ -141,7 +142,7 @@ class Webscraper:
             try:
                 prod_image = prod_image_['poster']
             except TypeError:
-                prod_image = "url_for('static',filename='images/broken-image.png')"
+                prod_image = url_for('static',filename='images/broken-image.png') 
 
         print('Getting product info: Success')
         return {

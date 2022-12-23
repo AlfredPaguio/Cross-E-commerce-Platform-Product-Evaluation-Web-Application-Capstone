@@ -4,10 +4,19 @@ Dashboard Page
 {% endblock %}
 {{ super() }}
 {% block content %}
-<div class="contianer-fluid">
+<div class="container-fluid">
    <div class="row">
       <div class="col-12 his-fav-menu">
-         
+         <div class="sidebar-btn">
+            <a class="open-btn" href="#">
+               <span class="fa-stack fa-1x">
+                  <i class="fa-solid fa-circle fa-stack-2x text-info"></i>
+                  <i class="fa-solid fa-bars fa-stack-1x text-light" aria-hidden="true"></i>
+               </span>
+              
+
+            </a>
+         </div>
          <div class="offcanvas-menu overflow-hidden" style="z-index: 6; margin-top: 50px;">
             <a class="close-btn bg-dark" style="margin-top: -10px; margin-left: -15px; border-radius: 0px 0px 15px 0px" href="#"><i class="fa fa-times text-light px-2" aria-hidden="true"></i></a>
             <div class="row pt-5 mx-auto">
@@ -175,51 +184,63 @@ Dashboard Page
                            {% for keyword_product in keyword_products_shopee[:15] %}
                            <div class="row border mb-2 overflow-hidden" style="height: 150px; max-height: 300px;">
                            
-                                 <div class="col-4 d-flex align-items-center h-100 p-3">
-                                    <img class="img-fluid rounded h-100 w-100" src="{{ keyword_product.keyword_product_image }}" alt="{{ keyword_product.keyword_product_name }}">
+                              <div class="col-4 d-flex align-items-center h-100 p-3">
+                                 <img class="img-fluid rounded h-100 w-100" src="{{ keyword_product.keyword_product_image }}"
+                                    alt="{{ keyword_product.keyword_product_name }}">
+                              </div>
+                              <div class="col-6 p-3">
+                                 <div class="row text-break" style="max-height: 90px; white-space: wrap;
+                                                               overflow: hidden;
+                                                               text-overflow: ellipsis;">
+                                    <a href="{{ keyword_product.keyword_product_link }}" class="responsive-text font-weight-bold text-dark"
+                                       target="_blank">{{ keyword_product.keyword_product_name }}</a>
                                  </div>
-                                 <div class="col-6 p-3">
-                                    <div class="row text-break" style="max-height: 90px; white-space: wrap;
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;">
-                                       <a href="{{ keyword_product.keyword_product_link }}" class="responsive-text font-weight-bold text-dark" target="_blank">{{ keyword_product.keyword_product_name }}</a>
-                                    </div>
-                                    <div class="row">
-                                       <p class="text-danger">{{ keyword_product.keyword_product_price }}</p>
-                                    </div>
+                                 <div class="row">
+                                    <p class="text-danger">{{ keyword_product.keyword_product_price }}</p>
                                  </div>
-                            
-                                 <div class="col-2 d-flex justify-content-center border">
-                                    <div class="form-check form-check-inline m-0">
-                                       <input class="form-check-input m-0 p-0" type="checkbox" style="height: calc(10px + 0.5vw); width: calc(10px + 0.5vw);" name="keyword_product_link_shopee" id="inlineRadio-{{ loop.index0 }}" value="{{ keyword_product.keyword_product_link }}">
-                                       <label class="form-check-label" for="inlineRadio-{{ loop.index0 }}"></label>
-                                    </div>
+                              </div>
+                           
+                              <div class="col-2 d-flex justify-content-center border">
+                                 <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input m-0 p-0" type="radio"
+                                       style="height: calc(10px + 0.5vw); width: calc(10px + 0.5vw);" name="keyword_product_link_shopee"
+                                       id="inlineRadio-{{ loop.index0 }}" value="{{ keyword_product.keyword_product_link }}">
+                                    <label class="form-check-label" for="inlineRadio-{{ loop.index0 }}"></label>
                                  </div>
-                        </div>
+                              </div>
+                           </div>
                            {% endfor %}
                      </div>
                      <div class="col-xs-12 col-md-6">
                         <h6 class="text-center mb-5 text-info">Lazada Products</h6>
                            {% for keyword_product in keyword_products_lazada[:15] %}
-                           <div class="row border pt-3 mb-2">
-                           <div class="col-10">
-                              <div class="row" style="height: auto; max-height: 300px">
-                                 <div class="col-4">
-                                    <img class="img-fluid rounded float-right" src="{{ keyword_product.keyword_product_image }}" style="max-height:150px;" alt="{{ keyword_product.keyword_product_name }}">
+                           <div class="row border mb-2 overflow-hidden" style="height: 150px; max-height: 300px;">
+                           
+                              <div class="col-4 d-flex align-items-center h-100 p-3">
+                                 <img class="img-fluid rounded h-100 w-100" src="{{ keyword_product.keyword_product_image }}"
+                                    alt="{{ keyword_product.keyword_product_name }}">
+                              </div>
+                              <div class="col-6 p-3">
+                                 <div class="row text-break" style="max-height: 90px; white-space: wrap;
+                                                               overflow: hidden;
+                                                               text-overflow: ellipsis;">
+                                    <a href="{{ keyword_product.keyword_product_link }}" class="responsive-text font-weight-bold text-dark"
+                                       target="_blank">{{ keyword_product.keyword_product_name }}</a>
                                  </div>
-                                 <div class="col-8">
-                                    <a href="{{ keyword_product.keyword_product_link }}" class="font-weight-bold text-dark" target="_blank">{{ keyword_product.keyword_product_name }}</a>
-                                    <p class="text-warning">{{ keyword_product.keyword_product_price }}</p>
+                                 <div class="row">
+                                    <p class="text-danger">{{ keyword_product.keyword_product_price }}</p>
+                                 </div>
+                              </div>
+                           
+                              <div class="col-2 d-flex justify-content-center border">
+                                 <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input m-0 p-0" type="radio"
+                                       style="height: calc(10px + 0.5vw); width: calc(10px + 0.5vw);" name="keyword_product_link_lazada"
+                                       id="inlineRadio-{{ loop.index0 }}" value="{{ keyword_product.keyword_product_link }}">
+                                    <label class="form-check-label" for="inlineRadio-{{ loop.index0 }}"></label>
                                  </div>
                               </div>
                            </div>
-                           <div class="col-2">
-                              <div class="form-check form-check-inline">
-                                 <input class="form-check-input" type="radio" name="keyword_product_link_lazada" id="inlineRadio-{{ loop.index0 }}" value="{{ keyword_product.keyword_product_link }}">
-                                 <label class="form-check-label" for="inlineRadio-{{ loop.index0 }}"></label>
-                              </div>
-                           </div>
-                        </div>
                            {% endfor %}
                      </div>
                   </div>
