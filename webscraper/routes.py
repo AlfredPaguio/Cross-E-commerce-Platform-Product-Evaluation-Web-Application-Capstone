@@ -93,8 +93,8 @@ def content_page():
                 session.pop('keyword_products_shopee')
                 session.pop('keyword_products_lazada')
 
-                shopee_link = f'https://www.google.com/search?q=shopee+{_link}&tbm=shop'
-                lazada_link = f'https://www.google.com/search?q=lazada+{_link}&tbm=shop'
+                shopee_link = f'https://www.google.com/search?q=shopee+{_link}&tbm=shop&gl=ph'
+                lazada_link = f'https://www.google.com/search?q=lazada+{_link}&tbm=shop&gl=ph'
                 is_loaded_shopee = None
                 is_loaded_lazada = None
 
