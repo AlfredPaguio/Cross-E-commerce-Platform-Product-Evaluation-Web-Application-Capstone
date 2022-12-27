@@ -184,13 +184,13 @@ html {
 
 .his-fav-menu .sidebar-btn {
   position: fixed;
-  right: 20px;
+  right: 30px;
   padding-right: 0px;
   z-index: 0;
 }
 
 .his-fav-menu .sidebar-btn .open-btn {
-  font-size: 30px;
+  font-size: 25px;
   color: #212121;
   justify-content: right;
 }
@@ -216,8 +216,8 @@ html {
 
 .close-btn {
   position: absolute;
-  top: 5px;
-  left: 15px;
+  top: 10px;
+  left: 20px;
   font-size: 30px;
   color: #212121;
 }

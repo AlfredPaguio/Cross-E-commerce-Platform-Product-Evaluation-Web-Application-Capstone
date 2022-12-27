@@ -49,8 +49,9 @@
                   target="_blank">Survey for Users</a>
             </li>
             <li class="d-sm-block d-md-none text-white-50">
-               Welcome, <span class="font-weight-bold">{{
+               <span class="d-none">Welcome, <span class="font-weight-bold">{{
                   current_user.username }}</span>
+               </span>
                <li class="pl-3">
                   <a class="nav-link d-sm-block d-md-none" href="{{ url_for('account_page') }}">Account</a>
                   <a class="nav-link d-sm-block d-md-none" onclick="loading();"
@@ -100,7 +101,7 @@
    {% for category,message in messages %}
    <div id="hideMe">
       <div class="alert alert-{{ category }}">
-         <button type="button" class="m1-2 close" data-dismiss="alert" aria-label="Close">
+         <button type="button" class="m1-2 close"data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
          </button>
          {{ message }}
