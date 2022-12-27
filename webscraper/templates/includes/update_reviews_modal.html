@@ -1,13 +1,9 @@
-<style>
-    .modal-content {
-        background-color: #212121
-    }
-</style>
+
 
 <div class="modal fade" id="Modal-UpdateReviews-{{ prod.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
      aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-white">
             <div class="modal-header">
                 <h6 class="modal-title text-center" id="ModalLabel">
                     {{ prod.name }}
@@ -26,13 +22,13 @@
                     <input name="update_review_item" type="hidden" value="{{ prod.product_id }}">
                     <input name="update_review_sku" type="hidden" value="{{ prod.sku }}">
                     <div class="text-center">
-                        {{ update_reviews_form.submit(class="btn btn-outline-success btn-sm", style="color:white;") }}
+                        {{ update_reviews_form.submit(class="btn-universal btn btn-success btn-sm rounded-pill", style="color:white;") }}
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                 <button type="button" class="btn btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+                 <button type="button" class="btn btn-secondary btn-sm rounded-pill" style="color:white;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -31,7 +31,7 @@ Session(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'capstone.it4f.flask@gmail.com'
-app.config['MAIL_PASSWORD'] = 'qddklhqikszvqouj'
+app.config['MAIL_PASSWORD'] = 'jvwvzripfhmbrykf'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)

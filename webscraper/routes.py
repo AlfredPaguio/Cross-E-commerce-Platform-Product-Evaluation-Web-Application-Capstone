@@ -63,6 +63,12 @@ def content_page():
     if session.get('recommended_2') is None:
         session['recommended_2'] = []
 
+    if session.get('keyword_products_shopee') is None:
+        session['keyword_products_shopee'] = []
+
+    if session.get('keyword_products_lazada') is None:
+        session['keyword_products_lazada'] = []
+
     if request.method == 'POST':
         # Scraper Logic
         if request.args.get("req") == "search":
@@ -72,202 +78,286 @@ def content_page():
             what_hostname = url_helper.get_hostname(input_link)
             supported_sites = {"shopee.ph", "www.lazada.com.ph"}
 
-            if what_hostname in supported_sites:
+            if input_link.find('https://') == -1:
+                scraper = Webscraper()
 
-                # check if product is already in the view
-                helpme = HelpMe()
-                in_dict = helpme.dict_isvalue_exist(session['list_of_products'], "link", input_link)
+                # Search with keywords needs to pop all sessions
+                # Acts as reset
+                session.pop('list_of_products')
+                session.pop('reviews_1')
+                session.pop('reviews_2')
+                session.pop('reviews_summary_1')
+                session.pop('reviews_summary_2')
+                session.pop('recommended_1')
+                session.pop('recommended_2')
+                session.pop('keyword_products_shopee')
+                session.pop('keyword_products_lazada')
 
-                if in_dict:
-                    flash(f'This product is already on the view.', category='info')
+                shopee_link = f'https://www.google.com/search?q=shopee+{_link}&tbm=shop'
+                lazada_link = f'https://www.google.com/search?q=lazada+{_link}&tbm=shop'
+                is_loaded_shopee = None
+                is_loaded_lazada = None
+
+                # First Run
+                scraper.land_first_page(shopee_link)
+                try:
+                    is_loaded_shopee = WebDriverWait(scraper.driver, 3).until(
+                        EC.visibility_of_element_located(
+                            (By.CSS_SELECTOR,
+                             'div[class="PR0QIb"]'
+                             )))
+                except TimeoutException:
+                    flash("Timed out: Waiting for target page to load took to long.",
+                          category='danger')
+                    scraper.driver.quit()
                     return redirect(url_for('content_page'))
+                finally:
+                    if is_loaded_shopee:
+                        time.sleep(3)
+                        try:
+                            shopee_products = scraper.find_product_by_keyword_shopee()
+                            session['keyword_products_shopee'] = shopee_products
+                        except AttributeError as e:
+                            print(f'Error: {e}')
+                            flash("Something went wrong.", category='danger')
+                            scraper.driver.quit()
+                            return redirect(url_for('content_page'))
 
-                exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
-                    ProductDetailsTable.product_link == input_link,
-                    ProductReferenceTable.user_id == current_user.id
-                ).join(ProductDetailsTable).first()
+                # Open a new window
+                scraper.driver.execute_script("window.open('');")
+                # Switch to the new window and open new URL
+                scraper.driver.switch_to.window(scraper.driver.window_handles[1])
 
-                exist_in_database = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
-                    ProductDetailsTable.product_link == input_link
-                ).join(ProductDetailsTable).first()
-
-                # data existing in current_user
-                if exists_in_current_user is not None:
-                    _product = ProductDetails(product_id=exists_in_current_user[0].product_id,
-                                              product_name=exists_in_current_user[1].product_name,
-                                              product_price=exists_in_current_user[1].product_price,
-                                              product_rating=exists_in_current_user[1].product_rating,
-                                              product_sold=exists_in_current_user[1].product_sold,
-                                              product_description=exists_in_current_user[1].product_description,
-                                              product_image=exists_in_current_user[1].product_image,
-                                              shop_rating=exists_in_current_user[1].shop_rating,
-                                              shop_response_rate=exists_in_current_user[1].shop_response_rate,
-                                              product_link=exists_in_current_user[1].product_link,
-                                              target_website=exists_in_current_user[1].target_website,
-                                              category_link=exists_in_current_user[1].category_link,
-                                              sku=exists_in_current_user[1].sku,
-                                              product_data_owner=current_user.id)
-
-                    # list indexing
-                    helpme = HelpMe()
-                    helpme.reorder_list_of_products(_product)
-                    session.pop('reviews_1')
-                    session.pop('reviews_2')
-                    session.pop('recommended_1')
-                    session.pop('recommended_2')
-                    session.pop('reviews_summary_1')
-                    session.pop('reviews_summary_2')
-                    flash(f'This product is loaded from the database, product information might be outdated',
-                          category='info')
-                    flash(f'Press the "Update" button if you want to update the product information',
-                          category='info')
-                    return redirect(url_for('content_page', ))
-
-                # data not existing in current_user, but existing in other user
-                elif exist_in_database is not None:
-
-                    # get product info from database
-                    # add new entry for current user referencing the product_id from product_details
-                    prod_data = ProductReferenceTable(product_id=exist_in_database[0].product_id,
-                                                      user_id=current_user.id)
-
-                    db.session.add(prod_data)
-                    db.session.commit()
-
-                    _product = ProductDetails(product_id=exist_in_database[0].product_id,
-                                              product_name=exist_in_database[1].product_name,
-                                              product_price=exist_in_database[1].product_price,
-                                              product_rating=exist_in_database[1].product_rating,
-                                              product_sold=exist_in_database[1].product_sold,
-                                              product_description=exist_in_database[1].product_description,
-                                              product_image=exist_in_database[1].product_image,
-                                              shop_rating=exist_in_database[1].shop_rating,
-                                              shop_response_rate=exist_in_database[1].shop_response_rate,
-                                              product_link=exist_in_database[1].product_link,
-                                              target_website=exist_in_database[1].target_website,
-                                              category_link=exist_in_database[1].category_link,
-                                              sku=exist_in_database[1].sku,
-                                              product_data_owner=current_user.id)
-
-                    # list indexing
-                    helpme = HelpMe()
-                    helpme.reorder_list_of_products(_product)
-                    session.pop('reviews_1')
-                    session.pop('reviews_2')
-                    session.pop('recommended_1')
-                    session.pop('recommended_2')
-                    session.pop('reviews_summary_1')
-                    session.pop('reviews_summary_2')
-
-                    flash(f'This product is loaded from the database, product information might be outdated',
-                          category='info')
-                    flash(f'Press the "Update" button if you want to update the product information',
-                          category='info')
+                # Second Run
+                scraper.driver.get(lazada_link)
+                try:
+                    is_loaded_lazada = WebDriverWait(scraper.driver, 3).until(
+                        EC.visibility_of_element_located(
+                            (By.CSS_SELECTOR,
+                             'div[class="PR0QIb"]'
+                             )))
+                except TimeoutException:
+                    flash("Timed out: Waiting for target page to load took to long.",
+                          category='danger')
+                    scraper.driver.quit()
                     return redirect(url_for('content_page'))
+                finally:
+                    if is_loaded_lazada:
+                        time.sleep(3)
+                        try:
+                            shopee_products = scraper.find_product_by_keyword_lazada()
+                            session['keyword_products_lazada'] = shopee_products
+                        except AttributeError as e:
+                            print(f'Error: {e}')
+                            flash("Something went wrong.", category='danger')
+                            scraper.driver.quit()
+                            return redirect(url_for('content_page'))
 
-                # data not existing in current_user, not existing in other users, run scraper
-                else:
-                    scraper = Webscraper()
-                    scraper.land_first_page(input_link)
-
-                    is_loaded = None
-
-                    try:
-                        is_loaded = WebDriverWait(scraper.driver, 3).until(
-                            EC.visibility_of_element_located(
-                                (By.CSS_SELECTOR,
-                                 'div[class="app-container"]' if "shopee.ph" in what_hostname else 'div[id="container"]'
-                                 )))
-                    except TimeoutException:
-                        flash("Timed out: Waiting for target page to load took to long.",
-                              category='danger')
-                        scraper.driver.quit()
-                        return redirect(url_for('content_page'))
-                    finally:
-                        if is_loaded:
-                            time.sleep(3)
-                            # Getting Product Information
-                            try:
-                                link = scraper.driver.current_url
-
-                                prod_info = scraper.find_product_info_shopee() if 'shopee.ph' in what_hostname \
-                                    else scraper.find_product_info_lazada()
-
-                                if what_hostname == 'shopee.ph':
-                                    target_website = 'Shopee'
-                                else:
-                                    target_website = 'Lazada'
-
-                                # adding new product to database
-                                prod_details = ProductDetailsTable(product_link=link,
-                                                                   product_name=prod_info.get('prod_name'),
-                                                                   product_price=prod_info.get('prod_price'),
-                                                                   product_rating=prod_info.get('prod_rating'),
-                                                                   product_sold=prod_info.get('prod_sold'),
-                                                                   product_description=prod_info.get('prod_desc'),
-                                                                   product_image=prod_info.get('prod_image'),
-                                                                   shop_rating=prod_info.get('shop_rating'),
-                                                                   shop_response_rate=prod_info.get('shop_res_rate'),
-                                                                   category=prod_info.get('category'),
-                                                                   category_link=prod_info.get('category_link'),
-                                                                   sku=prod_info.get('sku'),
-                                                                   target_website=target_website)
-                                db.session.add(prod_details)
-
-                                # adds the prod_details as "PENDING" into the database. will not persist
-                                # into the database until db.session.commit() is called..
-                                # this is needed to avoid product_details.product_id returning none
-                                db.session.flush()
-
-                                # referencing new product to current user
-                                prod_data = ProductReferenceTable(product_id=prod_details.product_id,
-                                                                  user_id=current_user.id)
-                                db.session.add(prod_data)
-                                db.session.commit()
-
-                                that_product = ProductDetails(product_id=prod_details.product_id,
-                                                              product_name=prod_details.product_name,
-                                                              product_price=prod_details.product_price,
-                                                              product_rating=prod_details.product_rating,
-                                                              product_sold=prod_details.product_sold,
-                                                              product_description=prod_details.product_description,
-                                                              product_image=prod_details.product_image,
-                                                              shop_rating=prod_details.shop_rating,
-                                                              shop_response_rate=prod_details.shop_response_rate,
-                                                              product_link=prod_details.product_link,
-                                                              target_website=prod_details.target_website,
-                                                              category_link=prod_details.category_link,
-                                                              sku=prod_details.sku,
-                                                              product_data_owner=current_user.id)
-
-                                # list indexing
-                                helpme = HelpMe()
-                                helpme.reorder_list_of_products(that_product)
-                                session.pop('reviews_1')
-                                session.pop('reviews_2')
-                                session.pop('recommended_1')
-                                session.pop('recommended_2')
-                                session.pop('reviews_summary_1')
-                                session.pop('reviews_summary_2')
-
-                                # Check if webdriver is undetected
-                                status = scraper.driver.execute_script('return navigator.webdriver')
-                                print(f'Webdriver status: {status}')
-
-                                # Close headless browser and webdriver instance gracefully
-                                scraper.driver.quit()
-
-                                flash(f'Displaying product information from {what_hostname}', category='success')
-                                return redirect(url_for('content_page'))
-
-                            except AttributeError as e:
-                                print(f'Error: {e}')
-                                flash("Something went wrong.", category='danger')
-                                scraper.driver.quit()
-                                return redirect(url_for('content_page'))
-            else:
-                flash(f'This host: {what_hostname}, is not a link either from Shopee or Lazada.', category='danger')
+                scraper.driver.quit()
+                flash("Showing products from Shopee and Lazada", category='success')
                 return redirect(url_for('content_page'))
+            else:
+                session.pop('keyword_products_shopee')
+                session.pop('keyword_products_lazada')
+
+                if what_hostname in supported_sites:
+
+                    # check if product is already in the view
+                    helpme = HelpMe()
+                    in_dict = helpme.dict_isvalue_exist(session['list_of_products'], "link", input_link)
+
+                    if in_dict:
+                        flash(f'This product is already on the view.', category='info')
+                        return redirect(url_for('content_page'))
+
+                    exists_in_current_user = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                        ProductDetailsTable.product_link == input_link,
+                        ProductReferenceTable.user_id == current_user.id
+                    ).join(ProductDetailsTable).first()
+
+                    exist_in_database = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                        ProductDetailsTable.product_link == input_link
+                    ).join(ProductDetailsTable).first()
+
+                    # data existing in current_user
+                    if exists_in_current_user is not None:
+                        _product = ProductDetails(product_id=exists_in_current_user[0].product_id,
+                                                  product_name=exists_in_current_user[1].product_name,
+                                                  product_price=exists_in_current_user[1].product_price,
+                                                  product_rating=exists_in_current_user[1].product_rating,
+                                                  product_sold=exists_in_current_user[1].product_sold,
+                                                  product_description=exists_in_current_user[1].product_description,
+                                                  product_image=exists_in_current_user[1].product_image,
+                                                  shop_rating=exists_in_current_user[1].shop_rating,
+                                                  shop_response_rate=exists_in_current_user[1].shop_response_rate,
+                                                  product_link=exists_in_current_user[1].product_link,
+                                                  target_website=exists_in_current_user[1].target_website,
+                                                  category_link=exists_in_current_user[1].category_link,
+                                                  sku=exists_in_current_user[1].sku,
+                                                  product_data_owner=current_user.id)
+
+                        # list indexing
+                        helpme = HelpMe()
+                        helpme.reorder_list_of_products(_product)
+                        session.pop('reviews_1')
+                        session.pop('reviews_2')
+                        session.pop('recommended_1')
+                        session.pop('recommended_2')
+                        session.pop('reviews_summary_1')
+                        session.pop('reviews_summary_2')
+                        flash(f'This product is loaded from the database, product information might be outdated',
+                              category='info')
+                        flash(f'Press the "Update" button if you want to update the product information',
+                              category='info')
+                        return redirect(url_for('content_page', ))
+
+                    # data not existing in current_user, but existing in other user
+                    elif exist_in_database is not None:
+
+                        # get product info from database
+                        # add new entry for current user referencing the product_id from product_details
+                        prod_data = ProductReferenceTable(product_id=exist_in_database[0].product_id,
+                                                          user_id=current_user.id)
+
+                        db.session.add(prod_data)
+                        db.session.commit()
+
+                        _product = ProductDetails(product_id=exist_in_database[0].product_id,
+                                                  product_name=exist_in_database[1].product_name,
+                                                  product_price=exist_in_database[1].product_price,
+                                                  product_rating=exist_in_database[1].product_rating,
+                                                  product_sold=exist_in_database[1].product_sold,
+                                                  product_description=exist_in_database[1].product_description,
+                                                  product_image=exist_in_database[1].product_image,
+                                                  shop_rating=exist_in_database[1].shop_rating,
+                                                  shop_response_rate=exist_in_database[1].shop_response_rate,
+                                                  product_link=exist_in_database[1].product_link,
+                                                  target_website=exist_in_database[1].target_website,
+                                                  category_link=exist_in_database[1].category_link,
+                                                  sku=exist_in_database[1].sku,
+                                                  product_data_owner=current_user.id)
+
+                        # list indexing
+                        helpme = HelpMe()
+                        helpme.reorder_list_of_products(_product)
+                        session.pop('reviews_1')
+                        session.pop('reviews_2')
+                        session.pop('recommended_1')
+                        session.pop('recommended_2')
+                        session.pop('reviews_summary_1')
+                        session.pop('reviews_summary_2')
+
+                        flash(f'This product is loaded from the database, product information might be outdated',
+                              category='info')
+                        flash(f'Press the "Update" button if you want to update the product information',
+                              category='info')
+                        return redirect(url_for('content_page'))
+
+                    # data not existing in current_user, not existing in other users, run scraper
+                    else:
+                        scraper = Webscraper()
+                        scraper.land_first_page(input_link)
+
+                        is_loaded = None
+
+                        try:
+                            is_loaded = WebDriverWait(scraper.driver, 3).until(
+                                EC.visibility_of_element_located(
+                                    (By.CSS_SELECTOR,
+                                     'div[class="app-container"]' if "shopee.ph" in what_hostname else
+                                     'div[id="container"]'
+                                     )))
+                        except TimeoutException:
+                            flash("Timed out: Waiting for target page to load took to long.",
+                                  category='danger')
+                            scraper.driver.quit()
+                            return redirect(url_for('content_page'))
+                        finally:
+                            if is_loaded:
+                                time.sleep(3)
+                                # Getting Product Information
+                                try:
+                                    link = scraper.driver.current_url
+
+                                    prod_info = scraper.find_product_info_shopee() if 'shopee.ph' in what_hostname \
+                                        else scraper.find_product_info_lazada()
+
+                                    if what_hostname == 'shopee.ph':
+                                        target_website = 'Shopee'
+                                    else:
+                                        target_website = 'Lazada'
+
+                                    # adding new product to database
+                                    prod_details = ProductDetailsTable(product_link=link,
+                                                                       product_name=prod_info.get('prod_name'),
+                                                                       product_price=prod_info.get('prod_price'),
+                                                                       product_rating=prod_info.get('prod_rating'),
+                                                                       product_sold=prod_info.get('prod_sold'),
+                                                                       product_description=prod_info.get('prod_desc'),
+                                                                       product_image=prod_info.get('prod_image'),
+                                                                       shop_rating=prod_info.get('shop_rating'),
+                                                                       shop_response_rate=prod_info.get(
+                                                                           'shop_res_rate'),
+                                                                       category=prod_info.get('category'),
+                                                                       category_link=prod_info.get('category_link'),
+                                                                       sku=prod_info.get('sku'),
+                                                                       target_website=target_website)
+                                    db.session.add(prod_details)
+
+                                    # adds the prod_details as "PENDING" into the database. will not persist
+                                    # into the database until db.session.commit() is called..
+                                    # this is needed to avoid product_details.product_id returning none
+                                    db.session.flush()
+
+                                    # referencing new product to current user
+                                    prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                                      user_id=current_user.id)
+                                    db.session.add(prod_data)
+                                    db.session.commit()
+
+                                    that_product = ProductDetails(product_id=prod_details.product_id,
+                                                                  product_name=prod_details.product_name,
+                                                                  product_price=prod_details.product_price,
+                                                                  product_rating=prod_details.product_rating,
+                                                                  product_sold=prod_details.product_sold,
+                                                                  product_description=prod_details.product_description,
+                                                                  product_image=prod_details.product_image,
+                                                                  shop_rating=prod_details.shop_rating,
+                                                                  shop_response_rate=prod_details.shop_response_rate,
+                                                                  product_link=prod_details.product_link,
+                                                                  target_website=prod_details.target_website,
+                                                                  category_link=prod_details.category_link,
+                                                                  sku=prod_details.sku,
+                                                                  product_data_owner=current_user.id)
+
+                                    # list indexing
+                                    helpme = HelpMe()
+                                    helpme.reorder_list_of_products(that_product)
+                                    session.pop('reviews_1')
+                                    session.pop('reviews_2')
+                                    session.pop('recommended_1')
+                                    session.pop('recommended_2')
+                                    session.pop('reviews_summary_1')
+                                    session.pop('reviews_summary_2')
+
+                                    # Check if webdriver is undetected
+                                    status = scraper.driver.execute_script('return navigator.webdriver')
+                                    print(f'Webdriver status: {status}')
+
+                                    # Close headless browser and webdriver instance gracefully
+                                    scraper.driver.quit()
+
+                                    flash(f'Displaying product information from {what_hostname}', category='success')
+                                    return redirect(url_for('content_page'))
+
+                                except AttributeError as e:
+                                    print(f'Error: {e}')
+                                    flash("Something went wrong.", category='danger')
+                                    scraper.driver.quit()
+                                    return redirect(url_for('content_page'))
+                else:
+                    flash(f'This host: {what_hostname}, is not a link either from Shopee or Lazada.', category='danger')
+                    return redirect(url_for('content_page'))
 
         # Update Product Logic
         if request.args.get("req") == "update_product":
@@ -382,9 +472,12 @@ def content_page():
 
                 if what_hostname == 'shopee.ph':
                     start = load_review_link.find('-i.')
-                    split_ = load_review_link[start:].strip(' ').split('.')
-
-                    review_link = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
+                    if start == -1:
+                        split_ = load_review_link.split('/')
+                        review_link = f'https://shopee.ph/shop/{split_[-2]}/item/{split_[-1]}/rating'
+                    else:
+                        split_ = load_review_link[start:].strip(' ').split('.')
+                        review_link = f'https://shopee.ph/shop/{split_[1]}/item/{split_[2]}/rating'
                 else:
                     sku_split = load_review_sku.split('_PH-')
                     item_id = sku_split[0]
@@ -624,8 +717,8 @@ def content_page():
                     time.sleep(3)
                     if recommended_products_loaded:
                         try:
-                            recommended_products = scraper.find_recommendations_shopee() if 'shopee.ph' in \
-                                                    what_hostname else scraper.find_recommendations_lazada()
+                            recommended_products = scraper.find_recommendations_shopee() \
+                                if 'shopee.ph' in what_hostname else scraper.find_recommendations_lazada()
 
                             if load_product_index == 0:
                                 session['recommended_1'] = recommended_products
@@ -892,6 +985,10 @@ def content_page():
         # Replace Logic
         if request.args.get("req") == "replace_item":
             replace_selected_item_with = request.form.get('replace_item')
+
+            session.pop('keyword_products_shopee')
+            session.pop('keyword_products_lazada')
+
             if len(session['list_of_products']) > 1:
                 replace_selected_item = request.form.get('productselect')  # returns index of 'prod'
 
@@ -979,9 +1076,287 @@ def content_page():
                     flash(f'Showing {product[1].product_name} on the view', category='success')
                     return redirect(url_for('content_page'))
 
+        # Compare Logic
+        if request.args.get("req") == "compare_item":
+            keyword_product_link_shopee = request.form.get('keyword_product_link_shopee')
+            keyword_product_link_lazada = request.form.get('keyword_product_link_lazada')
+
+            if keyword_product_link_shopee is not None and keyword_product_link_lazada is not None:
+                scraper = Webscraper()
+                # Run 1
+                exists_in_current_user_shopee = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                    ProductDetailsTable.product_link == keyword_product_link_shopee,
+                    ProductReferenceTable.user_id == current_user.id
+                ).join(ProductDetailsTable).first()
+
+                exist_in_database_shopee = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                    ProductDetailsTable.product_link == keyword_product_link_shopee
+                ).join(ProductDetailsTable).first()
+
+                if exists_in_current_user_shopee is not None:
+                    _product = ProductDetails(product_id=exists_in_current_user_shopee[0].product_id,
+                                              product_name=exists_in_current_user_shopee[1].product_name,
+                                              product_price=exists_in_current_user_shopee[1].product_price,
+                                              product_rating=exists_in_current_user_shopee[1].product_rating,
+                                              product_sold=exists_in_current_user_shopee[1].product_sold,
+                                              product_description=exists_in_current_user_shopee[1].product_description,
+                                              product_image=exists_in_current_user_shopee[1].product_image,
+                                              shop_rating=exists_in_current_user_shopee[1].shop_rating,
+                                              shop_response_rate=exists_in_current_user_shopee[1].shop_response_rate,
+                                              product_link=exists_in_current_user_shopee[1].product_link,
+                                              target_website=exists_in_current_user_shopee[1].target_website,
+                                              category_link=exists_in_current_user_shopee[1].category_link,
+                                              sku=exists_in_current_user_shopee[1].sku,
+                                              product_data_owner=current_user.id)
+                    # list indexing
+                    helpme = HelpMe()
+                    helpme.reorder_list_of_products(_product)
+                elif exist_in_database_shopee is not None:
+                    prod_data = ProductReferenceTable(product_id=exist_in_database_shopee[0].product_id,
+                                                      user_id=current_user.id)
+
+                    db.session.add(prod_data)
+                    db.session.commit()
+
+                    _product = ProductDetails(product_id=exist_in_database_shopee[0].product_id,
+                                              product_name=exist_in_database_shopee[1].product_name,
+                                              product_price=exist_in_database_shopee[1].product_price,
+                                              product_rating=exist_in_database_shopee[1].product_rating,
+                                              product_sold=exist_in_database_shopee[1].product_sold,
+                                              product_description=exist_in_database_shopee[1].product_description,
+                                              product_image=exist_in_database_shopee[1].product_image,
+                                              shop_rating=exist_in_database_shopee[1].shop_rating,
+                                              shop_response_rate=exist_in_database_shopee[1].shop_response_rate,
+                                              product_link=exist_in_database_shopee[1].product_link,
+                                              target_website=exist_in_database_shopee[1].target_website,
+                                              category_link=exist_in_database_shopee[1].category_link,
+                                              sku=exist_in_database_shopee[1].sku,
+                                              product_data_owner=current_user.id)
+                    # list indexing
+                    helpme = HelpMe()
+                    helpme.reorder_list_of_products(_product)
+                else:
+                    scraper.land_first_page(keyword_product_link_shopee)
+                    is_loaded_shopee = None
+                    try:
+                        is_loaded_shopee = WebDriverWait(scraper.driver, 3).until(
+                            EC.visibility_of_element_located(
+                                (By.CSS_SELECTOR,
+                                 'div[class="app-container"]'
+                                 )))
+                    except TimeoutException:
+                        flash("Timed out: Waiting for target page to load took to long.",
+                              category='danger')
+                        scraper.driver.quit()
+                        return redirect(url_for('content_page'))
+                    finally:
+                        if is_loaded_shopee:
+                            time.sleep(3)
+                            try:
+                                link = scraper.driver.current_url
+                                prod_info = scraper.find_product_info_shopee()
+                                target_website = 'Shopee'
+
+                                # adding new product to database
+                                prod_details = ProductDetailsTable(product_link=link,
+                                                                   product_name=prod_info.get('prod_name'),
+                                                                   product_price=prod_info.get('prod_price'),
+                                                                   product_rating=prod_info.get('prod_rating'),
+                                                                   product_sold=prod_info.get('prod_sold'),
+                                                                   product_description=prod_info.get('prod_desc'),
+                                                                   product_image=prod_info.get('prod_image'),
+                                                                   shop_rating=prod_info.get('shop_rating'),
+                                                                   shop_response_rate=prod_info.get(
+                                                                       'shop_res_rate'),
+                                                                   category=prod_info.get('category'),
+                                                                   category_link=prod_info.get('category_link'),
+                                                                   sku=prod_info.get('sku'),
+                                                                   target_website=target_website)
+                                db.session.add(prod_details)
+
+                                # adds the prod_details as "PENDING" into the database. will not persist
+                                # into the database until db.session.commit() is called..
+                                # this is needed to avoid product_details.product_id returning none
+                                db.session.flush()
+
+                                # referencing new product to current user
+                                prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                                  user_id=current_user.id)
+                                db.session.add(prod_data)
+                                db.session.commit()
+
+                                that_product = ProductDetails(product_id=prod_details.product_id,
+                                                              product_name=prod_details.product_name,
+                                                              product_price=prod_details.product_price,
+                                                              product_rating=prod_details.product_rating,
+                                                              product_sold=prod_details.product_sold,
+                                                              product_description=prod_details.product_description,
+                                                              product_image=prod_details.product_image,
+                                                              shop_rating=prod_details.shop_rating,
+                                                              shop_response_rate=prod_details.shop_response_rate,
+                                                              product_link=prod_details.product_link,
+                                                              target_website=prod_details.target_website,
+                                                              category_link=prod_details.category_link,
+                                                              sku=prod_details.sku,
+                                                              product_data_owner=current_user.id)
+                                # list indexing
+                                helpme = HelpMe()
+                                helpme.reorder_list_of_products(that_product)
+                            except AttributeError as e:
+                                print(f'Error: {e}')
+                                flash("Something went wrong.", category='danger')
+                                scraper.driver.quit()
+                                return redirect(url_for('content_page'))
+
+                # Run 2
+                exists_in_current_user_lazada = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                    ProductDetailsTable.product_link == keyword_product_link_lazada,
+                    ProductReferenceTable.user_id == current_user.id
+                ).join(ProductDetailsTable).first()
+
+                exist_in_database_lazada = db.session.query(ProductReferenceTable, ProductDetailsTable).filter(
+                    ProductDetailsTable.product_link == keyword_product_link_lazada
+                ).join(ProductDetailsTable).first()
+
+                if exists_in_current_user_lazada is not None:
+                    _product = ProductDetails(product_id=exists_in_current_user_lazada[0].product_id,
+                                              product_name=exists_in_current_user_lazada[1].product_name,
+                                              product_price=exists_in_current_user_lazada[1].product_price,
+                                              product_rating=exists_in_current_user_lazada[1].product_rating,
+                                              product_sold=exists_in_current_user_lazada[1].product_sold,
+                                              product_description=exists_in_current_user_lazada[1].product_description,
+                                              product_image=exists_in_current_user_lazada[1].product_image,
+                                              shop_rating=exists_in_current_user_lazada[1].shop_rating,
+                                              shop_response_rate=exists_in_current_user_lazada[1].shop_response_rate,
+                                              product_link=exists_in_current_user_lazada[1].product_link,
+                                              target_website=exists_in_current_user_lazada[1].target_website,
+                                              category_link=exists_in_current_user_lazada[1].category_link,
+                                              sku=exists_in_current_user_lazada[1].sku,
+                                              product_data_owner=current_user.id)
+                    # list indexing
+                    helpme = HelpMe()
+                    helpme.reorder_list_of_products(_product)
+                elif exist_in_database_lazada is not None:
+                    prod_data = ProductReferenceTable(product_id=exist_in_database_lazada[0].product_id,
+                                                      user_id=current_user.id)
+
+                    db.session.add(prod_data)
+                    db.session.commit()
+
+                    _product = ProductDetails(product_id=exist_in_database_lazada[0].product_id,
+                                              product_name=exist_in_database_lazada[1].product_name,
+                                              product_price=exist_in_database_lazada[1].product_price,
+                                              product_rating=exist_in_database_lazada[1].product_rating,
+                                              product_sold=exist_in_database_lazada[1].product_sold,
+                                              product_description=exist_in_database_lazada[1].product_description,
+                                              product_image=exist_in_database_lazada[1].product_image,
+                                              shop_rating=exist_in_database_lazada[1].shop_rating,
+                                              shop_response_rate=exist_in_database_lazada[1].shop_response_rate,
+                                              product_link=exist_in_database_lazada[1].product_link,
+                                              target_website=exist_in_database_lazada[1].target_website,
+                                              category_link=exist_in_database_lazada[1].category_link,
+                                              sku=exist_in_database_lazada[1].sku,
+                                              product_data_owner=current_user.id)
+                    # list indexing
+                    helpme = HelpMe()
+                    helpme.reorder_list_of_products(_product)
+                else:
+                    # Open a new window
+                    scraper.driver.execute_script("window.open('');")
+                    # Switch to the new window and open new URL
+                    scraper.driver.switch_to.window(scraper.driver.window_handles[1])
+
+                    scraper.driver.get(keyword_product_link_lazada)
+                    is_loaded_lazada = None
+                    try:
+                        is_loaded_lazada = WebDriverWait(scraper.driver, 3).until(
+                            EC.visibility_of_element_located(
+                                (By.CSS_SELECTOR,
+                                 'div[id="container"]'
+                                 )))
+                    except TimeoutException:
+                        flash("Timed out: Waiting for target page to load took to long.",
+                              category='danger')
+                        scraper.driver.quit()
+                        return redirect(url_for('content_page'))
+                    finally:
+                        if is_loaded_lazada:
+                            time.sleep(3)
+                            try:
+                                link = scraper.driver.current_url
+                                prod_info = scraper.find_product_info_lazada()
+                                target_website = 'Lazada'
+
+                                # adding new product to database
+                                prod_details = ProductDetailsTable(product_link=link,
+                                                                   product_name=prod_info.get('prod_name'),
+                                                                   product_price=prod_info.get('prod_price'),
+                                                                   product_rating=prod_info.get('prod_rating'),
+                                                                   product_sold=prod_info.get('prod_sold'),
+                                                                   product_description=prod_info.get('prod_desc'),
+                                                                   product_image=prod_info.get('prod_image'),
+                                                                   shop_rating=prod_info.get('shop_rating'),
+                                                                   shop_response_rate=prod_info.get(
+                                                                       'shop_res_rate'),
+                                                                   category=prod_info.get('category'),
+                                                                   category_link=prod_info.get('category_link'),
+                                                                   sku=prod_info.get('sku'),
+                                                                   target_website=target_website)
+                                db.session.add(prod_details)
+
+                                # adds the prod_details as "PENDING" into the database. will not persist
+                                # into the database until db.session.commit() is called..
+                                # this is needed to avoid product_details.product_id returning none
+                                db.session.flush()
+
+                                # referencing new product to current user
+                                prod_data = ProductReferenceTable(product_id=prod_details.product_id,
+                                                                  user_id=current_user.id)
+                                db.session.add(prod_data)
+                                db.session.commit()
+
+                                that_product = ProductDetails(product_id=prod_details.product_id,
+                                                              product_name=prod_details.product_name,
+                                                              product_price=prod_details.product_price,
+                                                              product_rating=prod_details.product_rating,
+                                                              product_sold=prod_details.product_sold,
+                                                              product_description=prod_details.product_description,
+                                                              product_image=prod_details.product_image,
+                                                              shop_rating=prod_details.shop_rating,
+                                                              shop_response_rate=prod_details.shop_response_rate,
+                                                              product_link=prod_details.product_link,
+                                                              target_website=prod_details.target_website,
+                                                              category_link=prod_details.category_link,
+                                                              sku=prod_details.sku,
+                                                              product_data_owner=current_user.id)
+                                # list indexing
+                                helpme = HelpMe()
+                                helpme.reorder_list_of_products(that_product)
+                            except AttributeError as e:
+                                print(f'Error: {e}')
+                                flash("Something went wrong.", category='danger')
+                                scraper.driver.quit()
+                                return redirect(url_for('content_page'))
+
+                session.pop('keyword_products_shopee')
+                session.pop('keyword_products_lazada')
+                flash('Compare success', category='success')
+                return redirect(url_for('content_page'))
+            else:
+                flash('Please select products from Shopee and Lazada to compare', category='info')
+                return redirect(url_for('content_page'))
+
         # Clear View Logic
         if request.args.get('req') == 'clear_product_view':
             session.pop('list_of_products')
+            session.pop('reviews_1')
+            session.pop('reviews_2')
+            session.pop('reviews_summary_1')
+            session.pop('reviews_summary_2')
+            session.pop('recommended_1')
+            session.pop('recommended_2')
+            session.pop('keyword_products_shopee')
+            session.pop('keyword_products_lazada')
             flash('Product view cleared!', category='success')
             return redirect(url_for('content_page'))
 
@@ -1083,6 +1458,8 @@ def content_page():
                                reviews_summary_2=session['reviews_summary_2'],
                                recommended_1=session['recommended_1'],
                                recommended_2=session['recommended_2'],
+                               keyword_products_shopee=session['keyword_products_shopee'],
+                               keyword_products_lazada=session['keyword_products_lazada']
                                )
 
 

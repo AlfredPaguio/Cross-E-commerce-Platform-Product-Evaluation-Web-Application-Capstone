@@ -1,13 +1,9 @@
-<style>
-    .modal-content {
-        background-color: #212121
-    }
-</style>
+
 
 <div class="modal fade" id="Modal-LoadRecommendedProducts-{{ prod.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
      aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content bg-white">
             <div class="modal-header">
                 <h6 class="modal-title text-center" id="ModalLabel">
                     {{ prod.name }}
@@ -24,13 +20,13 @@
                     <input name="load_product_index" type="hidden" value="{{ loop.index0 }}">
                     <input name="load_product_category_link" type="hidden" value="{{ prod.category_link }}">
                     <div class="text-center">
-                        {{ load_recommended_products_form.submit(class="btn btn-sm btn-outline-success", style="color:white;") }}
+                        {{ load_recommended_products_form.submit(class="btn-universal btn btn-sm btn-success rounded-pill", style="color:white;") }}
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                 <button type="button" class="btn btn-outline-secondary btn-sm" style="color:white;" data-dismiss="modal">Close</button>
+                 <button type="button" class="btn btn-secondary btn-sm rounded-pill" style="color:white;" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

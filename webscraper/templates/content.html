@@ -2,16 +2,22 @@
 {% block title %}
 Dashboard Page
 {% endblock %}
-{{ super() }}
 {% block content %}
-<div class="contianer-fluid">
+<div class="container-fluid">
    <div class="row">
       <div class="col-12 his-fav-menu">
          <div class="sidebar-btn">
-            <a class="open-btn" href="#"><i class="fa fa-bars" aria-hidden="true"></i></a>
+            <a class="open-btn" href="#">
+               <span class="fa-stack fa-1x">
+                  <i class="fa-solid fa-circle fa-stack-2x text-info"></i>
+                  <i class="fa-solid fa-bars fa-stack-1x text-light" aria-hidden="true"></i>
+               </span>
+              
+
+            </a>
          </div>
-         <div class="offcanvas-menu">
-            <a class="close-btn" href="#"><i class="fa fa-bars" aria-hidden="true"></i></a>
+         <div class="offcanvas-menu overflow-hidden" style="z-index: 6; margin-top: 50px;">
+            <a class="close-btn bg-dark" style="margin-top: -10px; margin-left: -15px; border-radius: 0px 0px 15px 0px" href="#"><i class="fa fa-times text-light px-2" aria-hidden="true"></i></a>
             <div class="row pt-5 mx-auto">
                <div class="col-12 pt-1 mx-auto pr-3 mb-5">
                   <nav class="border rounded navbar navbar-expand navbar-dark mb-3">
@@ -28,12 +34,11 @@ Dashboard Page
                   </nav>
                   <div class="tab-content" id="myTabContent">
                      <div class="tab-pane fade show active" style="height:500px; overflow-y:auto; overflow-x:hidden; !important;" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
-                     {% for favorite in list_of_favorites %}
+                        {% for favorite in list_of_favorites %}
                         <div class="row border mb-3 rounded" style="width:300px">
                            <div class="col-4 mt-4">
                               <img class="img-fluid rounded" src="{{ favorite.product_image }}"  alt="Product Image">
                            </div>
-
                            <div class="col-8 mt-3 mb-3">
                               {% if favorite.target_website == 'Shopee' %}
                               <h6 class="text-danger">{{ favorite.product_name }}</h6>
@@ -42,29 +47,32 @@ Dashboard Page
                               {% endif %}
                               <p class="font-weight-bold">Price: <span class="font-weight-normal">{{ favorite.product_price }}</span></p>
                            </div>
-
                            <div class="row mx-auto mb-3">
                               <div class="col-12 text-center">
-                                 <button type="submit" style="color:white;" class="btn  btn-outline-success btn-sm mt-2" data-toggle="modal" data-target="#Modal-ReplaceProduct-{{ favorite.product_id }}">
+                                 <button type="submit" style="color:white;" class="btn  btn-success btn-sm mt-2 rounded-pill" data-toggle="modal" data-target="#Modal-ReplaceProduct-{{ favorite.product_id }}">
                                  {% if list_of_products|length > 1 %}
                                  <i class="fa fa-refresh" aria-hidden="true"></i> Replace
                                  {% else %}
                                  <i class="fa fa-eye" aria-hidden="true"></i> View
                                  {% endif %}
                                  </button>
-                                 <a href='{{ favorite.product_link }}' style="color:white;" class="btn btn-outline-info btn-sm mt-2" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
-                                 <button type="submit" style="color:white;" class="btn btn-outline-danger btn-sm mt-2" data-toggle="modal" data-target="#Modal-RemoveToFavoritesConfirm-{{ favorite.product_id }}"><i class="fa fa-trash-o" aria-hidden="true"></i> Remove</button>
+                                 <a href='{{ favorite.product_link }}' style="color:white;" class="btn btn-info btn-sm mt-2 rounded-pill" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
+                                 <button type="submit" style="color:white;" class="btn btn-danger btn-sm mt-2 rounded-pill" data-toggle="modal" data-target="#Modal-RemoveToFavoritesConfirm-{{ favorite.product_id }}"><i class="fa fa-trash-o" aria-hidden="true"></i> Remove</button>
                               </div>
                            </div>
                         </div>
-                     {% endfor %}
+                        {% endfor %}
                      </div>
                      <div class="tab-pane fade"  id="history"  role="tabpanel" aria-labelledby="history-tab">
                         <div class="row" style="height:500px; overflow-y:auto; overflow-x:hidden; !important;">
                            <div class="col-12">
                               <ul class="list-group list-group-flush">
                                  {% for history in list_of_history %}
-                                    <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded" style="width:270px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
+                                 {% if history.target_website == 'Shopee' %}
+                                 <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded text-danger" style="width:270px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
+                                 {% else %}
+                                 <a class="d-inline-block text-truncate list-group-item list-group-item-light list-group-item-action mb-3 rounded text-primary" style="width:270px;" href="{{ history.product_link }}" target="_blank">{{ history.product_name }}</a>
+                                 {% endif %}
                                  {% endfor %}
                               </ul>
                            </div>
@@ -76,28 +84,27 @@ Dashboard Page
          </div>
       </div>
    </div>
-
    <div class="row main-content">
       <div class="col-10 mx-auto">
-          <!-- Data Visualization -->
+         <!-- Data Visualization -->
          <div class="row">
             <div class="col-12 mx-auto">
-               <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+               <div id="carouselExampleIndicators" class="carousel slide border"data-ride="carousel">
                   <div class="carousel-inner">
-                     <div class="carousel-item active " data-interval="3000">
+                     <div class="carousel-item active" data-interval="3000">
                         <!-- Shopee -->
                         <div class="row mx-auto">
-                           <div class="col-xs-12 col-md-8 mx-auto">
-                              <h6 class="mb-3 text-center font-weight-bold"><span class="text-danger font-weight-bold">Shopee's</span> Top 5 Searches</h6>
+                           <div class="col-xs-12 col-md-8 mx-auto my-3">
+                              <h6 class="mb-3 text-left font-weight-bold"><span class="font-weight-bold" style="color: rgb(231, 87, 58);">Shopee's</span> Top 5 Searches</h6>
                               {% for sdf in shopee_dataframe[:5] %}
                               <div class="row">
                                  <div class="col-4 nav-item d-none d-lg-block">
-                                    <a href="{{ sdf.category_link }}" class="d-inline-block text-truncate" style="max-width: 150px; color:white;" target="_blank">{{ sdf.category }}</a>
+                                    <a href="{{ sdf.category_link }}" class="d-inline-block text-truncate" style="max-width: 250px; color:black;" target="_blank">{{ sdf.category }}</a>
                                  </div>
                                  <div class="col-xs-12 col-lg-8">
                                     <div class="progress mb-3" style="height: 30px;">
-                                       <div class="progress-bar" role="progressbar" style="width: {{ sdf.percentage }}%" aria-valuenow="{{ sdf.size }}" aria-valuemin="0" aria-valuemax="100">{{ sdf.size }}</div>
-                                        <a href="{{ sdf.category_link }}" class="d-xs-block d-lg-none text-center font-weight-bold ml-2 mt-3 text-primary" target="_blank"><small>{{ sdf.category  }}</small></a>
+                                       <div class="progress-bar bg-dark" role="progressbar" style="width: {{ sdf.percentage }}%" aria-valuenow="{{ sdf.size }}" aria-valuemin="0" aria-valuemax="100">{{ sdf.size }}</div>
+                                       <a href="{{ sdf.category_link }}" class="d-xs-block d-lg-none text-center font-weight-bold ml-2 mt-3 text-primary" target="_blank"><small>{{ sdf.category  }}</small></a>
                                     </div>
                                  </div>
                               </div>
@@ -108,334 +115,393 @@ Dashboard Page
                      <div class="carousel-item" data-interval="3000">
                         <!-- Lazada -->
                         <div class="row mx-auto">
-                            <div class="col-xs-12 col-md-8 mx-auto">
-                               <h6  class="mb-3 text-center font-weight-bold"><span class="text-info font-weight-bold">Lazada's</span> Top 5 Searches</h6>
-                               {% for ldf in lazada_dataframe[:5] %}
-                               <div class="row">
-                                  <div class="col-4 nav-item d-none d-lg-block">
-                                     <a href="{{ ldf.category_link }}" class="d-inline-block text-truncate" style="max-width: 150px; color:white;" target="_blank">{{ ldf.category }}</a>
-                                  </div>
-                                  <div class="col-xs-12 col-lg-8">
-                                     <div class="progress mb-3" style="height: 30px;">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ ldf.percentage }}%" aria-valuenow="{{ ldf.size }}" aria-valuemin="0" aria-valuemax="100">{{ ldf.size }}</div>
-                                         <a href="{{ ldf.category_link }}" class="d-xs-block d-lg-none text-center font-weight-bold ml-2 mt-3 text-primary" target="_blank"><small>{{ ldf.category  }}</small></a>
-                                     </div>
-                                  </div>
-                               </div>
-                               {% endfor %}
-                            </div>
+                           <div class="col-xs-12 col-md-8 mx-auto my-3">
+                              <h6  class="mb-3 text-left font-weight-bold"><span class="text-info font-weight-bold">Lazada's</span> Top 5 Searches</h6>
+                              {% for ldf in lazada_dataframe[:5] %}
+                              <div class="row">
+                                 <div class="col-4 nav-item d-none d-lg-block">
+                                    <a href="{{ ldf.category_link }}" class="d-inline-block text-truncate" style="max-width: 250px; color:black;" target="_blank">{{ ldf.category }}</a>
+                                 </div>
+                                 <div class="col-xs-12 col-lg-8">
+                                    <div class="progress mb-3" style="height: 30px;">
+                                       <div class="progress-bar bg-dark" role="progressbar" style="width: {{ ldf.percentage }}%" aria-valuenow="{{ ldf.size }}" aria-valuemin="0" aria-valuemax="100">{{ ldf.size }}</div>
+                                       <a href="{{ ldf.category_link }}" class="d-xs-block d-lg-none text-center font-weight-bold ml-2 mt-3 text-primary" target="_blank"><small>{{ ldf.category  }}</small></a>
+                                    </div>
+                                 </div>
+                              </div>
+                              {% endfor %}
+                           </div>
                         </div>
                      </div>
                   </div>
                   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="fa-stack fa-1x"><i class="fa-solid fa-circle fa-stack-2x text-info"></i><i class="fa-solid fa-chevron-left fa-stack-1x text-light" aria-hidden="true"></i></span>
                   <span class="sr-only">Previous</span>
                   </a>
                   <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="fa-stack fa-1x"><i class="fa-solid fa-circle fa-stack-2x text-info"></i><i class="fa-solid fa-chevron-right fa-stack-1x text-light" aria-hidden="true"></i></span>
                   <span class="sr-only">Next</span>
                   </a>
                </div>
             </div>
          </div>
-
-          <!-- Search Bar -->
+         <!-- Search Bar -->
          <div class="row mt-5 mb-5">
             <div class="col-xs-12 col-lg-10 mx-auto">
                <form onsubmit="loading();" action="/content?req=search" method="POST">
                   <div class="row mx-auto">
-                     <div class="col">
-                        <input type="url" class="form-control" id="inputLink" name="inputLink" placeholder="Please input product links from Shopee and Lazada" aria-label="Input Link" required>
+                     <div class="col input-group mb-3 d-flex justify-content-end" style="border-color:black;">
+                        <input type="text" class="form-control rounded-pill"  id="inputLink" name="inputLink" placeholder="Please input keywords or product links from Shopee or Lazada" aria-label="Input Link" required>
+                        <div class="input-group-append text-right position-absolute p-1" style="z-index: 5;">
+                           <button type="submit" class="btn btn-info btn-sm rounded-pill" style="color:white;">Search</button>
+                         </div>
                      </div>
-                     <button type="submit" class="btn btn-outline-primary" style="color:white;">Search</button>
                   </div>
                </form>
             </div>
          </div>
-
          <!-- Product View and Reccomendation -->
          <div class="row mt-5 mb-5 mx-auto">
             {% if list_of_products|length == 0 %}
             <!-- Product View Empty -->
-               <div class="col-xs-12 col-lg-10 mx-auto">
-                  <img class="img-fluid mx-auto d-block" src="{{url_for('static',filename='images/empty-state.svg')}}" style="height:350px;"  alt="Product Image">
-                  <h4 class="text-center font-weight-bold text-muted">View is empty</h4>
-               </div>
+            {% if keyword_products_shopee|length == 0 and keyword_products_lazda|length == 0 %}
+            <div class="col-xs-12 col-lg-10 mx-auto">
+               <img class="img-fluid mx-auto d-block" src="{{url_for('static',filename='images/empty-state.svg')}}" style="height:350px;"  alt="Product Image">
+               <h4 class="text-center font-weight-bold text-muted">View is empty</h4>
+            </div>
             {% else %}
-               <div class="col-xs-12 col-lg-10 mx-auto">
-                  <div class="row mx-auto mb-5">
-                     {% include 'includes/clear_view_modal.html' %}
-                     <button type="submit" class="btn btn-outline-danger btn-sm mt-2 mx-auto" style="color:white; " data-toggle="modal" data-target="#Modal-ClearProductView">Clear View</button>
-                  </div>
-
-                  <div class="row mx-auto">
-                     {% for prod in list_of_products %}
-                     {% include 'includes/add_to_favorites_modal.html' %}
-                     {% include 'includes/update_product_modal.html' %}
-                     {% include 'includes/load_reviews_modal.html' %}
-                     {% include 'includes/update_reviews_modal.html' %}
-                     {% include 'includes/load_recommended_products_modal.html' %}
-                     <div class="col-xs-12 col-lg-6 mx-auto pb-5  ">
-                        <h6 class="font-weight-bold">Product Information</h6>
-
-                        <!-- Product Information -->
-                        <div class="row" style="height:300px;">
-                           <div class="col-6 mt-3">
-                              <img class="img-fluid rounded mx-auto d-block" src="{{ prod.product_image }}" height="300px;" alt="Product Image">
-
-                              <div class="mt-3 ml-2">
-                                 <small class="font-weight-bold">Chat Response Rate: {{ prod.shop_response_rate }}</small><br>
-                                 <small class="font-weight-bold">Shop Rating: {{ prod.shop_rating }}</small>
-                              </div>
-                           </div>
-                           <div class="col-6 mt-3">
-                              {% if prod.target_website == 'Shopee'%}
-                              <h6 class="overflow-auto text-danger font-weight-bold" style="height:100px">{{ prod.name}}</h6>
-                              {% else %}
-                              <h6 class="overflow-auto text-primary font-weight-bold" style="height:100px">{{ prod.name}}</h6>
-                              {% endif %}
-                              <p class="font-weight-normal"><span class="font-weight-bold">Price: </span>{{ prod.price }}</p>
-                              <p class="font-weight-normal"><span class="font-weight-bold">Rating: </span>{{ prod.rating }} stars</p>
-                              <p class="font-weight-normal"><span class="font-weight-bold">Sold: </span>{{ prod.sold }}</p>
-                              {% if prod.target_website == 'Shopee' %}
-                              <p class="font-weight-bold text-danger"><span class="font-weight-bold">From: </span>{{ prod.target_website }}</p>
-                              {% else %}
-                              <p class="font-weight-bold text-primary"><span class="font-weight-bold">From: </span>{{ prod.target_website }}</p>
-                              {% endif %}
-                           </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="text-center pt-5 pb-3">
-                           <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateProduct-{{ prod.product_id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>  Update</button>
-                           <a href='{{ prod.link }}' class="btn btn-outline-info btn-sm mt-2" style="color:white;" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
-                           <button type="submit" class="btn btn-outline-danger btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-AddToFavoritesConfirm-{{ prod.product_id }}"><i class="fa fa-heart-o" aria-hidden="true"></i>  Favorite</button>
-                        </div>
-
-                        <!-- Product Description -->
-                        <div class="row">
-                           <div class="col-12 mt-2">
-                              <h6 class="font-weight-bold">Product Description</h6>
-                              <textarea class="form-control"  style="resize:none;" id="productView1" rows="10" readonly>{{ prod.description }}</textarea>
-                           </div>
-                        </div>
-
-                        <!-- Customer Reviews Summary -->
-                        <div class="row mt-3 mb-2">
-                           <div class="col-12 pl-3">
-                              <h6 class="font-weight-bold">Customer Reviews</h6>
-                           </div>
-
-                           <div class="col-12 pt-3">
-                              {% if loop.index0 == 0 %}
-                                 <div class="text-center">
-                                    {% if reviews_summary_1|length >= 0 %}
-                                       {% for g in reviews_summary_1 %}
-                                          <label class="font-weight-bold text-{{'success' if g.review_sentiment == 1 else 'warning' if g.review_sentiment == 0 else 'danger'  }} mr-3">
-                                             {% if g.review_sentiment == 1 %}
-                                                Good<span class="text-white"> : {{ g.percentage }} %</span>
-                                             {% endif %}
-
-                                             {% if g.review_sentiment == 0 %}
-                                                Fair<span class="text-white"> : {{ g.percentage }} %</span>
-                                             {% endif %}
-
-                                             {% if g.review_sentiment == -1 %}
-                                                Bad<span class="text-white"> : {{ g.percentage }} %</span>
-                                             {% endif %}
-                                          </label>
-                                       {% endfor %}
-                                    {% endif %}
-                                 </div>
-                              {% else %}
-                                 <div class="text-center">
-                                    {% if reviews_summary_2|length >= 0 %}
-                                       {% for g in reviews_summary_2 %}
-                                          <label class="font-weight-bold text-{{'success' if g.review_sentiment == 1 else 'warning' if g.review_sentiment == 0 else 'danger'  }} mr-3">
-                                             {% if g.review_sentiment == 1 %}
-                                                Good<span class="text-white"> : {{ g.percentage }} %</span>
-                                             {% endif %}
-
-                                             {% if g.review_sentiment == 0 %}
-                                                Fair<span class="text-white"> : {{ g.percentage }} %</span>
-                                             {% endif %}
-
-                                             {% if g.review_sentiment == -1 %}
-                                                Bad<span class="text-white"> : {{ g.percentage }} %</span>
-                                             {% endif %}
-                                          </label>
-                                       {% endfor %}
-                                    {% endif %}
-                                 </div>
-                              {% endif %}
-                           </div>
-                        </div>
-
-                        <!-- Customer Reviews -->
-                        <div class="row mt-3 mb-3">
-                           {% if loop.index0 == 0 %}
-                            <div class="col-12 overflow-auto" style="height:{{ '500px;' if reviews_1|length >= 1 else '0px;' }}">
-                               {% if reviews_1|length >= 1 %}
-                                    {% for review in reviews_1 %}
-                                       {% if review.product_id == prod.product_id %}
-                                          <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
-                                             <div class="d-none d-lg-block col-2 p-3 pt-4">
-                                                {% if review.review_sentiment == 1 %}
-                                                <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
-                                                {% elif review.review_sentiment == 0 %}
-                                                <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
-                                                {% else %}
-                                                <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
-                                                {% endif %}
-                                             </div>
-                                             <div class="col-xs-12 col-lg-10 p-3">
-                                                <h6 class="font-weight-bold">Review Author | {{ review.review_author }}</h6>
-                                                <h6 class="font-weight-normal">Date | {{ review.review_data_time }}</h6>
-                                                <hr style="background-color:white;">
-                                                <h6  class="font-weight-bold">Review Comment</h6>
-                                                <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
-                                             </div>
-                                          </div>
-                                       {% endif %}
-                                    {% endfor %}
-                               {% endif %}
-                            </div>
-                           {% elif loop.index0 == 1 %}
-                           <div class="col-12 overflow-auto" style="height:{{ '500px;' if reviews_2|length >= 1 else '0px;' }}">
-                              {% if reviews_2|length >= 1 %}
-                                    {% for review in reviews_2 %}
-                                       {% if review.product_id == prod.product_id %}
-                                          <div class="row mt-3 border rounded mx-auto" style="height: 350px;">
-                                             <div class="d-none d-lg-block col-2 p-3 pt-4">
-                                                {% if review.review_sentiment == 1 %}
-                                                <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
-                                                {% elif review.review_sentiment == 0 %}
-                                                <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
-                                                {% else %}
-                                                <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
-                                                {% endif %}
-                                             </div>
-                                             <div class="col-xs-12 col-lg-10 p-3">
-                                                <h5>Review Author | {{ review.review_author }}</h5>
-                                                <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
-                                                <hr style="background-color:white;">
-                                                <h6  class="font-weight-bold">Review Comment</h6>
-                                                <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
-                                             </div>
-                                          </div>
-                                       {% endif %}
-                                    {% endfor %}
-                               {% endif %}
-                           </div>
-                           {% endif %}
-                        </div>
-
-                        <!-- Load Reviews/Recommended -->
-                        <div class="row mt-3 mb-3">
-                           {% if loop.index0 == 0 %}
-                              <div class="text-center pt-3 pb-3 mx-auto">
-                                 {% if reviews_1|length == 0  %}
-                                    <!-- Load Reviews -->
-                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
-                                 {% else %}
-                                    <!-- Update Reviews -->
-                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
-                                 {% endif %}
-
-                                 {% if recommended_1|length == 0 %}
-                                    <!-- Load Recommended -->
-                                    <button type="submit" class="btn btn-outline-info btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
-                                 {% endif %}
-                              </div>
-                           {% else%}
-                              <div class="text-center pt-3 pb-3 mx-auto">
-                                 {% if reviews_2|length == 0  %}
-                                    <!-- Load Reviews -->
-                                    <button type="submit" class="btn btn-sm btn-outline-success mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
-                                 {% else %}
-                                    <!-- Update Reviews -->
-                                    <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
-                                 {% endif %}
-
-                                 {% if recommended_2|length == 0 %}
-                                    <!-- Load Recommended -->
-                                    <button type="submit" class="btn btn-sm btn-outline-info mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
-                                 {% endif %}
-                              </div>
-                           {% endif %}
-                        </div>
-
-                        <!-- Recommended Products -->
-                        <div class="row mt-3 mb-3">
-                              {% if loop.index0 == 0 %}
-                                 {% if recommended_1|length >= 1 %}
-                                    <label  class="font-weight-bold mb-3 pl-3">Recommended Products</label>
-                                    {% for recommended in recommended_1[:20] %}
-                                    {% include 'includes/view_product_modal_1.html' %}
-                                       <div class="col-12 mb-3" style="height:150px;">
-                                          <div class="row">
-                                             <div class="col-4">
-                                                 <img class="img-fluid rounded" src="{{ recommended.recommendation_image }}" style="max-height:150px;" alt="{{ recommended.recommendation_name }}">
-                                             </div>
-
-                                             <div class="col-8">
-                                                <h6 class="font-weight-bold overflow-hidden" style="height:55px;">{{ recommended.recommendation_name }}</h6>
-                                                <h6 class="font-weight-bold text-warning">{{ recommended.recommendation_price }}</h6>
-
-                                                <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-ViewRecommendedProduct1-{{ loop.index0 }}">View</button>
-                                                <a href='{{ recommended.recommendation_link }}' style="color:white;" class="btn btn-outline-info btn-sm  mt-2" target="_blank" >Visit</a>
-                                             </div>
-                                          </div>
-                                       </div>
-                                    {% endfor %}
-                                    <div class="mx-auto pt-3 mb-3">
-                                       <a href="{{ url_for('content_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
-                                    </div>
-                                 {% endif %}
-                              {% endif %}
-
-                              {% if loop.index0 == 1 %}
-                                 {% if recommended_2|length >= 1 %}
-                                    <label  class="font-weight-bold mb-3 pl-3">Recommended Products</label>
-                                    {% for recommended in recommended_2[:20] %}
-                                    {% include 'includes/view_product_modal_2.html' %}
-                                       <div class="col-12 mb-3" style="height:150px;">
-                                          <div class="row">
-                                             <div class="col-4">
-                                                 <img class="img-fluid rounded" src="{{ recommended.recommendation_image }}" style="max-height:150px;" alt="{{ recommended.recommendation_name }}">
-                                             </div>
-
-                                             <div class="col-8">
-                                                <h6 class="font-weight-bold overflow-hidden" style="height:55px;">{{ recommended.recommendation_name }}</h6>
-                                                <h6 class="font-weight-bold text-warning">{{ recommended.recommendation_price }}</h6>
-                                                <button type="submit" class="btn btn-outline-success btn-sm mt-2" style="color:white; " data-toggle="modal" data-target="#Modal-ViewRecommendedProduct2-{{ loop.index0 }}">View</button>
-                                                <a href='{{ recommended.recommendation_link }}' style="color:white;" class="btn btn-outline-info btn-sm mt-2" target="_blank">Visit</a>
-                                             </div>
-                                          </div>
-                                       </div>
-                                    {% endfor %}
-                                    <div class="mx-auto pt-3 mb-3">
-                                       <a href="{{ url_for('content_page') }}" class="btn btn-sm btn-outline-primary" style="color:white;">Back to top</a>
-                                    </div>
-                                 {% endif %}
-                              {% endif %}
-                           </div>
-                        </div>
-                     {% endfor %}
-                  </div>
+            <div class="col-xs-12 col-lg-10 mx-auto">
+               <div class="row mx-auto mb-5">
+                  {% include 'includes/clear_view_modal.html' %}
+                  <button type="submit" class="btn btn-danger btn-sm rounded-pill mx-auto" style="color:white; " data-toggle="modal" data-target="#Modal-ClearProductView">Clear View</button>
                </div>
+               <form action="/content?req=compare_item" onsubmit="loading();" method="POST">
+                  <div class="row mx-auto b-5">
+                     <div class="col-xs-12 col-md-6">
+                        <h6 class="text-center mb-5" style="color: rgb(231, 87, 58);">Shopee Products</h6>
+
+                           {% for keyword_product in keyword_products_shopee[:15] %}
+                           <div class="row border mb-2 overflow-hidden" style="height: 150px; max-height: 300px;">
+                           
+                              <div class="col-4 d-flex align-items-center h-100 p-3">
+                                 <img loading="lazy" class="img-fluid rounded h-100 w-100" src="{{ keyword_product.keyword_product_image }}"
+                                    alt="{{ keyword_product.keyword_product_name }}">
+                              </div>
+                              <div class="col-6 p-3">
+                                 <div class="row text-break" style="max-height: 90px; white-space: wrap;
+                                                               overflow: hidden;
+                                                               text-overflow: ellipsis;">
+                                    <a href="{{ keyword_product.keyword_product_link }}" class="responsive-text font-weight-bold text-dark"
+                                       target="_blank">{{ keyword_product.keyword_product_name }}</a>
+                                 </div>
+                                 <div class="row">
+                                    <p class="text-danger">{{ keyword_product.keyword_product_price }}</p>
+                                 </div>
+                              </div>
+                           
+                              <div class="col-2 d-flex justify-content-center border">
+                                 <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input m-0 p-0" type="radio"
+                                       style="height: calc(10px + 0.5vw); width: calc(10px + 0.5vw);" name="keyword_product_link_shopee"
+                                       id="inlineRadio-{{ loop.index0 }}" value="{{ keyword_product.keyword_product_link }}">
+                                    <label class="form-check-label" for="inlineRadio-{{ loop.index0 }}"></label>
+                                 </div>
+                              </div>
+                           </div>
+                           {% endfor %}
+                     </div>
+                     <div class="col-xs-12 col-md-6">
+                        <h6 class="text-center mb-5 text-info">Lazada Products</h6>
+                           {% for keyword_product in keyword_products_lazada[:15] %}
+                           <div class="row border mb-2 overflow-hidden" style="height: 150px; max-height: 300px;">
+                           
+                              <div class="col-4 d-flex align-items-center h-100 p-3">
+                                 <img loading="lazy" class="img-fluid rounded h-100 w-100" src="{{ keyword_product.keyword_product_image }}"
+                                    alt="{{ keyword_product.keyword_product_name }}">
+                              </div>
+                              <div class="col-6 p-3">
+                                 <div class="row text-break" style="max-height: 90px; white-space: wrap;
+                                                               overflow: hidden;
+                                                               text-overflow: ellipsis;">
+                                    <a href="{{ keyword_product.keyword_product_link }}" class="responsive-text font-weight-bold text-dark"
+                                       target="_blank">{{ keyword_product.keyword_product_name }}</a>
+                                 </div>
+                                 <div class="row">
+                                    <p class="text-danger">{{ keyword_product.keyword_product_price }}</p>
+                                 </div>
+                              </div>
+                           
+                              <div class="col-2 d-flex justify-content-center border">
+                                 <div class="form-check form-check-inline m-0">
+                                    <input class="form-check-input m-0 p-0" type="radio"
+                                       style="height: calc(10px + 0.5vw); width: calc(10px + 0.5vw);" name="keyword_product_link_lazada"
+                                       id="inlineRadio-{{ loop.index0 }}" value="{{ keyword_product.keyword_product_link }}">
+                                    <label class="form-check-label" for="inlineRadio-{{ loop.index0 }}"></label>
+                                 </div>
+                              </div>
+                           </div>
+                           {% endfor %}
+                     </div>
+                  </div>
+                  <div class="row mx-auto mb-5 mt-3">
+                     <button type="submit" class="btn btn-success btn-sm rounded-pill mx-auto" style="color:white;">Compare Products</button>
+                  </div>
+               </form>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="col-xs-12 col-lg-10 mx-auto">
+               <div class="row mx-auto mb-5">
+                  {% include 'includes/clear_view_modal.html' %}
+                  <button type="submit" class="btn btn-danger btn-sm rounded-pill mx-auto" style="color:white; " data-toggle="modal" data-target="#Modal-ClearProductView">Clear View</button>
+               </div>
+               <div class="row mx-auto">
+                  {% for prod in list_of_products %}
+                  {% include 'includes/add_to_favorites_modal.html' %}
+                  {% include 'includes/update_product_modal.html' %}
+                  {% include 'includes/load_reviews_modal.html' %}
+                  {% include 'includes/update_reviews_modal.html' %}
+                  {% include 'includes/load_recommended_products_modal.html' %}
+                  <div class="col-xs-12 col-lg-6 mx-auto pb-5  ">
+                     <h6 class="font-weight-bold">Product Information</h6>
+                     <!-- Product Information -->
+                     <div class="row">
+                        <div class="col-6 mt-3" style="height: auto;">
+                           <img class="img-fluid rounded mx-auto d-block" src="{{ prod.product_image }}" height="300px;" alt="Product Image">
+                           <div class="mt-3 ml-2">
+                              <small class="font-weight-bold">Chat Response Rate: {{ prod.shop_response_rate }}</small><br>
+                              <small class="font-weight-bold">Shop Rating: {{ prod.shop_rating }}</small>
+                           </div>
+                        </div>
+                        <div class="col-6 mt-3">
+                           {% if prod.target_website == 'Shopee'%}
+                           <h6 class="overflow-auto text-danger font-weight-bold" style="height:100px">{{ prod.name}}</h6>
+                           {% else %}
+                           <h6 class="overflow-auto text-primary font-weight-bold" style="height:100px">{{ prod.name}}</h6>
+                           {% endif %}
+                           <p class="font-weight-normal"><span class="font-weight-bold">Price: </span>{{ prod.price }}</p>
+                           <p class="font-weight-normal"><span class="font-weight-bold">Rating: </span>{{ prod.rating }} stars</p>
+                           <p class="font-weight-normal"><span class="font-weight-bold">Sold: </span>{{ prod.sold }}</p>
+                           {% if prod.target_website == 'Shopee' %}
+                           <p class="font-weight-bold text-danger"><span class="font-weight-bold">From: </span>{{ prod.target_website }}</p>
+                           {% else %}
+                           <p class="font-weight-bold text-primary"><span class="font-weight-bold">From: </span>{{ prod.target_website }}</p>
+                           {% endif %}
+                        </div>
+                     </div>
+                     <!-- Buttons -->
+                     <div class="text-center py-2" style="z-index: 3;">
+                        <button type="submit" class="btn btn-success btn-sm mb-2 rounded-pill" style="color:white;" data-toggle="modal" data-target="#Modal-UpdateProduct-{{ prod.product_id }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>  Update</button>
+                        <a href='{{ prod.link }}' class="btn btn-info btn-sm mb-2 rounded-pill" style="color:white;" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Visit</a>
+                        <button type="submit" class="btn btn-danger btn-sm mb-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-AddToFavoritesConfirm-{{ prod.product_id }}"><i class="fa fa-heart-o" aria-hidden="true"></i>  Favorite</button>
+                     </div>
+                     <!-- Product Description -->
+                     <div class="row">
+                        <div class="col-12 mt-2">
+                           <h6 class="font-weight-bold">Product Description</h6>
+                           <textarea class="form-control"  style="resize:none;" id="productView1" rows="10" readonly>{{ prod.description }}</textarea>
+                        </div>
+                     </div>
+                     <!-- Customer Reviews Summary -->
+                     <div class="row mt-3 mb-2">
+                        <div class="col-12 pl-3">
+                           <h6 class="font-weight-bold">Customer Reviews</h6>
+                        </div>
+                        <div class="col-12 pt-3">
+                           {% if loop.index0 == 0 %}
+                           <div class="text-center">
+                              {% if reviews_summary_1|length >= 0 %}
+                              {% for g in reviews_summary_1 %}
+                              <label class="font-weight-bold text-{{'success' if g.review_sentiment == 1 else 'warning' if g.review_sentiment == 0 else 'danger'  }} mr-3">
+                              {% if g.review_sentiment == 1 %}
+                              Good<span class="text-dark"> : {{ g.percentage }} %</span>
+                              {% endif %}
+                              {% if g.review_sentiment == 0 %}
+                              Fair<span class="text-dark"> : {{ g.percentage }} %</span>
+                              {% endif %}
+                              {% if g.review_sentiment == -1 %}
+                              Bad<span class="text-dark"> : {{ g.percentage }} %</span>
+                              {% endif %}
+                              </label>
+                              {% endfor %}
+                              {% endif %}
+                           </div>
+                           {% else %}
+                           <div class="text-center">
+                              {% if reviews_summary_2|length >= 0 %}
+                              {% for g in reviews_summary_2 %}
+                              <label class="font-weight-bold text-{{'success' if g.review_sentiment == 1 else 'warning' if g.review_sentiment == 0 else 'danger'  }} mr-3">
+                              {% if g.review_sentiment == 1 %}
+                              Good<span class="text-dark"> : {{ g.percentage }} %</span>
+                              {% endif %}
+                              {% if g.review_sentiment == 0 %}
+                              Fair<span class="text-dark"> : {{ g.percentage }} %</span>
+                              {% endif %}
+                              {% if g.review_sentiment == -1 %}
+                              Bad<span class="text-dark"> : {{ g.percentage }} %</span>
+                              {% endif %}
+                              </label>
+                              {% endfor %}
+                              {% endif %}
+                           </div>
+                           {% endif %}
+                        </div>
+                     </div>
+                     <!-- Customer Reviews -->
+                     <div class="row mt-3 mb-3">
+                        {% if loop.index0 == 0 %}
+                        <div class="col-12 overflow-auto" style="height:{{ '500px;' if reviews_1|length >= 1 else '0px;' }}">
+                           {% if reviews_1|length >= 1 %}
+                           {% for review in reviews_1 %}
+                           {% if review.product_id == prod.product_id %}
+                           <div class="row mt-3 border rounded mx-auto border-{{ 'success' if review.review_sentiment == 1 else 'warning' if review.review_sentiment == 0 else 'danger' }}" style="height: 350px;">
+                              <div class="d-none d-lg-block col-2 p-3 pt-4">
+                                 {% if review.review_sentiment == 1 %}
+                                 <i class="fa fa-smile-o text-success" aria-hidden="true" style="font-size:70px;"></i>
+                                 {% elif review.review_sentiment == 0 %}
+                                 <i class="fa fa-meh-o text-warning" aria-hidden="true" style="font-size:70px;"></i>
+                                 {% else %}
+                                 <i class="fa fa-frown-o text-danger" aria-hidden="true" style="font-size:70px;"></i>
+                                 {% endif %}
+                              </div>
+                              <div class="col-xs-12 col-lg-10 p-3">
+                                 <h6 class="font-weight-bold">Review Author | {{ review.review_author }}</h6>
+                                 <h6 class="font-weight-normal">Date | {{ review.review_data_time }}</h6>
+                                 <hr style="background-color:white;">
+                                 <h6  class="font-weight-bold">Review Comment</h6>
+                                 <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+                              </div>
+                           </div>
+                           {% endif %}
+                           {% endfor %}
+                           {% endif %}
+                        </div>
+                        {% elif loop.index0 == 1 %}
+                        <div class="col-12 overflow-auto" style="height:{{ '500px;' if reviews_2|length >= 1 else '0px;' }}">
+                           {% if reviews_2|length >= 1 %}
+                           {% for review in reviews_2 %}
+                           {% if review.product_id == prod.product_id %}
+                           <div class="row mt-3 border rounded mx-auto mx-auto border-{{ 'success' if review.review_sentiment == 1 else 'warning' if review.review_sentiment == 0 else 'danger' }}" style="height: 350px;">
+                              <div class="d-none d-lg-block col-2 p-3 pt-4">
+                                 {% if review.review_sentiment == 1 %}
+                                 <i class="fa fa-smile-o" aria-hidden="true" style="font-size:70px;color:green;"></i>
+                                 {% elif review.review_sentiment == 0 %}
+                                 <i class="fa fa-meh-o" aria-hidden="true" style="font-size:70px;color:yellow;"></i>
+                                 {% else %}
+                                 <i class="fa fa-frown-o" aria-hidden="true" style="font-size:70px;color:red;"></i>
+                                 {% endif %}
+                              </div>
+                              <div class="col-xs-12 col-lg-10 p-3">
+                                 <h5>Review Author | {{ review.review_author }}</h5>
+                                 <p class="font-weight-normal">Date | {{ review.review_data_time }}</p>
+                                 <hr style="background-color:white;">
+                                 <h6  class="font-weight-bold">Review Comment</h6>
+                                 <p class="font-weight-normal overflow-auto" style="height:160px">{{ review.review_comment }}</p>
+                              </div>
+                           </div>
+                           {% endif %}
+                           {% endfor %}
+                           {% endif %}
+                        </div>
+                        {% endif %}
+                     </div>
+                     <!-- Load Reviews/Recommended -->
+                     <div class="row mt-3 mb-3">
+                        {% if loop.index0 == 0 %}
+                        <div class="text-center pt-3 pb-3 mx-auto">
+                           {% if reviews_1|length == 0  %}
+                           <!-- Load Reviews -->
+                           <button type="submit" class="btn btn-success btn-sm mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
+                           {% else %}
+                           <!-- Update Reviews -->
+                           <button type="submit" class="btn btn-success btn-sm mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
+                           {% endif %}
+                           {% if recommended_1|length == 0 %}
+                           <!-- Load Recommended -->
+                           <button type="submit" class="btn btn-info btn-sm mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+                           {% endif %}
+                        </div>
+                        {% else%}
+                        <div class="text-center pt-3 pb-3 mx-auto">
+                           {% if reviews_2|length == 0  %}
+                           <!-- Load Reviews -->
+                           <button type="submit" class="btn btn-sm btn-success mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-LoadReviews-{{ prod.product_id }}"> Load Reviews</button>
+                           {% else %}
+                           <!-- Update Reviews -->
+                           <button type="submit" class="btn btn-success btn-sm mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-UpdateReviews-{{ prod.product_id }}"> Update Reviews</button>
+                           {% endif %}
+                           {% if recommended_2|length == 0 %}
+                           <!-- Load Recommended -->
+                           <button type="submit" class="btn btn-sm btn-info mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-LoadRecommendedProducts-{{ prod.product_id }}"> Recommended</button>
+                           {% endif %}
+                        </div>
+                        {% endif %}
+                     </div>
+                     <!-- Recommended Products -->
+                     <div class="row mt-3 mb-3">
+                        {% if loop.index0 == 0 %}
+                        {% if recommended_1|length >= 1 %}
+                        <label  class="font-weight-bold mb-3 pl-3">Recommended Products</label>
+                        {% for recommended in recommended_1[:20] %}
+                        {% include 'includes/view_product_modal_1.html' %}
+                        <div class="col-12 mb-3" style="height:150px;">
+                           <div class="row">
+                              <div class="col-4">
+                                 <img loading="lazy" class="img-fluid rounded" src="{{ recommended.recommendation_image }}" style="max-height:150px;" alt="{{ recommended.recommendation_name }}">
+                              </div>
+                              <div class="col-8">
+                                 <h6 class="font-weight-bold overflow-hidden" style="height:55px;">{{ recommended.recommendation_name }}</h6>
+                                 <h6 class="font-weight-bold text-warning">{{ recommended.recommendation_price }}</h6>
+                                 <button type="submit" class="btn btn-success btn-sm mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-ViewRecommendedProduct1-{{ loop.index0 }}">View</button>
+                                 <a href='{{ recommended.recommendation_link }}' style="color:white;" class="btn btn-info btn-sm mt-2 rounded-pill" target="_blank" >Visit</a>
+                              </div>
+                           </div>
+                        </div>
+                        {% endfor %}
+                        <div class="mx-auto pt-3 mb-3">
+                           <a href="{{ url_for('content_page') }}" class="btn btn-sm btn-primary rounded-pill" style="color:white;">Back to top</a>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                        {% if loop.index0 == 1 %}
+                        {% if recommended_2|length >= 1 %}
+                        <label  class="font-weight-bold mb-3 pl-3">Recommended Products</label>
+                        {% for recommended in recommended_2[:20] %}
+                        {% include 'includes/view_product_modal_2.html' %}
+                        <div class="col-12 mb-3" style="height:150px;">
+                           <div class="row">
+                              <div class="col-4">
+                                 <img loading="lazy" class="img-fluid rounded" src="{{ recommended.recommendation_image }}" style="max-height:150px;" alt="{{ recommended.recommendation_name }}">
+                              </div>
+                              <div class="col-8">
+                                 <h6 class="font-weight-bold overflow-hidden" style="height:55px;">{{ recommended.recommendation_name }}</h6>
+                                 <h6 class="font-weight-bold text-warning">{{ recommended.recommendation_price }}</h6>
+                                 <button type="submit" class="btn btn-success btn-sm mt-2 rounded-pill" style="color:white; " data-toggle="modal" data-target="#Modal-ViewRecommendedProduct2-{{ loop.index0 }}">View</button>
+                                 <a href='{{ recommended.recommendation_link }}' style="color:white;" class="btn btn-info btn-sm mt-2 rounded-pill" target="_blank">Visit</a>
+                              </div>
+                           </div>
+                        </div>
+                        {% endfor %}
+                        <div class="mx-auto pt-3 mb-3">
+                           <a href="{{ url_for('content_page') }}" class="btn btn-sm btn-primary rounded-pill" style="color:white;">Back to top</a>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                     </div>
+                  </div>
+                  {% endfor %}
+               </div>
+            </div>
             {% endif %}
          </div>
       </div>
    </div>
-
-
    {% for favorite in list_of_favorites %}
    <!-- Replace Modal-->
    <div class="modal fade" id="Modal-ReplaceProduct-{{ favorite.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
       aria-hidden="true">
       <div class="modal-dialog">
-         <div class="modal-content">
+         <div class="modal-content bg-white">
             <div class="modal-header">
                <h5 class="modal-title text-center">
                   {{ favorite.product_name }}
@@ -453,11 +519,10 @@ Dashboard Page
                      <div class="col-10 text-center">
                         <p class="font-weight-bold">{{ prod.name }}</p>
                      </div>
-
                      <div class="col-2 mt-3">
-                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="productselect" id="inlineRadio-{{ prod.product_id }}" value="{{ loop.index0 }}">
-                          <label class="form-check-label" for="inlineRadio-{{ prod.product_id }}"></label>
+                        <div class="form-check form-check-inline">
+                           <input class="form-check-input" type="radio" name="productselect" id="inlineRadio-{{ prod.product_id }}" value="{{ loop.index0 }}">
+                           <label class="form-check-label" for="inlineRadio-{{ prod.product_id }}"></label>
                         </div>
                      </div>
                   </div>
@@ -470,49 +535,61 @@ Dashboard Page
                   <br>
                   <input id="replace_item" name="replace_item" type="hidden" value="{{ favorite.product_id }}">
                   <div class="text-center">
-                     {{ replace_product_modal_form.submit(class="btn btn-sm btn-outline-success", style="color:white;") }}
+                     {{ replace_product_modal_form.submit(class="btn-universal btn btn-sm btn-success rounded-pill", style="color:white;") }}
                   </div>
-
                </form>
             </div>
             <div class="modal-footer">
-               <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+               <button type="button" class="btn btn-sm btn-secondary rounded-pill" style="color:white;" data-dismiss="modal">Close</button>
             </div>
          </div>
       </div>
    </div>
-
    <!-- Remove to Favorites Modal-->
    <div class="modal fade" id="Modal-RemoveToFavoritesConfirm-{{ favorite.product_id }}" tabindex="-1" aria-labelledby="exampleModallable"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+      aria-hidden="true">
+      <div class="modal-dialog">
+         <div class="modal-content bg-white">
             <div class="modal-header">
-                <h6 class="modal-title text-center">
-                    {{ favorite.product_name }}
-                </h6>
+               <h6 class="modal-title text-center">
+                  {{ favorite.product_name }}
+               </h6>
             </div>
             <div class="modal-body">
-                <form action="/content?req=remove" onsubmit="loading();" method="POST">
-                    {{ remove_to_favorites_form.hidden_tag() }}
-                    <h6 class="text-center">
-                        Are you sure you want to remove this item to Favorites?
-                    </h6>
-                    <br>
-                    <input id="remove_item" name="remove_item" type="hidden" value="{{ favorite.product_id }}">
-                    <div class="text-center">
-                        {{ remove_to_favorites_form.submit(class="btn btn-sm btn-outline-danger", style="color:white;") }}
-                    </div>
-                </form>
+               <form action="/content?req=remove" onsubmit="loading();" method="POST">
+                  {{ remove_to_favorites_form.hidden_tag() }}
+                  <h6 class="text-center">
+                     Are you sure you want to remove this item to Favorites?
+                  </h6>
+                  <br>
+                  <input id="remove_item" name="remove_item" type="hidden" value="{{ favorite.product_id }}">
+                  <div class="text-center">
+                     {{ remove_to_favorites_form.submit(class="btn-universal btn btn-sm btn-danger rounded-pill", style="color:white;") }}
+                  </div>
+               </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-outline-secondary" style="color:white;" data-dismiss="modal">Close</button>
+               <button type="button" class="btn btn-sm btn-secondary rounded-pill" style="color:white;" data-dismiss="modal">Close</button>
             </div>
-        </div>
-    </div>
-</div>
+         </div>
+      </div>
+   </div>
    {% endfor %}
-
-
 </div>
+{% endblock %}
+{% block javascripts_local %}
+  {{ super() }} {# to load the parent assets #}
+  <script>
+   const openBtn = document.querySelector('.open-btn');
+   const closeBtn = document.querySelector('.close-btn');
+   openBtn.addEventListener('click', function(e) {
+       e.preventDefault();
+       offcanvasMenu.classList.add('active');
+   });
+   
+   closeBtn.addEventListener('click', function (e) {
+       e.preventDefault();
+       offcanvasMenu.classList.remove('active');
+   });
+  </script>
 {% endblock %}

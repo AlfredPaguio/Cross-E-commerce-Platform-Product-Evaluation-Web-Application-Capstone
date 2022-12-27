@@ -3,36 +3,64 @@
 Account Page
 {% endblock %}
 {% block content %}
-<div class="container col-md-4 col-sm-12 p-4 mx-auto">
-   <h1 class="h3 mb-3 font-weight-normal text-center">
-      Account
-   </h1>
-   <h5>Username: {{ current_user.username }}</h5>
-   <h5>Email address: {{ maskedEmail }}</h5>
-   <p class="text-center">
-      <button class="btn btn-outline-primary btn-sm" style="color:white;" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-      Password
-      </button>
-   </p>
-   <div class="collapse" id="collapseExample">
-      <div class="">
-         <form method="POST" onsubmit="loading();" class="form-signin" style="color:white">
-            {{ change_password_form.hidden_tag() }}
+<div class="container-fluid">
+   <div class="row">
+      <div class="col"></div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 text-center px-5"
+         style="padding-top:calc(10px + 10vh); padding-bottom: calc(10px + 10vh);">
+         <h1 class="h3 mb-3 font-weight-normal text-center">
+            Account
+         </h1>
+         <h5 class="text-left">Username: {{ current_user.username }}</h5>
+         <h5 class="text-left">Email address: {{ maskedEmail }}</h5>
+         <p class="text-center">
+            <button class="btn-universal btn btn-primary btn-sm rounded-pill" style="color:white;" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            Password
+            </button>
+         </p>
+         <div class="collapse" id="collapseExample">
+            <div class="">
+               <form method="POST" onsubmit="loading();" class="form-signin fading" style="color:white">
 
-            {{ change_password_form.old_password.label() }}
-            {{ change_password_form.old_password(class="form-control mb-2", placeholder="Old Password") }}
+                  <div class="text-left" style="color:black;">
+                     {{ change_password_form.hidden_tag() }}
 
-            {{ change_password_form.new_password.label() }}
-            {{ change_password_form.new_password(class="form-control mb-2", placeholder="New Password (Requires a combination of uppercase, numbers, and special characters") }}
+                     {{ change_password_form.old_password.label() }}
+                     {{ change_password_form.old_password(class="password-input form-control mb-2", placeholder="Old Password") }}
 
-            {{ change_password_form.confirm_new_password.label() }}
-            {{ change_password_form.confirm_new_password(class="form-control mb-2", placeholder="Confirm New Password") }}
-            <input type="checkbox" onclick="password_show_account()"> Show Password <br>
-            <div class="checkbox mb-3 text-center mt-3">
-               {{ change_password_form.submit(class="btn btn-sm btn-outline-primary", style="color:white;") }}
+                     {{ change_password_form.new_password.label() }}
+                     {{ change_password_form.new_password(class="password-input form-control mb-2", placeholder="New Password (Requires a combination of uppercase, numbers, and special characters") }}
+
+                     {{ change_password_form.confirm_new_password.label() }}
+                     {{ change_password_form.confirm_new_password(class="password-input form-control mb-2", placeholder="Confirm New Password") }}
+
+                     <input type="checkbox" onclick="password_show()"> Show Password <br>
+                  </div>
+
+                  <div class="checkbox mb-3 text-center mt-3">
+                     {{ change_password_form.submit(class="btn-universal btn btn-sm btn-primary rounded-pill", style="color:white;") }}
+                  </div>
+               </form>
             </div>
-         </form>
+         </div>
       </div>
+      <div class="col"></div>
    </div>
 </div>
+{% endblock %}
+{% block javascripts_local %}
+  {{ super() }} {# to load the parent assets #}
+  <script>
+   function password_show() {
+      var passwordInputs = document.getElementsByClassName('password-input');
+      for (var i = 0; i < passwordInputs.length; i++) {
+        var input = passwordInputs[i];
+        if (input.type === "password") {
+          input.type = "text";
+        } else {
+          input.type = "password";
+        }
+      }
+    }
+  </script>
 {% endblock %}

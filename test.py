@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 service = Service(ChromeDriverManager().install())
 
-ua = UserAgent()
+# ua = UserAgent()
 # user_agent = ua.chrome
 mobile_user_agent = [
     'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.61 Mobile ' \
@@ -30,7 +30,7 @@ mobile_user_agent = [
     'Safari/537.36 '
 ]
 
-mobile_emulation = {"deviceName": "iPhone 12 Pro"}
+mobile_emulation = {"deviceName": "Nest Hub"}
 # mobile_emulation = {"deviceName": "Nest Hub"}
 
 options = webdriver.ChromeOptions()
@@ -42,7 +42,7 @@ options.add_argument('--disable-blink-features=AutomationControlled')
 options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
 options.add_experimental_option("mobileEmulation", mobile_emulation)
 options.add_experimental_option('useAutomationExtension', False)
-options.headless = True
+# options.headless = True
 
 capabilities = options.to_capabilities()
 
