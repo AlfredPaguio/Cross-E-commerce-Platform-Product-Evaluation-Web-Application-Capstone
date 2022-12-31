@@ -2,6 +2,7 @@ import random
 import time
 import json
 import os
+import base64
 # from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -50,7 +51,7 @@ class Webscraper:
 
         # emulate mobile view
         mobile_emulation = {"deviceName": "Nest Hub"}
-    
+
         # set chrome options
         options = webdriver.ChromeOptions()
         options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
@@ -69,7 +70,7 @@ class Webscraper:
         options.add_experimental_option("mobileEmulation", mobile_emulation)
         options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         options.add_experimental_option('useAutomationExtension', False)
-        options.headless = True
+        # options.headless = True
 
         capabilities = options.to_capabilities()
         # set webdriver
@@ -121,28 +122,31 @@ class Webscraper:
                 category_link = json_object['itemListElement'][1]['item']['@id']
 
         # Image
-        # prod_image_raw = self.driver.find_element(
-        #     By.CSS_SELECTOR,
-        #     'div[class="stardust-carousel"]'
-        # ).screenshot_as_png
-        #
-        # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
-
         try:
-            prod_image_ = soup.find('img', class_='product-carousel__item _1AkNaT')
+            prod_image_raw = self.driver.find_element(
+                By.CSS_SELECTOR,
+                'div[class="stardust-carousel__item-inner-wrapper"]'
+            ).screenshot_as_png
 
-            try:
-                prod_image = prod_image_['src']
-            except TypeError:
-                prod_image = url_for('static',filename='images/broken-image.png') 
-
+            prod_image = base64.b64encode(prod_image_raw).decode('utf-8')
         except AttributeError:
-            prod_image_ = soup.find('video', class_='product-video__video')
+            prod_image = url_for('static', filename='images/broken-image.png')
 
-            try:
-                prod_image = prod_image_['poster']
-            except TypeError:
-                prod_image = url_for('static',filename='images/broken-image.png') 
+        # try:
+        #     prod_image_ = soup.find('img', class_='product-carousel__item _1AkNaT')
+        #
+        #     try:
+        #         prod_image = prod_image_['src']
+        #     except TypeError:
+        #         prod_image = url_for('static',filename='images/broken-image.png')
+        #
+        # except AttributeError:
+        #     prod_image_ = soup.find('video', class_='product-video__video')
+        #
+        #     try:
+        #         prod_image = prod_image_['poster']
+        #     except TypeError:
+        #         prod_image = url_for('static',filename='images/broken-image.png')
 
         print('Getting product info: Success')
         return {
@@ -347,12 +351,15 @@ class Webscraper:
             prod_image_ = soup.find('div', class_='slick-slide slick-active').find('img')
             prod_image = prod_image_['src']
 
-        # prod_image_raw = self.driver.find_element(
-        #     By.CSS_SELECTOR,
-        #     'div[class="mod-pdp-item-gallery-inner"]'
-        # ).screenshot_as_png
+        # try:
+        #     prod_image_raw = self.driver.find_element(
+        #         By.CSS_SELECTOR,
+        #         'div[class="pdp-mod-gallery"]'
+        #     ).screenshot_as_png
         #
-        # prod_image_encoded = base64.b64encode(prod_image_raw).decode('utf-8')
+        #     prod_image = base64.b64encode(prod_image_raw).decode('utf-8')
+        # except AttributeError:
+        #     prod_image = url_for('static', filename='images/broken-image.png')
 
         print('Getting product info: Success')
         return {

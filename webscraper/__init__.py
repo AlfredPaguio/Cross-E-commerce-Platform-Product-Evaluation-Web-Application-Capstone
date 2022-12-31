@@ -5,10 +5,13 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 import os
+
 app = Flask(__name__)
 
 # database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rewrite_db3.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rewrite_db3.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db_base64.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mixed_db.db'
 # SQLAlchemy v1.4++ can't 'postgres' as it was depricated..
 # https://help.heroku.com/ZKNTJQSK/why-is-sqlalchemy-1-4-x-not-connecting-to-heroku-postgres
 # uri = os.getenv("DATABASE_URL")

@@ -36,7 +36,16 @@ Dashboard Page
                         {% for favorite in list_of_favorites %}
                         <div class="row border mb-3 rounded" style="width:300px">
                            <div class="col-4 mt-4">
+                              {% if favorite.product_image == '/static/images/broken-image.png' and favorite.target_website == 'Shopee' %}
+                                 <img class="img-fluid rounded" src="{{ favorite.product_image }}" alt="Broken Product Image">
+                              {% elif favorite.target_website == 'Lazada' %}
+                                 <img class="img-fluid rounded" src="{{ favorite.product_image }}" alt="Lazada Product Image">
+                              {% else%}
+                                  <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ favorite.product_image }}" alt="Shopee Product Image">
+                              {% endif %}
+                              <!--
                               <img class="img-fluid rounded" src="{{ favorite.product_image }}"  alt="Product Image">
+                              -->
                            </div>
                            <div class="col-8 mt-3 mb-3">
                               {% if favorite.target_website == 'Shopee' %}
@@ -266,7 +275,19 @@ Dashboard Page
                      <!-- Product Information -->
                      <div class="row">
                         <div class="col-6 mt-3" style="height: auto;">
+                           {% if prod.product_image == '/static/images/broken-image.png' and prod.target_website == 'Shopee' %}
+                              <img class="img-fluid rounded" src="{{ prod.product_image }}" alt="Broken Product Image">
+                           {% elif prod.target_website == 'Lazada' %}
+                              <img class="img-fluid rounded" src="{{ prod.product_image }}" alt="Lazada Product Image">
+                           {% else%}
+                               <img class="img-fluid rounded" src="data:image/jpeg;base64,{{ prod.product_image }}" alt="Shopee Product Image">
+                           {% endif %}
+                           <!--
+                           <img class="img-fluid rounded mx-auto d-block" src="data:image/jpeg;base64,{{ prod.product_image }}" height="300px;" alt="Product Image">
+                           -->
+                           <!--
                            <img class="img-fluid rounded mx-auto d-block" src="{{ prod.product_image }}" height="300px;" alt="Product Image">
+                           -->
                            <div class="mt-3 ml-2">
                               <small class="font-weight-bold">Chat Response Rate: {{ prod.shop_response_rate }}</small><br>
                               <small class="font-weight-bold">Shop Rating: {{ prod.shop_rating }}</small>
